@@ -1,0 +1,208 @@
+{% extends 'base.html' %}
+{% block content %}
+    {% load static %}
+    {% load custom_tags %}
+
+    <style>
+
+    .timing.available {
+    color: green !important;/* Or any color indicating availability */
+    cursor: pointer;
+}
+
+.timing.unavailable {
+    color: red !important; /* Or any color indicating unavailability */
+    cursor: not-allowed;
+}
+
+.past .timing{
+    color: #ccc !important;
+    pointer-events: none;
+    cursor: default;
+}
+
+.timing.available {
+    color: #4CAF50; /* Example: green color for available slots */
+}
+
+    </style>
+		<!-- Main Wrapper -->
+		<div class="main-wrapper">
+
+    <!-- Breadcrumb -->
+			<div class="breadcrumb-bar">
+				<div class="container-fluid">
+					<div class="row align-items-center">
+						<div class="col-md-12 col-12">
+							<nav aria-label="breadcrumb" class="page-breadcrumb">
+								<ol class="breadcrumb">
+									<li class="breadcrumb-item"><a href="index-2.html">Home</a></li>
+									<li class="breadcrumb-item active" aria-current="page">Booking</li>
+								</ol>
+							</nav>
+							<h2 class="breadcrumb-title">Booking</h2>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- /Breadcrumb -->
+
+			<!-- Page Content -->
+			<div class="content">
+				<div class="container">
+
+					<div class="row">
+						<div class="col-12">
+
+							<div class="card">
+								<div class="card-body">
+									<div class="booking-doc-info">
+										<a href="doctor-profile.html" class="booking-doc-img">
+										<img src="{% if doctor.user.userprofile.profile_picture %}{{ doctor.user.userprofile.profile_picture.url }}{% else %}{% endif %}" class="img-fluid" alt="User Image">
+										</a>
+										<div class="booking-info">
+											<h4><a href="doctor-profile.html">Dr. {{ doctor.user.first_name }} {{ doctor.user.last_name }}</a></h4>
+											<p class="text-muted mb-0"><i class="fas fa-map-marker-alt"></i> {{ doctor.user.userprofile.address }}</p>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<!-- Schedule Widget -->
+<div class="card booking-schedule schedule-widget">
+
+    <!-- Schedule Header -->
+    <div class="schedule-header">
+        <div class="row">
+            <div class="col-md-12">
+
+                <!-- Day Slot -->
+                <div class="day-slot">
+                    <ul>
+
+                        {% for date in week_dates %}
+                            <li>
+                                <span>{{ date|date:"D" }}</span>
+                                <span class="slot-date">{{ date|date:"d M" }} <small class="slot-year">{{ date|date:"Y" }}</small></span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <!-- /Day Slot -->
+
+            </div>
+        </div>
+    </div>
+    <!-- /Schedule Header -->
+
+    <!-- Schedule Content -->
+<div class="schedule-cont">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="time-slot">
+                <ul class="clearfix">
+                    {% with today=now|date:"Y-m-d" %}
+{% for date in week_dates %}
+<li class="{% if date|date:'Y-m-d' < current_date %}past{% else %}current{% endif %}">
+    <div class="day-column">
+        <div class="day-slots">
+            {% with day_name=date|date:"l"|lower %}
+            {% with day_slots=time_slots|get_item:day_name %}
+            {% for entry in day_slots %}
+                {% if entry.is_booked %}
+                    <div class="timing booked">
+                        <span>{{ entry.slot.start_time|date:"g:i A" }}</span> -
+                        <span>{{ entry.slot.end_time|date:"g:i A" }}</span> (Unavailable)
+                    </div>
+                {% else %}
+                    <a class="timing available" href="#appointmentModal" data-toggle="modal" data-time-slot-id="{{ entry.slot.id }}" data-doctor-id="{{ doctor.id }}" data-appointment-date="{{ date|date:'Y-m-d' }}">
+                        <span>{{ entry.slot.start_time|date:"g:i A" }}</span> -
+                        <span>{{ entry.slot.end_time|date:"g:i A" }}</span>
+                    </a>
+                {% endif %}
+            {% empty %}
+                <div class="timing">No slots available</div>
+            {% endfor %}
+            {% endwith %}
+            {% endwith %}
+        </div>
+    </div>
+</li>
+{% endfor %}
+
+                    {% endwith %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Schedule Content -->
+
+
+</div>
+<!-- /Schedule Widget -->
+</div>
+
+
+						</div>
+					</div>
+				</div>
+
+			</div>
+			<!-- /Page Content -->
+        </div>
+    <!-- Modal for Booking Appointment -->
+<div class="modal fade" id="appointmentModal" tabindex="-1" role="dialog" aria-labelledby="appointmentModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="appointmentModalLabel">Book Appointment</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="{% url 'book_appointment' %}" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <input type="hidden" name="doctor_id" id="modal-doctor-id">
+                    <input type="hidden" name="time_slot_id" id="modal-time-slot-id">
+                    <input type="hidden" name="appointment_date" id="modal-appointment-date">
+                    <div class="form-group">
+                        <label for="appointment_type">Appointment Type:</label>
+                        <select name="appointment_type" id="appointment_type" class="form-control">
+                            <option value="followup">Follow Up</option>
+                            <option value="checkup">Check Up</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Message (optional):</label>
+                        <textarea name="message" id="message" class="form-control"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="image">Upload Image (optional):</label>
+                        <input type="file" name="image_upload" id="image_upload" class="form-control">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Book Appointment</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+$(document).ready(function() {
+    $('.timing').click(function() {
+        var timeSlotId = $(this).data('time-slot-id');
+        console.log(timeSlotId);
+        var doctorId = $(this).data('doctor-id');
+        var appointmentDate = $(this).data('appointment-date');
+        $('#modal-time-slot-id').val(timeSlotId);
+        $('#modal-doctor-id').val(doctorId);
+        $('#modal-appointment-date').val(appointmentDate);
+    });
+});
+</script>
+
+{% endblock %}
