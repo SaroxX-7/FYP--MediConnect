@@ -1,0 +1,47 @@
+{% extends "dashboard/base.html" %}
+{% block content %}
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+  <h2 class="mb-0">Bookings</h2>
+  <form method="get" class="d-flex gap-2">
+    <input class="form-control" style="min-width:220px" name="q" value="{{ q }}" placeholder="Search by user/doctor">
+    <button class="btn btn-outline-dark" type="submit">Search</button>
+  </form>
+</div>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-striped table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>User</th>
+          <th>Doctor</th>
+          <th>Date</th>
+          <th>Slot</th>
+          <th>Created</th>
+          <th class="text-end">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for b in page.object_list %}
+          <tr>
+            <td>{{ b.id }}</td>
+            <td>{{ b.user.email }}</td>
+            <td>{{ b.time_slot.doctor.user.email }}</td>
+            <td>{{ b.date }}</td>
+            <td>{{ b.time_slot.day }} {{ b.time_slot.start_time }}-{{ b.time_slot.end_time }}</td>
+            <td>{{ b.created_at }}</td>
+            <td class="text-end">
+              <a class="btn btn-sm btn-outline-danger" href="{% url 'dashboard:booking_delete' b.id %}">Delete</a>
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="7" class="text-center text-muted p-4">No bookings.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% include "dashboard/pagination.html" with page=page q=q %}
+{% endblock %}

@@ -20,26 +20,37 @@ class UserForm(forms.ModelForm):
             raise forms.ValidationError(
                 "Password does not match!"
             )
-
+# attrs={'placeholder': 'Start typing...', 'required': 'required'}
 
 class UserProfileForm(forms.ModelForm):
-    address = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Start typing...', 'required': 'required'}))
+    address = forms.CharField(
+        widget=forms.TextInput(attrs={
+            'placeholder': 'Enter your full address',
+            'class': 'form-control',  # Explicitly add form-control class
+            'id': 'my_address_field'
+        }),
+        required=False
+    )
     profile_picture = forms.FileField(widget=forms.FileInput(attrs={'class': 'btn btn-info'}),
                                       validators=[allow_only_images_validator])
 
 
-    latitude = forms.CharField(widget=forms.TextInput(attrs={'readonly': 'readonly'}))
-    longitude = forms.CharField(widget=forms.TextInput(attrs={'readonly': 'readonly'}))
+    
     class Meta:
         model = UserProfile
-        fields = ['profile_picture', 'date_of_birth', 'gender', 'blood_group', 'address', 'country', 'state', 'city', 'pin_code', 'latitude',
-                  'longitude']
+        fields = ['profile_picture', 'date_of_birth', 'gender', 'blood_group', 'address', 'country', 'state', 'city', 'pin_code',]
+        widgets = {
+            'address': forms.TextInput(attrs={  # Define again in Meta
+                'class': 'form-control',
+                'placeholder': 'Enter your full address',
+                'id': 'my_address_field'
+            }),
+           
+        }
+                  
 
     def __init__(self, *args, **kwargs):
         super(UserProfileForm, self).__init__(*args, **kwargs)
-        for field in self.fields:
-            if field == 'latitude' or field == 'longitude':
-                self.fields[field].widget.attrs['readonly'] = 'readonly'
 
 class UserInfoForm(forms.ModelForm):
     class Meta:

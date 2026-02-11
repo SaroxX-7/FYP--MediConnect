@@ -1,0 +1,45 @@
+{% extends "dashboard/base.html" %}
+{% block content %}
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+  <h2 class="mb-0">User Profiles</h2>
+  <form method="get" class="d-flex gap-2">
+    <input class="form-control" style="min-width:220px" name="q" value="{{ q }}" placeholder="Search by email/city">
+    <button class="btn btn-outline-dark" type="submit">Search</button>
+  </form>
+</div>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-striped table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>User</th>
+          <th>Gender</th>
+          <th>City</th>
+          <th>Phone</th>
+          <th class="text-end">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in page.object_list %}
+          <tr>
+            <td>{{ p.id }}</td>
+            <td>{{ p.user.email }}</td>
+            <td>{{ p.gender|default:"-" }}</td>
+            <td>{{ p.city|default:"-" }}</td>
+            <td>{{ p.phone_number|default:"-" }}</td>
+            <td class="text-end">
+              <a class="btn btn-sm btn-outline-dark" href="{% url 'dashboard:profile_edit' p.id %}">Edit</a>
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="6" class="text-center text-muted p-4">No profiles.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% include "dashboard/pagination.html" with page=page q=q %}
+{% endblock %}

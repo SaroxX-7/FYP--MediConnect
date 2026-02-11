@@ -1,0 +1,15 @@
+{% extends "dashboard/base.html" %}
+{% block content %}
+<h2 class="mb-3">{{ title }}</h2>
+<div class="card">
+  <div class="card-body">
+    <p>Are you sure you want to delete:</p>
+    <pre class="bg-light p-3 rounded">{{ object }}</pre>
+    <form method="post">
+      {% csrf_token %}
+      <a class="btn btn-outline-secondary" href="javascript:history.back()">Cancel</a>
+      <button class="btn btn-danger" type="submit">Delete</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

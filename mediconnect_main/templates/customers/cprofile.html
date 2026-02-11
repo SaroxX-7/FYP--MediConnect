@@ -42,17 +42,29 @@
                                                         <img id="profilePicture" src="{% if user_profile.profile_picture %}{{ user_profile.profile_picture.url }}{% else %}{% static 'img/patients/patient.jpg' %}{% endif %}" alt="Profile Picture">
 														</div>
 														<div class="upload-img">
-                                                            <div class="change-photo-btn">
-                                                                <span><i class="fa fa-upload"></i> Upload Photo</span>
-                                                                <!-- Hidden original input -->
-                                                                <div style="display: none;">
-                                                                    {{profile_form.profile_picture}}
-                                                                </div>
-                                                                <!-- Custom file input trigger -->
-                                                                <input type="file" class="upload" style="display: none;">
-                                                            </div>
-                                                            <small class="form-text text-muted">Allowed JPG, GIF or PNG. Max size of 2MB</small>
-                                                        </div>
+    <div class="change-photo-btn">
+        <label for="id_profile_picture" style="cursor: pointer; margin-bottom: 0; display: inline-block; width: 100%;">
+            <span><i class="fa fa-upload"></i> Upload Photo</span>
+        </label>
+        <!-- Hidden original input - remove the div wrapper -->
+        {{profile_form.profile_picture}}
+        <!-- Completely remove this custom file input trigger -->
+    </div>
+    <small class="form-text text-muted">Allowed JPG, GIF or PNG. Max size of 2MB</small>
+</div>
+<style>
+/* This specific selector ensures ONLY the profile picture input is affected */
+.upload-img input[name="profile_picture"] {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    border: 0 !important;
+}
+</style>
 													</div>
 												</div>
 											</div>
@@ -128,14 +140,14 @@
                                                 </div>
 											</div>
 											<div class="col-12">
-												<div class="form-group">
-													<label>Address</label>
-                                                    <input type="text" class="form-control" name="address" id="id_address" {% if profile_form.address.value %} value="{{ profile_form.address.value }}" {% else%}value="" {% endif %}>
-												    {% if profile_form.address.errors %}
-                                                        <div class="error">{{ profile_form.address.errors.as_text }}</div>
-                                                    {% endif %}
-                                                </div>
-											</div>
+    <div class="form-group">
+        <label>Address</label>
+        {{ profile_form.address }}
+        {% if profile_form.address.errors %}
+            <div class="error">{{ profile_form.address.errors.as_text }}</div>
+        {% endif %}
+    </div>
+</div>
 											<div class="col-12 col-md-6">
 												<div class="form-group">
 													<label>City</label>
@@ -172,25 +184,7 @@
                                                     {% endif %}
                                                 </div>
 											</div>
-                                        <div class="col-12 col-md-6">
-												<div class="form-group">
-													<label>Latitude</label>
-                                                    <input type="text" class="form-control" name="latitude" id="id_latitude" {% if profile_form.latitude.value %} value="{{ profile_form.latitude.value }}" {% else%}value="" {% endif %}>
-												    {% if profile_form.latitude.errors %}
-                                                        <div class="error">{{ profile_form.latitude.errors.as_text }}</div>
-                                                    {% endif %}
-                                                </div>
-											</div>
-                                        <div class="col-12 col-md-6">
-												<div class="form-group">
-													<label>Longitude</label>
-                                                    <input type="text" class="form-control" name="longitude" id="id_longitude" {% if profile_form.longitude.value %} value="{{ profile_form.longitude.value }}" {% else%}value="" {% endif %}>
-												    {% if profile_form.longitude.errors %}
-                                                        <div class="error">{{ profile_form.longitude.errors.as_text }}</div>
-                                                    {% endif %}
-                                                </div>
-											</div>
-										</div>
+                                        
 										<div class="submit-section">
 											<button type="submit" class="btn btn-primary submit-btn">Save Changes</button>
 										</div>
@@ -207,26 +201,40 @@
 			<!-- /Page Content -->
 
 <script>
-document.querySelector('.change-photo-btn span').addEventListener('click', function() {
-    // Trigger the original input
-    document.querySelector('.upload-img input[type="file"]').click();
-});
-
-document.querySelector('.upload-img input[type="file"]').addEventListener('change', function() {
-    // Handle file selection UI feedback here, if needed
-    var fileName = this.files[0].name;
-    document.querySelector('.change-photo-btn span').textContent = fileName; // Example UI feedback
-
-    // Update the profile picture in the UI instantly
-    if (this.files && this.files[0]) {
-        var reader = new FileReader();
-
-        reader.onload = function(e) {
-            document.getElementById('profilePicture').src = e.target.result;
-        };
-
-        reader.readAsDataURL(this.files[0]);
-    }
+	document.getElementById('id_address').removeAttribute('disabled');
+document.getElementById('id_address').classList.remove('pac-target-input', 'gm-err-autocomplete');
+document.getElementById('id_address').style.backgroundImage = 'none';
+document.addEventListener('DOMContentLoaded', function() {
+    // Get the actual Django form field
+    const djangoFileInput = document.getElementById('id_profile_picture');
+    const uploadButton = document.querySelector('.change-photo-btn span');
+    const profileImage = document.getElementById('profilePicture');
+    
+    // Store original button text
+    const originalButtonText = uploadButton.innerHTML;
+    
+    // When upload button is clicked, trigger Django file input
+    uploadButton.addEventListener('click', function() {
+        djangoFileInput.click();
+    });
+    
+    // When file is selected
+    djangoFileInput.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+            // Show filename but keep the icon
+            uploadButton.innerHTML = '<i class="fa fa-upload"></i> ' + this.files[0].name;
+            
+            // Preview image
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                profileImage.src = e.target.result;
+            }
+            reader.readAsDataURL(this.files[0]);
+        } else {
+            // Reset if no file selected
+            uploadButton.innerHTML = originalButtonText;
+        }
+    });
 });
 </script>
 

@@ -1,0 +1,36 @@
+{% extends "dashboard/base.html" %}
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <div>
+    <h2 class="mb-0">{{ title }}</h2>
+    {% if subtitle %}<div class="text-muted">{{ subtitle }}</div>{% endif %}
+  </div>
+  <a class="btn btn-outline-secondary" href="javascript:history.back()">Back</a>
+</div>
+
+<form method="post" enctype="multipart/form-data" class="card">
+  <div class="card-body">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    {% for field in form %}
+      <div class="mb-3">
+        <label class="form-label">{{ field.label }}</label>
+        {{ field }}
+        {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+        <div class="text-danger small">{{ field.errors }}</div>
+      </div>
+    {% endfor %}
+
+    {% if show_password %}
+      <div class="mb-3">
+        <label class="form-label">Password (optional)</label>
+        <input class="form-control" type="text" name="password" placeholder="Leave blank to keep unchanged">
+        <div class="form-text">For new users, if blank it will be set to <code>ChangeMe123!</code>.</div>
+      </div>
+    {% endif %}
+  </div>
+  <div class="card-footer d-flex justify-content-end gap-2">
+    <button class="btn btn-dark" type="submit">Save</button>
+  </div>
+</form>
+{% endblock %}

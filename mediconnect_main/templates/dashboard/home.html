@@ -1,0 +1,66 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Dashboard - MediConnect{% endblock %}
+{% block content %}
+<h2 class="mb-4">Dashboard</h2>
+
+<div class="row g-3">
+  <div class="col-12 col-md-4">
+    <div class="card">
+      <div class="card-body">
+        <div class="text-muted">Users</div>
+        <div class="display-6">{{ user_count }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-md-4">
+    <div class="card">
+      <div class="card-body">
+        <div class="text-muted">Doctors</div>
+        <div class="display-6">{{ doctor_count }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-md-4">
+    <div class="card">
+      <div class="card-body">
+        <div class="text-muted">Patients</div>
+        <div class="display-6">{{ patient_count }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-md-4">
+    <div class="card">
+      <div class="card-body">
+        <div class="text-muted">Departments</div>
+        <div class="display-6">{{ department_count }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-md-4">
+    <div class="card">
+      <div class="card-body">
+        <div class="text-muted">Diseases</div>
+        <div class="display-6">{{ disease_count }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-md-4">
+    <div class="card">
+      <div class="card-body">
+        <div class="text-muted">Time Slots</div>
+        <div class="display-6">{{ timeslot_count }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="text-muted">Bookings</div>
+        <div class="display-6">{{ booking_count }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
