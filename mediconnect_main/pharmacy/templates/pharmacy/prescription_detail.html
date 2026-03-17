@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="breadcrumb-bar">
+  <div class="container-fluid">
+    <div class="row align-items-center">
+      <div class="col-md-12 col-12">
+        <h2 class="breadcrumb-title">Prescription #{{ rx.id }}</h2>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex justify-content-between">
+              <div>
+                <p class="mb-1"><strong>Patient:</strong> {{ rx.patient.first_name }} {{ rx.patient.last_name }} ({{ rx.patient.email }})</p>
+                <p class="mb-1"><strong>Doctor:</strong> {{ rx.doctor.user.first_name }} {{ rx.doctor.user.last_name }}</p>
+                <p class="mb-1"><strong>Status:</strong> {{ rx.get_status_display }}</p>
+              </div>
+              <div>
+                {% if rx.status != 'dispensed' %}
+                  <a class="btn btn-success" href="{% url 'dispense_prescription' rx.id %}"><i class="fas fa-check"></i> Dispense</a>
+                {% endif %}
+                <a class="btn btn-secondary" href="{% url 'pharmacist_dashboard' %}">Back</a>
+              </div>
+            </div>
+            <hr>
+            <p><strong>Notes:</strong> {{ rx.notes|default:"-" }}</p>
+
+            <div class="table-responsive mt-3">
+              <table class="table table-hover mb-0">
+                <thead>
+                  <tr>
+                    <th>Medicine</th>
+                    <th>Dosage</th>
+                    <th>Frequency</th>
+                    <th>Duration (days)</th>
+                    <th>Qty</th>
+                    <th>Instructions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for item in rx.items.all %}
+                    <tr>
+                      <td>{{ item.medicine }}</td>
+                      <td>{{ item.dosage|default:"-" }}</td>
+                      <td>{{ item.frequency|default:"-" }}</td>
+                      <td>{{ item.duration_days }}</td>
+                      <td>{{ item.quantity }}</td>
+                      <td>{{ item.instructions|default:"-" }}</td>
+                    </tr>
+                  {% empty %}
+                    <tr><td colspan="6">No items.</td></tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

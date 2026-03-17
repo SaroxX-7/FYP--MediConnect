@@ -1,109 +1,137 @@
 {% extends 'base.html' %}
 {% block content %}
-    {% load static %}
-    <!-- Page Content -->
-			<div class="content">
-				<div class="container-fluid">
+{% load static %}
 
-					<div class="row">
+<div class="content">
+    <div class="container-fluid">
 
-						{% include 'includes/c_sidebar.html' %}
+        <div class="row">
 
-						<div class="col-md-7 col-lg-8 col-xl-9">
-							<div class="card">
-								<div class="card-body pt-0">
+            {% include 'includes/c_sidebar.html' %}
 
+            <div class="col-md-7 col-lg-8 col-xl-9">
+                <div class="card">
+                    <div class="card-body pt-0">
 
+                        <div class="tab-content pt-0">
 
-									<!-- Tab Content -->
-									<div class="tab-content pt-0">
+                            <!-- Appointment Tab -->
+                            <div id="pat_appointments" class="tab-pane fade show active">
+                                <div class="card card-table mb-0">
+                                    <div class="card-body">
+                                        <div class="table-responsive">
 
-										<!-- Appointment Tab -->
-										<div id="pat_appointments" class="tab-pane fade show active">
-											<div class="card card-table mb-0">
-												<div class="card-body">
-													<div class="table-responsive">
-                                                        <table class="table table-hover table-center mb-0">
-    <thead>
-        <tr>
-            <th>Doctor Name</th>
-            <th>Appt Date/Time</th>
-            <th>Type</th>
-            <th>Status</th> <!-- New column for appointment status -->
-            <th class = "text-center">Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for appointment in appointments %}
-        <tr>
-            <td>
-                <h2 class="table-avatar">
-                    <a href="" class="avatar avatar-sm mr-2">
+                                            <table class="table table-hover table-center mb-0">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Doctor Name</th>
+                                                        <th>Get Connected</th>
+                                                        <th>Appt Date/Time</th>
+                                                        <th>Type</th>
+                                                        <th>Status</th>
+                                                        <th class="text-center">Actions</th>
+                                                    </tr>
+                                                </thead>
 
-                        <img class="avatar-img rounded-circle" src="{% if appointment.doctor.user.userprofile.profile_picture %}{{ appointment.doctor.user.userprofile.profile_picture.url }}{% else %}{% static 'img/favicon.png' %}{% endif %}" alt="User Image">
-                    </a>
-                    <a href="">
-                        Dr. {{ appointment.doctor.user.first_name }} {{ appointment.doctor.user.last_name }}
-                    </a>
-                </h2>
-            </td>
-            <td>
-                {{ appointment.appointment_date|date:"d M Y" }}
-                <span class="d-block text-info">{{ appointment.time_slot.start_time|date:"g:i A" }}</span>
-            </td>
-            <td>{{ appointment.get_appointment_type_display }}</td>
-            <td>
-                {% if appointment.appointment_status == "pending" %}<span class="badge badge-pill bg-warning-light">
-                {% elif appointment.appointment_status == "confirmed" %}<span class="badge badge-pill bg-success-light">
-                {% elif appointment.appointment_status == "cancelled" %}<span class="badge badge-pill bg-danger-light">
-                {% endif %}
+                                                <tbody>
+                                                    {% for appointment in appointments %}
+                                                    <tr>
+                                                        <!-- Doctor Info -->
+                                                        <td>
+                                                            <h2 class="table-avatar">
+                                                                <a href="#" class="avatar avatar-sm mr-2">
+                                                                    <img
+                                                                        class="avatar-img rounded-circle"
+                                                                        src="{% if appointment.doctor.user.userprofile.profile_picture %}{{ appointment.doctor.user.userprofile.profile_picture.url }}{% else %}{% static 'img/favicon.png' %}{% endif %}"
+                                                                        alt="Doctor Image"
+                                                                    >
+                                                                </a>
+                                                                <a href="#">
+                                                                    Dr. {{ appointment.doctor.user.first_name }} {{ appointment.doctor.user.last_name }}
+                                                                </a>
+                                                            </h2>
+                                                        </td>
 
-                    {{ appointment.get_appointment_status_display }}</span></td> <!-- Displaying the appointment status -->
-            <td class="text-right">
-                <div class="table-action">
-                    <a href="{% url 'appointment_details' appointment_id=appointment.id %}" class="btn btn-sm bg-info-light">
-                        <i class="far fa-eye"></i> View
-                    </a>
+                                                        <!-- Get Connected -->
+                                                        <td>
+                                                            {% if appointment.doctor.user.phone_number %}
+                                                                <a
+                                                                    href="https://wa.me/{{ appointment.doctor.user.phone_number|cut:'+'|cut:' ' }}?text=Hello%20Dr.%20{{ appointment.doctor.user.first_name }}%20{{ appointment.doctor.user.last_name }},%20I%20am%20{{ request.user.first_name }}%20{{ request.user.last_name }}%20regarding%20my%20appointment%20on%20{{ appointment.appointment_date|date:'d%20M%20Y' }}."
+                                                                    target="_blank"
+                                                                    style="color:#25D366;font-weight:600;"
+                                                                >
+                                                                    <i class="fab fa-whatsapp"></i>
+                                                                    {{ appointment.doctor.user.phone_number }}
+                                                                </a>
+                                                            {% else %}
+                                                                N/A
+                                                            {% endif %}
+                                                        </td>
 
-                    {% comment %}{% if appointment.appointment_status != 'confirmed' %} <!-- Conditionally display the accept button -->
-                        <a href="{% url 'accept_appointment' appointment_id=appointment.id %}" class="btn btn-sm bg-success-light">
-                            <i class="fas fa-check"></i> Accept
-                        </a>
-                    {% endif %}
+                                                        <!-- Appointment Date and Time -->
+                                                        <td>
+                                                            {{ appointment.appointment_date|date:"d M Y" }}
+                                                            <span class="d-block text-info">
+                                                                {{ appointment.time_slot.start_time|date:"g:i A" }}
+                                                            </span>
+                                                        </td>
 
-                {% if appointment.appointment_status != 'cancelled' %} <!-- Conditionally display the accept button -->
-                    <a href="{% url 'reject_appointment' appointment_id=appointment.id %}" class="btn btn-sm bg-danger-light">
-                        <i class="fas fa-times"></i> Cancel
-                    </a>
-                {% endif %}{% endcomment %}
+                                                        <!-- Appointment Type -->
+                                                        <td>{{ appointment.get_appointment_type_display }}</td>
+
+                                                        <!-- Appointment Status -->
+                                                        <td>
+                                                            {% if appointment.appointment_status == "pending" %}
+                                                                <span class="badge badge-pill bg-warning-light">
+                                                                    {{ appointment.get_appointment_status_display }}
+                                                                </span>
+                                                            {% elif appointment.appointment_status == "confirmed" %}
+                                                                <span class="badge badge-pill bg-success-light">
+                                                                    {{ appointment.get_appointment_status_display }}
+                                                                </span>
+                                                            {% elif appointment.appointment_status == "cancelled" %}
+                                                                <span class="badge badge-pill bg-danger-light">
+                                                                    {{ appointment.get_appointment_status_display }}
+                                                                </span>
+                                                            {% else %}
+                                                                <span class="badge badge-pill bg-secondary-light">
+                                                                    {{ appointment.get_appointment_status_display }}
+                                                                </span>
+                                                            {% endif %}
+                                                        </td>
+
+                                                        <!-- Actions -->
+                                                        <td class="text-right">
+                                                            <div class="table-action">
+                                                                <a href="{% url 'appointment_details' appointment_id=appointment.id %}" class="btn btn-sm bg-info-light">
+                                                                    <i class="far fa-eye"></i> View
+                                                                </a>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+
+                                                    {% empty %}
+                                                    <tr>
+                                                        <td colspan="6">No appointments available</td>
+                                                    </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- /Appointment Tab -->
+
+                        </div>
+
+                    </div>
                 </div>
+            </div>
+        </div>
 
-            </td>
-        </tr>
-        {% empty %}
-        <tr>
-            <td colspan="5">No appointments available</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-													</div>
-												</div>
-											</div>
-										</div>
-										<!-- /Appointment Tab -->
+    </div>
+</div>
 
-
-									</div>
-									<!-- Tab Content -->
-
-								</div>
-							</div>
-						</div>
-					</div>
-
-				</div>
-
-			</div>
-			<!-- /Page Content -->
 {% endblock %}

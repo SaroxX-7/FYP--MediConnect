@@ -21,6 +21,8 @@ from django.contrib.gis.geos import Point
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.measure import D # ``D`` is a shortcut for ``Distance``
 from django.contrib.gis.db.models.functions import Distance
+from appointment.models import Appointment, Remark, RemarkMedicine
+
 
 
 @login_required(login_url='login')
@@ -217,9 +219,9 @@ from django.db.models import Q
 
 def search_doctors(request):
     query = request.GET.get('query', '')
-    latitude = request.GET.get('lat', '')
-    longitude = request.GET.get('lng', '')
-    radius = request.GET.get('radius', '')
+    # latitude = request.GET.get('lat', '')
+    # longitude = request.GET.get('lng', '')
+    # radius = request.GET.get('radius', '')
 
     # First, determine if there are any specific diseases or departments being queried
     disease = Disease.objects.filter(name__iexact=query).first()
@@ -419,8 +421,28 @@ def available_appointment(request, doctor_id, start_date=None):
 
 
 def appointment_details(request, appointment_id):
-    appointment = get_object_or_404(Appointment, pk=appointment_id)
-    return render(request, 'customers/appointment_details.html', {'appointment': appointment})
+    appointment = get_object_or_404(
+        Appointment.objects.select_related(
+            'doctor',
+            'patient',
+            'time_slot'
+        ).prefetch_related(
+            Prefetch(
+                'remarks',
+                queryset=Remark.objects.select_related('doctor').prefetch_related(
+                    Prefetch(
+                        'medicines',
+                        queryset=RemarkMedicine.objects.select_related('medicine')
+                    )
+                ).order_by('-created_at')
+            )
+        ),
+        pk=appointment_id
+    )
+
+    return render(request, 'customers/appointment_details.html', {
+        'appointment': appointment,
+    })
 
 def searchByLocation(request):
     if not 'address' in request.GET:

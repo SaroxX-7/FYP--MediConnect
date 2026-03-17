@@ -1,83 +1,223 @@
 {% extends 'base.html' %}
 {% block content %}
-    {% load static %}
+{% load static %}
 
+<style>
+    body {
+        font-family: Arial, sans-serif;
+    }
 
-    <style>
-        body { font-family: Arial, sans-serif; }
-        .invoice-box {
-            max-width: 800px;
-            margin: auto;
-            padding: 30px;
-            border: 1px solid #eee;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
-            font-size: 16px;
-            line-height: 24px;
-            color: #555;
-        }
-        .header {
-            color: #333;
-            font-size: 24px;
-            font-weight: bold;
-        }
-        .details {
-            margin-top: 20px;
-        }
-        .details th {
-            text-align: left;
-            padding-top: 8px;
-            padding-bottom: 8px;
-        }
-        .details td {
-            padding-top: 8px;
-            padding-bottom: 8px;
-        }
-    </style>
+    .invoice-box {
+        max-width: 900px;
+        margin: auto;
+        padding: 30px;
+        border: 1px solid #eee;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+        font-size: 16px;
+        line-height: 24px;
+        color: #555;
+        background: #fff;
+    }
 
-    <div class="invoice-box">
-        <div class="header">Appointment Details</div>
-        <table class="details">
-            <tr>
-                <th>Appointment ID:</th>
-                <td>{{ appointment.id }}</td>
-            </tr>
-            <tr>
-                <th>Doctor:</th>
-                <td>Dr. {{ appointment.doctor.user.first_name }} {{  appointment.doctor.user.last_name}}</td>
-            </tr>
-            <tr>
-                <th>Patient:</th>
-                <td>{{ appointment.patient.username }}</td>
-            </tr>
-            <tr>
-                <th>Appointment Type:</th>
-                <td>{{ appointment.appointment_type }}</td>
-            </tr>
-            <tr>
-                <th>Status:</th>
-                <td>{{ appointment.appointment_status }}</td>
-            </tr>
-            <tr>
-                <th>Appointment Time:</th>
-                <td>{{ appointment.appointment_date }} at {{ appointment.time_slot.start_time|date:"H:i" }}</td>
-            </tr>
-            <tr>
-                <th>Message:</th>
-                <td>{{ appointment.message }}</td>
-            </tr>
-            <tr>
+    .header {
+        color: #333;
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 20px;
+    }
+
+    .section-title {
+        margin-top: 30px;
+        margin-bottom: 10px;
+        font-size: 20px;
+        font-weight: bold;
+        color: #222;
+        border-bottom: 2px solid #eee;
+        padding-bottom: 8px;
+    }
+
+    .details {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .details th {
+        text-align: left;
+        padding: 10px 8px;
+        width: 220px;
+        vertical-align: top;
+        color: #333;
+    }
+
+    .details td {
+        padding: 10px 8px;
+        vertical-align: top;
+    }
+
+    .remark-box {
+        border: 1px solid #e5e5e5;
+        padding: 18px;
+        margin-top: 20px;
+        border-radius: 8px;
+        background: #fafafa;
+    }
+
+    .medicine-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+    }
+
+    .medicine-table th,
+    .medicine-table td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: left;
+        vertical-align: top;
+    }
+
+    .medicine-table th {
+        background-color: #f5f5f5;
+        color: #333;
+    }
+
+    .empty-text {
+        color: #888;
+        font-style: italic;
+        margin-top: 10px;
+    }
+
+    .preview-image {
+        width: 100px;
+        height: 100px;
+        cursor: pointer;
+        object-fit: cover;
+        border-radius: 6px;
+        border: 1px solid #ddd;
+    }
+</style>
+
+<div class="invoice-box">
+    <div class="header">Appointment Details</div>
+
+    <div class="section-title">Basic Information</div>
+    <table class="details">
+        <tr>
+            <th>Appointment ID:</th>
+            <td>{{ appointment.id }}</td>
+        </tr>
+        <tr>
+            <th>Doctor:</th>
+            <td>Dr. {{ appointment.doctor.user.first_name }} {{ appointment.doctor.user.last_name }}</td>
+        </tr>
+        <tr>
+            <th>Patient:</th>
+            <td>{{ appointment.patient.username }}</td>
+        </tr>
+        <tr>
+            <th>Appointment Type:</th>
+            <td>{{ appointment.appointment_type }}</td>
+        </tr>
+        <tr>
+            <th>Status:</th>
+            <td>{{ appointment.appointment_status }}</td>
+        </tr>
+        <tr>
+            <th>Appointment Time:</th>
+            <td>{{ appointment.appointment_date }} at {{ appointment.time_slot.start_time|time:"H:i" }}</td>
+        </tr>
+        <tr>
+            <th>Message:</th>
+            <td>{{ appointment.message|default:"-" }}</td>
+        </tr>
+
         {% if appointment.image_upload %}
-        <td colspan="2" style="text-align: center;">
-            <img src="{{ appointment.image_upload.url }}" id="image-preview" style="width: 100px; height: 100px; cursor: pointer;" alt="View Image">
-        </td>
+        <tr>
+            <th>Uploaded Image:</th>
+            <td>
+                <img src="{{ appointment.image_upload.url }}" id="image-preview" class="preview-image" alt="View Image">
+            </td>
+        </tr>
         {% endif %}
-    </tr>
-        </table>
-    </div>
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var viewer;
-        var image = document.getElementById('image-preview');
+    </table>
+
+    <div class="section-title">Doctor Remarks</div>
+
+    {% for remark in appointment.remarks.all %}
+        <div class="remark-box">
+            <table class="details">
+                <tr>
+                    <th>Doctor:</th>
+                    <td>Dr. {{ remark.doctor.user.first_name }} {{ remark.doctor.user.last_name }}</td>
+                </tr>
+                <tr>
+                    <th>Diagnosis:</th>
+                    <td>{{ remark.diagnosis|default:"-" }}</td>
+                </tr>
+                <tr>
+                    <th>Symptoms:</th>
+                    <td>{{ remark.symptoms|default:"-" }}</td>
+                </tr>
+                <tr>
+                    <th>Note:</th>
+                    <td>{{ remark.note|default:"-" }}</td>
+                </tr>
+                <tr>
+                    <th>Advice:</th>
+                    <td>{{ remark.advice|default:"-" }}</td>
+                </tr>
+                <tr>
+                    <th>Follow Up Date:</th>
+                    <td>{{ remark.follow_up_date|default:"-" }}</td>
+                </tr>
+                <tr>
+                    <th>Created At:</th>
+                    <td>{{ remark.created_at }}</td>
+                </tr>
+            </table>
+
+            <div class="section-title" style="font-size:18px; margin-top:20px;">Medicines</div>
+
+            <table class="medicine-table">
+                <thead>
+                    <tr>
+                        <th>Medicine</th>
+                        <th>Dosage</th>
+                        <th>Quantity</th>
+                        <th>Frequency</th>
+                        <th>Duration</th>
+                        <th>Instruction</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for med in remark.medicines.all %}
+                    <tr>
+                        <td>{{ med.medicine }}</td>
+                        <td>{{ med.dosage|default:"-" }}</td>
+                        <td>{{ med.quantity }}</td>
+                        <td>{{ med.frequency|default:"-" }}</td>
+                        <td>{{ med.duration|default:"-" }}</td>
+                        <td>{{ med.instruction|default:"-" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6">No medicines added.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% empty %}
+        <p class="empty-text">No remarks added yet.</p>
+    {% endfor %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var viewer;
+    var image = document.getElementById('image-preview');
+
+    if (image) {
         image.addEventListener('click', function () {
             if (viewer) {
                 viewer.destroy();
@@ -92,6 +232,7 @@
             });
             viewer.show();
         });
-    });
+    }
+});
 </script>
 {% endblock %}

@@ -15,6 +15,77 @@ from accounts.models import UserProfile, Department
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib import messages
 
+from django.shortcuts import get_object_or_404, render, redirect
+from django.db.models import Prefetch
+from appointment.models import Appointment, Remark, RemarkMedicine
+from pharmacy.models import Medicine
+from doctor.models import Doctor
+
+
+def doctor_appointment_details(request, appointment_id):
+    appointment = get_object_or_404(
+        Appointment.objects.select_related(
+            'doctor',
+            'doctor__user',
+            'patient',
+            'time_slot'
+        ).prefetch_related(
+            Prefetch(
+                'remarks',
+                queryset=Remark.objects.select_related('doctor', 'doctor__user').prefetch_related(
+                    Prefetch(
+                        'medicines',
+                        queryset=RemarkMedicine.objects.select_related('medicine')
+                    )
+                ).order_by('-created_at')
+            )
+        ),
+        pk=appointment_id
+    )
+
+    medicines = Medicine.objects.all()
+
+    if request.method == 'POST':
+        doctor = get_object_or_404(Doctor, user=request.user)
+
+        remark = Remark.objects.create(
+            appointment=appointment,
+            doctor=doctor,
+            diagnosis=request.POST.get('diagnosis'),
+            symptoms=request.POST.get('symptoms'),
+            note=request.POST.get('note'),
+            advice=request.POST.get('advice'),
+            follow_up_date=request.POST.get('follow_up_date') or None,
+        )
+
+        medicine_ids = request.POST.getlist('medicine_id[]')
+        dosages = request.POST.getlist('dosage[]')
+        quantities = request.POST.getlist('quantity[]')
+        frequencies = request.POST.getlist('frequency[]')
+        durations = request.POST.getlist('duration[]')
+        instructions = request.POST.getlist('instruction[]')
+
+        for i in range(len(medicine_ids)):
+            if medicine_ids[i]:
+                medicine = get_object_or_404(Medicine, id=medicine_ids[i])
+
+                RemarkMedicine.objects.create(
+                    remark=remark,
+                    medicine=medicine,
+                    dosage=dosages[i] if i < len(dosages) else '',
+                    quantity=quantities[i] if i < len(quantities) and quantities[i] else 1,
+                    frequency=frequencies[i] if i < len(frequencies) else '',
+                    duration=durations[i] if i < len(durations) else '',
+                    instruction=instructions[i] if i < len(instructions) else '',
+                )
+
+        return redirect('doctors/appointment_details', appointment_id=appointment.id)
+
+    return render(request, 'doctors/appointment_details.html', {
+        'appointment': appointment,
+        'medicines': medicines,
+    })
+
 # EducationFormSet = inlineformset_factory(Doctor, Education, form=EducationForm, extra=1)
 # ExperienceFormSet = inlineformset_factory(Doctor, Experience, form=ExperienceForm, extra=1)
 # AwardsFormSet = inlineformset_factory(Doctor, Award, form=AwardForm, extra=1)

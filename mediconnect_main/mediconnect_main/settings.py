@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'customers',
     'appointment',
     'dashboard',
+    'pharmacy',
     'django.contrib.gis',
 ]
 
@@ -209,7 +210,8 @@ INSTALLED_APPS = [
     'doctor',
     'customers',
     'appointment',
-    'django.contrib.gis',  # keep if your frontend depends on maps
+    'pharmacy',
+    'django.contrib.gis',
 ]
 
 MIDDLEWARE = [

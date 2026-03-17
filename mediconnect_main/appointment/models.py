@@ -1,11 +1,9 @@
-from django.db import models
-
-from accounts.models import User, UserProfile
-from doctor.models import Doctor
 from django.conf import settings
+from django.db import models
+from accounts.models import User
+from doctor.models import Doctor
 
 
-# Create your models here.
 class Appointment(models.Model):
     APPOINTMENT_TYPE = (
         ('followup', 'followup'),
@@ -16,6 +14,7 @@ class Appointment(models.Model):
         ('confirmed', 'confirmed'),
         ('cancelled', 'cancelled'),
     )
+
     appointment_date = models.DateField(blank=True, null=True)
     time_slot = models.ForeignKey('TimeSlot', on_delete=models.CASCADE, blank=True, null=True)
     doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
@@ -26,8 +25,8 @@ class Appointment(models.Model):
     image_upload = models.ImageField(upload_to='appointment/', null=True, blank=True)
 
     def __str__(self):
-        return str(self.patient.username)
-        return f"{self.patient.first_name} {self.patient.last_name} - {self.doctor.doctor_name} on {self.appointment_time}"
+        return f"{self.patient.username} - {self.doctor} - {self.appointment_date}"
+
 
 class TimeSlot(models.Model):
     DAY_CHOICES = [
@@ -39,6 +38,7 @@ class TimeSlot(models.Model):
         ('Friday', 'Friday'),
         ('Saturday', 'Saturday'),
     ]
+
     doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE, null=True, blank=True)
     day = models.CharField(max_length=9, choices=DAY_CHOICES)
     start_time = models.TimeField()
@@ -58,3 +58,47 @@ class Booking(models.Model):
 
     def __str__(self):
         return f"{self.time_slot} on {self.date} by {self.user}"
+
+
+class Remark(models.Model):
+    appointment = models.ForeignKey(
+        Appointment,
+        on_delete=models.CASCADE,
+        related_name='remarks'
+    )
+    doctor = models.ForeignKey(
+        Doctor,
+        on_delete=models.CASCADE,
+        related_name='remarks'
+    )
+    diagnosis = models.TextField(blank=True, null=True)
+    symptoms = models.TextField(blank=True, null=True)
+    note = models.TextField(blank=True, null=True)
+    advice = models.TextField(blank=True, null=True)
+    follow_up_date = models.DateField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Remark for Appointment #{self.appointment.id}"
+
+
+class RemarkMedicine(models.Model):
+    remark = models.ForeignKey(
+        Remark,
+        on_delete=models.CASCADE,
+        related_name='medicines'
+    )
+    medicine = models.ForeignKey(
+        'pharmacy.Medicine',
+        on_delete=models.CASCADE,
+        related_name='remark_medicines'
+    )
+
+    dosage = models.CharField(max_length=100, blank=True, null=True)  
+    quantity = models.PositiveIntegerField(default=1)                 
+    frequency = models.CharField(max_length=100, blank=True, null=True) 
+    duration = models.CharField(max_length=100, blank=True, null=True) 
+    instruction = models.CharField(max_length=255, blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.medicine} for Remark #{self.remark.id}"

@@ -45,10 +45,12 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser):
     DOCTOR = 1
     CUSTOMER = 2
+    PHARMACIST = 3
 
     ROLE_CHOICE = (
         (DOCTOR, 'Doctor'),
         (CUSTOMER, 'Customer'),
+        (PHARMACIST, 'Pharmacist'),
     )
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
@@ -94,10 +96,13 @@ class User(AbstractBaseUser):
     def is_customer(self):
         return self.role == self.CUSTOMER
 
+    def is_pharmacist(self):
+        return self.role == self.PHARMACIST
+
 
 class UserProfile(models.Model):
     user = OneToOneField(User, on_delete=models.CASCADE, blank=True, null=True)
-    profile_picture = models.ImageField(upload_to='users/profile_pictures', blank=True, null=True)
+    profile_picture = models.ImageField(upload_to='users/profile_pictures', blank=True, null=True, default="users/default.png")
     gender = models.CharField(max_length=10, blank=True, null=True)
     date_of_birth = models.DateField(blank=True, null=True)
     phone_number = models.CharField(max_length=12, blank=True, null=True)
@@ -139,7 +144,7 @@ class Department(models.Model):
     name = models.CharField(max_length=100)
     disease = models.ManyToManyField(Disease, related_name='departments', blank=True, null=True)
     description = models.TextField(blank=True, null=True)
-    image = models.ImageField(upload_to='departments', blank=True, null=True)
+    image = models.ImageField(upload_to='departments', blank=True, null=True, default="users/default.png")
     slug = models.SlugField(max_length=100, unique=False, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)

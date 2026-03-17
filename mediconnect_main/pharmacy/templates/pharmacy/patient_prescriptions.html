@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="breadcrumb-bar">
+  <div class="container-fluid">
+    <div class="row align-items-center">
+      <div class="col-md-12 col-12">
+        <h2 class="breadcrumb-title">My Prescriptions</h2>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-hover mb-0">
+                <thead>
+                  <tr>
+                    <th>Rx #</th>
+                    <th>Doctor</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th>Medicines</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for rx in rxs %}
+                    <tr>
+                      <td>#{{ rx.id }}</td>
+                      <td>{{ rx.doctor.user.first_name }} {{ rx.doctor.user.last_name }}</td>
+                      <td>{{ rx.get_status_display }}</td>
+                      <td>{{ rx.created_at|date:"d M Y" }}</td>
+                      <td>
+                        {% for item in rx.items.all %}
+                          <div>{{ item.medicine }} (x{{ item.quantity }})</div>
+                        {% empty %}
+                          -
+                        {% endfor %}
+                      </td>
+                    </tr>
+                  {% empty %}
+                    <tr><td colspan="5">No prescriptions yet.</td></tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

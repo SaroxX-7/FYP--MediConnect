@@ -33,6 +33,14 @@ def check_role_customer(user):
     else:
         raise PermissionDenied
 
+
+# Restrict non-pharmacist from accessing pharmacist pages
+def check_role_pharmacist(user):
+    if user.role == 3:
+        return True
+    else:
+        raise PermissionDenied
+
 # Create your views here.
 
 def registerUser(request):
@@ -116,6 +124,37 @@ def registerDoctor(request):
     }
 
     return render(request, 'accounts/registerDoctor.html', context)
+
+
+def registerPharmacist(request):
+    if request.user.is_authenticated:
+        messages.warning(request, 'You are already logged in!')
+        return redirect('dashboard')
+    elif request.method == 'POST':
+        form = UserForm(request.POST)
+        if form.is_valid():
+            first_name = form.cleaned_data['first_name']
+            last_name = form.cleaned_data['last_name']
+            username = form.cleaned_data['username']
+            email = form.cleaned_data['email']
+            password = form.cleaned_data['password']
+            user = User.objects.create_user(first_name=first_name, last_name=last_name, username=username, email=email, password=password)
+            user.role = User.PHARMACIST
+            user.save()
+
+            mail_subject = 'Please activate your account'
+            email_template = 'accounts/email/account_verification_email.html'
+            send_verification_email(request, user, mail_subject, email_template)
+
+            messages.success(request, 'Activation mail has been sent. Please activate your account.')
+            return redirect('login')
+        else:
+            print('invalid form')
+            print(form.errors)
+    else:
+        form = UserForm()
+
+    return render(request, 'accounts/registerPharmacist.html', {'form': form})
 
 def activate(request, uidb64, token):
     # Activate the user by setting the is_active status to True
@@ -219,16 +258,35 @@ def custDashboard(request):
     }
     return render(request, 'accounts/custDashboard.html', context)
 
+@login_required(login_url='login')
+@user_passes_test(check_role_pharmacist)
+def pharmacistDashboard(request):
+    # Simple dashboard managed by pharmacist user
+    return redirect('pharmacist_dashboard')
+
 from django.utils.timezone import now
 @login_required(login_url='login')
 @user_passes_test(check_role_vendor)
 def doctorDashboard(request):
     doctor = Doctor.objects.get(user=request.user)
-    #filter appointments by doctor
-    appointments = Appointment.objects.filter(doctor=doctor).order_by('-appointment_date')
+
+    appointments = Appointment.objects.select_related(
+        'patient'
+    ).filter(
+        doctor=doctor
+    ).order_by('-appointment_date')
+
     appointment_count = appointments.count()
-    patient_count = Appointment.objects.values('patient').distinct().count()
-    today_appointments = Appointment.objects.filter(doctor=doctor, appointment_date=now().date()).count()
+
+    patient_count = Appointment.objects.filter(
+        doctor=doctor
+    ).values('patient').distinct().count()
+
+    today_appointments = Appointment.objects.filter(
+        doctor=doctor,
+        appointment_date=now().date()
+    ).count()
+
     context = {
         'appointments': appointments,
         'now': now(),
@@ -237,7 +295,6 @@ def doctorDashboard(request):
         'today_appointments': today_appointments,
     }
 
-    # appointments = Appointment.objects.all().order_by('-appointment_date')
     return render(request, 'accounts/doctorDashboard.html', context)
 
 

@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="breadcrumb-bar">
+  <div class="container-fluid">
+    <div class="row align-items-center">
+      <div class="col-md-12 col-12">
+        <nav aria-label="breadcrumb" class="page-breadcrumb">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'doctorDashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Prescription</li>
+          </ol>
+        </nav>
+        <h2 class="breadcrumb-title">Create / Update Prescription</h2>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-body">
+
+            <p class="mb-1"><strong>Patient:</strong> {{ appointment.patient.first_name }} {{ appointment.patient.last_name }}</p>
+            <p class="mb-3"><strong>Appointment:</strong> {{ appointment.appointment_date }} | {{ appointment.time_slot.start_time }}</p>
+
+            <form method="post">
+              {% csrf_token %}
+
+              <div class="mb-3">
+                {{ form.as_p }}
+              </div>
+
+              <h5 class="mt-4">Medicines (choose from Pharmacy)</h5>
+              {{ formset.management_form }}
+
+              <div class="table-responsive">
+                <table class="table table-hover">
+                  <thead>
+                    <tr>
+                      <th>Medicine</th>
+                      <th>Dosage</th>
+                      <th>Frequency</th>
+                      <th>Duration</th>
+                      <th>Qty</th>
+                      <th>Instructions</th>
+                      <th>Remove</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for f in formset %}
+                      <tr>
+                        <td>{{ f.medicine }}</td>
+                        <td>{{ f.dosage }}</td>
+                        <td>{{ f.frequency }}</td>
+                        <td>{{ f.duration_days }}</td>
+                        <td>{{ f.quantity }}</td>
+                        <td>{{ f.instructions }}</td>
+                        <td>{% if f.instance.pk %}{{ f.DELETE }}{% else %}-{% endif %}</td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+
+              <button type="submit" class="btn btn-primary">Save Prescription</button>
+              <a href="{% url 'appointment_details' appointment.id %}" class="btn btn-secondary">Back</a>
+
+              <p class="text-muted mt-3">Tip: To send to Pharmacy, set status to <strong>Sent to Pharmacy</strong>.</p>
+            </form>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

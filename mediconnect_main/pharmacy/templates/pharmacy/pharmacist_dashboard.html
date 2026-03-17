@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="breadcrumb-bar">
+  <div class="container-fluid">
+    <div class="row align-items-center">
+      <div class="col-md-12 col-12">
+        <nav aria-label="breadcrumb" class="page-breadcrumb">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Pharmacist Dashboard</li>
+          </ol>
+        </nav>
+        <h2 class="breadcrumb-title">Pharmacy</h2>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+  <div class="container-fluid">
+
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+              <h4 class="mb-0">Medicines</h4>
+              <a class="btn btn-primary" href="{% url 'medicine_create' %}"><i class="fas fa-plus"></i> Add Medicine</a>
+            </div>
+            <div class="table-responsive mt-3">
+              <table class="table table-hover mb-0">
+                <thead>
+                  <tr>
+                    <th>Image</th>
+                    <th>Name</th>
+                    <th>Form</th>
+                    <th>Strength</th>
+                    <th>Price</th>
+                    <th>Stock</th>
+                    <th>Status</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for m in medicines %}
+                    <tr>
+                      <td>
+                        {% if m.image %}
+                          <img src="{{ m.image.url }}" alt="{{ m.name }}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px;">
+                        {% endif %}
+                      </td>
+                      <td>{{ m.name }}</td>
+                      <td>{{ m.dosage_form|default:"-" }}</td>
+                      <td>{{ m.strength|default:"-" }}</td>
+                      <td>{{ m.unit_price }}</td>
+                      <td>{{ m.stock_qty }}</td>
+                      <td>{% if m.is_active %}Active{% else %}Inactive{% endif %}</td>
+                      <td class="text-right">
+                        <a class="btn btn-sm bg-info-light" href="{% url 'medicine_edit' m.id %}"><i class="far fa-edit"></i> Edit</a>
+                      </td>
+                    </tr>
+                  {% empty %}
+                    <tr><td colspan="8">No medicines added yet.</td></tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-body">
+            <h4 class="mb-3">Recent Prescriptions</h4>
+            <div class="table-responsive">
+              <table class="table table-hover mb-0">
+                <thead>
+                  <tr>
+                    <th>Rx #</th>
+                    <th>Patient</th>
+                    <th>Doctor</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for rx in prescriptions %}
+                    <tr>
+                      <td>#{{ rx.id }}</td>
+                      <td>{{ rx.patient.first_name }} {{ rx.patient.last_name }}</td>
+                      <td>{{ rx.doctor.user.first_name }} {{ rx.doctor.user.last_name }}</td>
+                      <td>{{ rx.get_status_display }}</td>
+                      <td>{{ rx.created_at|date:"d M Y" }}</td>
+                      <td class="text-right">
+                        <a class="btn btn-sm bg-info-light" href="{% url 'pharmacy_prescription_detail' rx.id %}"><i class="far fa-eye"></i> View</a>
+                      </td>
+                    </tr>
+                  {% empty %}
+                    <tr><td colspan="6">No prescriptions yet.</td></tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}

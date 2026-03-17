@@ -26,6 +26,7 @@ urlpatterns = [
     path('panel/', include('dashboard.urls')) ,
     path('doctor/', include('doctor.urls')),
     path('customer/', include('customers.urls')),
+    path('pharmacy/', include('pharmacy.urls')),
     path('search/location/', CustomerViews.searchByLocation, name='search'),
     # path('appointment/', include('appointment.urls')),
 
