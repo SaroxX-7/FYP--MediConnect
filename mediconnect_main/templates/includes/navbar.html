@@ -1,112 +1,105 @@
 {% load static %}
 <!-- Header -->
-			<header class="header">
-				<nav class="navbar navbar-expand-lg header-nav">
-					<div class="navbar-header">
-						<a id="mobile_btn" href="javascript:void(0);">
-							<span class="bar-icon">
-								<span></span>
-								<span></span>
-								<span></span>
-							</span>
-						</a>
-						<a href="{% url 'home' %}" class="navbar-brand logo">
-    MediConnect
-</a>
-					</div>
-					<div class="main-menu-wrapper">
-						<div class="menu-header">
-							<a href="{% url 'home' %}" class="menu-logo">
-								MediConnect
-							</a>
-							<a id="menu_close" class="menu-close" href="javascript:void(0);">
-								<i class="fas fa-times"></i>
-							</a>
-						</div>
-						<ul class="main-nav">
-							<li class="{% if request.path == '/' %}active{% endif %}">
-								<a href="{% url 'home' %}">Home</a>
-							</li>
+<header class="header">
+    <nav class="navbar navbar-expand-lg header-nav">
+        <div class="navbar-header">
+            <a id="mobile_btn" href="javascript:void(0);">
+                <span class="bar-icon">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </span>
+            </a>
+            <a href="{% url 'home' %}" class="navbar-brand logo">
+                MediConnect
+            </a>
+        </div>
 
-                            <li class="{% if '/custDashboard/' in request.path %}active{% endif %}">
-								<a href="{% if request.user.is_authenticated and request.user.is_doctor %}{% url 'doctorDashboard' %}{% elif request.user.is_authenticated and request.user.is_pharmacist %}{% url 'pharmacistDashboard' %}{% else %}{% url 'custDashboard' %}{% endif %}">Dashboard</a>
-							</li>
+        <div class="main-menu-wrapper">
+            <div class="menu-header">
+                <a href="{% url 'home' %}" class="menu-logo">
+                    MediConnect
+                </a>
+                <a id="menu_close" class="menu-close" href="javascript:void(0);">
+                    <i class="fas fa-times"></i>
+                </a>
+            </div>
 
+            <ul class="main-nav">
+                <li class="{% if request.path == '/' %}active{% endif %}">
+                    <a href="{% url 'home' %}">Home</a>
+                </li>
 
-							{% comment %}<li class="has-submenu">
-								<a href="#">Doctors <i class="fas fa-chevron-down"></i></a>
-								<ul class="submenu">
-									<li><a href="{% url 'myAccount' %}">Doctor Dashboard</a></li>
-									<li><a href="appointments.html">Appointments</a></li>
-									<li><a href="schedule-timings.html">Schedule Timing</a></li>
-									<li><a href="my-patients.html">Patients List</a></li>
-									<li><a href="doctor-profile-settings.html">Profile Settings</a></li>
-									<li><a href="doctor-register.html">Doctor Register</a></li>
-								</ul>
-							</li>
-							<li class="has-submenu">
-								<a href="#">Patients <i class="fas fa-chevron-down"></i></a>
-								<ul class="submenu">
-									<li><a href="search.html">Search Doctor</a></li>
-									<li><a href="booking.html">Booking</a></li>
-									<li><a href="{% url 'customer' %}">Patient Dashboard</a></li>
-									<li><a href="profile-settings.html">Profile Settings</a></li>
-									<li><a href="change-password.html">Change Password</a></li>
-								</ul>
-							</li>{% endcomment %}
+                <li class="{% if '/custDashboard/' in request.path %}active{% endif %}">
+                    <a href="{% if request.user.is_authenticated and request.user.is_doctor %}{% url 'doctorDashboard' %}{% elif request.user.is_authenticated and request.user.is_pharmacist %}{% url 'pharmacistDashboard' %}{% else %}{% url 'custDashboard' %}{% endif %}">
+                        Dashboard
+                    </a>
+                </li>
 
-                            {% if user.is_authenticated %}
-							<li class="login-link">
-								<a href="{% url 'logout' %}">Logout</a>
-							</li>
-                            {% else %}
-                            <li class="login-link">
-								<a href="{% url 'login' %}">Login / Signup</a>
-							</li>
-                            {% endif %}
-						</ul>
-					</div>
-					<ul class="nav header-navbar-rht">
-						<li class="nav-item contact-item">
-							<div class="header-contact-img">
-								<i class="far fa-hospital"></i>
-							</div>
-							<div class="header-contact-detail">
-								<p class="contact-header">Contact</p>
-								<p class="contact-info-header"> +1 315 369 5943</p>
-							</div>
-						</li>
-                        {% if user.is_authenticated %}
-                        <li class="nav-item">
-							<a class="nav-link header-login" href="{% url 'logout' %}">logout</a>
-						</li>
-                            <li class="nav-right dropdown has-arrow logged-item">
-							<a href="" class="dropdown-toggle nav-link" data-toggle="dropdown">
-								<span class="user-img">
-									<img class="rounded-circle" src="{% if user_profile.profile_picture %}{{ user_profile.profile_picture.url }}{% else %}{% static 'doctors/doctor-01.jpg' %}{% endif %}" width="31" alt="{{ request.user.first_name }} {{ request.user.last_name }}">
-								</span>
-							</a>
-							<div class="dropdown-menu dropdown-menu-right">
-								<div class="user-header">
-									<div class="avatar avatar-sm">
-										<img src="{% if user_profile.profile_picture %}{{ user_profile.profile_picture.url }}{% else %}{% static 'doctors/doctor-01.jpg' %}{% endif %}" alt="User Image" class="avatar-img rounded-circle">
-									</div>
-									<div class="user-text">
-										<h6>{{ request.user.first_name }} {{ request.user.last_name }}</h6>
-										<p class="text-muted mb-0">Patient</p>
-									</div>
-								</div>
-								<a class="dropdown-item" href="{% url 'custDashboard' %}">Dashboard</a>
-								<a class="dropdown-item" href="{% url 'cprofile' %}">Profile Settings</a>
-								<a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
-							</div>
-						</li>
-                        {% else %}
-						<li class="nav-item">
-							<a class="nav-link header-login" href="{% url 'login' %}">login / Signup </a>
-						</li>
-                        {% endif %}
-					</ul>
-				</nav>
-			</header>
-			<!-- /Header -->
+                <li class="{% if '/pharmacy/store/' in request.path %}active{% endif %}">
+                    <a href="{% url 'pharmacy_store' %}">Pharmacy</a>
+                </li>
+
+                {% if user.is_authenticated %}
+                <li class="login-link">
+                    <a href="{% url 'logout' %}">Logout</a>
+                </li>
+                {% else %}
+                <li class="login-link">
+                    <a href="{% url 'login' %}">Login / Signup</a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+
+        <ul class="nav header-navbar-rht">
+            <li class="nav-item contact-item">
+                <div class="header-contact-img">
+                    <i class="far fa-hospital"></i>
+                </div>
+                <div class="header-contact-detail">
+                    <p class="contact-header">Contact</p>
+                    <p class="contact-info-header"> +1 315 369 5943</p>
+                </div>
+            </li>
+
+            {% if user.is_authenticated %}
+            <li class="nav-item">
+                <a class="nav-link header-login" href="{% url 'logout' %}">logout</a>
+            </li>
+
+            <li class="nav-right dropdown has-arrow logged-item">
+                <a href="" class="dropdown-toggle nav-link" data-toggle="dropdown">
+                    <span class="user-img">
+                        <img class="rounded-circle"
+                             src="{% if user_profile.profile_picture %}{{ user_profile.profile_picture.url }}{% else %}{% static 'doctors/doctor-01.jpg' %}{% endif %}"
+                             width="31"
+                             alt="{{ request.user.first_name }} {{ request.user.last_name }}">
+                    </span>
+                </a>
+                <div class="dropdown-menu dropdown-menu-right">
+                    <div class="user-header">
+                        <div class="avatar avatar-sm">
+                            <img src="{% if user_profile.profile_picture %}{{ user_profile.profile_picture.url }}{% else %}{% static 'doctors/doctor-01.jpg' %}{% endif %}"
+                                 alt="User Image"
+                                 class="avatar-img rounded-circle">
+                        </div>
+                        <div class="user-text">
+                            <h6>{{ request.user.first_name }} {{ request.user.last_name }}</h6>
+                            <p class="text-muted mb-0">Patient</p>
+                        </div>
+                    </div>
+                    <a class="dropdown-item" href="{% url 'custDashboard' %}">Dashboard</a>
+                    <a class="dropdown-item" href="{% url 'cprofile' %}">Profile Settings</a>
+                    <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
+                </div>
+            </li>
+            {% else %}
+            <li class="nav-item">
+                <a class="nav-link header-login" href="{% url 'login' %}">login / Signup</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+</header>
+<!-- /Header -->

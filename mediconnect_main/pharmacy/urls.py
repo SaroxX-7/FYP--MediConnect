@@ -15,4 +15,14 @@ urlpatterns = [
 
     # Patient
     path('patient/prescriptions/', views.patient_prescriptions, name='patient_prescriptions'),
+    path('store/', views.pharmacy_store, name='pharmacy_store'),
+    path('cart/', views.view_cart, name='view_cart'),
+    path('add-to-cart/<int:medicine_id>/', views.add_to_cart, name='add_to_cart'),
+    path('remove-from-cart/<int:medicine_id>/', views.remove_from_cart, name='remove_from_cart'),
+
+    path(
+    'cart/add-remark-medicines/<int:remark_id>/',
+    views.add_remark_medicines_to_cart,
+    name='add_remark_medicines_to_cart'
+),
 ]

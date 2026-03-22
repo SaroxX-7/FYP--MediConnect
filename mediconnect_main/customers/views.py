@@ -440,8 +440,11 @@ def appointment_details(request, appointment_id):
         pk=appointment_id
     )
 
+    latest_remark = appointment.remarks.first()
+
     return render(request, 'customers/appointment_details.html', {
         'appointment': appointment,
+        'latest_remark': latest_remark,
     })
 
 def searchByLocation(request):

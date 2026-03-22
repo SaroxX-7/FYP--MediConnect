@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container mt-4">
+    <h2>Pharmacy Store</h2>
+
+    <div class="row">
+        {% for medicine in medicines %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    {% if medicine.image %}
+                        <img src="{{ medicine.image.url }}" class="card-img-top" style="height: 220px; object-fit: cover;">
+                    {% endif %}
+
+                    <div class="card-body">
+                        <h5 class="card-title">{{ medicine.name }}</h5>
+                        <p><strong>Category:</strong> {{ medicine.category|default:"-" }}</p>
+                        <p><strong>Description:</strong> {{ medicine.description|default:"No description" }}</p>
+                        <p><strong>Price:</strong> Rs. {{ medicine.price }}</p>
+                        <p><strong>Stock:</strong> {{ medicine.stock_qty }}</p>
+
+                        {% if medicine.stock_qty > 0 %}
+                            <form method="POST" action="{% url 'add_to_cart' medicine.id %}">
+                                {% csrf_token %}
+                                
+                                <div class="mb-2">
+                                    <label><strong>Quantity:</strong></label>
+                                    <input type="number"
+                                           name="quantity"
+                                           class="form-control"
+                                           value="1"
+                                           min="1"
+                                           max="{{ medicine.stock_qty }}">
+                                </div>
+
+                                <button type="submit" class="btn btn-primary">
+                                    Add to Cart
+                                </button>
+                            </form>
+                        {% else %}
+                            <button class="btn btn-secondary" disabled>Out of Stock</button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <p>No medicines available.</p>
+        {% endfor %}
+    </div>
+
+    <a href="{% url 'view_cart' %}" class="btn btn-success">View Cart</a>
+</div>
+
+{% endblock %}

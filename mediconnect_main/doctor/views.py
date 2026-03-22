@@ -21,7 +21,6 @@ from appointment.models import Appointment, Remark, RemarkMedicine
 from pharmacy.models import Medicine
 from doctor.models import Doctor
 
-
 def doctor_appointment_details(request, appointment_id):
     appointment = get_object_or_404(
         Appointment.objects.select_related(
@@ -32,7 +31,10 @@ def doctor_appointment_details(request, appointment_id):
         ).prefetch_related(
             Prefetch(
                 'remarks',
-                queryset=Remark.objects.select_related('doctor', 'doctor__user').prefetch_related(
+                queryset=Remark.objects.select_related(
+                    'doctor',
+                    'doctor__user'
+                ).prefetch_related(
                     Prefetch(
                         'medicines',
                         queryset=RemarkMedicine.objects.select_related('medicine')
@@ -44,19 +46,32 @@ def doctor_appointment_details(request, appointment_id):
     )
 
     medicines = Medicine.objects.all()
+    doctor = get_object_or_404(Doctor, user=request.user)
+
+    # get existing remark for this appointment by this doctor
+    existing_remark = appointment.remarks.filter(doctor=doctor).first()
 
     if request.method == 'POST':
-        doctor = get_object_or_404(Doctor, user=request.user)
-
-        remark = Remark.objects.create(
-            appointment=appointment,
-            doctor=doctor,
-            diagnosis=request.POST.get('diagnosis'),
-            symptoms=request.POST.get('symptoms'),
-            note=request.POST.get('note'),
-            advice=request.POST.get('advice'),
-            follow_up_date=request.POST.get('follow_up_date') or None,
-        )
+        if existing_remark:
+            # update existing remark
+            remark = existing_remark
+            remark.diagnosis = request.POST.get('diagnosis')
+            remark.symptoms = request.POST.get('symptoms')
+            remark.note = request.POST.get('note')
+            remark.advice = request.POST.get('advice')
+            remark.follow_up_date = request.POST.get('follow_up_date') or None
+            remark.save()
+        else:
+            # create new remark only once
+            remark = Remark.objects.create(
+                appointment=appointment,
+                doctor=doctor,
+                diagnosis=request.POST.get('diagnosis'),
+                symptoms=request.POST.get('symptoms'),
+                note=request.POST.get('note'),
+                advice=request.POST.get('advice'),
+                follow_up_date=request.POST.get('follow_up_date') or None,
+            )
 
         medicine_ids = request.POST.getlist('medicine_id[]')
         dosages = request.POST.getlist('dosage[]')
@@ -64,6 +79,9 @@ def doctor_appointment_details(request, appointment_id):
         frequencies = request.POST.getlist('frequency[]')
         durations = request.POST.getlist('duration[]')
         instructions = request.POST.getlist('instruction[]')
+
+        # remove old medicines before adding updated ones
+        remark.medicines.all().delete()
 
         for i in range(len(medicine_ids)):
             if medicine_ids[i]:
@@ -79,13 +97,40 @@ def doctor_appointment_details(request, appointment_id):
                     instruction=instructions[i] if i < len(instructions) else '',
                 )
 
-        return redirect('doctors/appointment_details', appointment_id=appointment.id)
+        appointment = get_object_or_404(
+            Appointment.objects.select_related(
+                'doctor',
+                'doctor__user',
+                'patient',
+                'time_slot'
+            ).prefetch_related(
+                Prefetch(
+                    'remarks',
+                    queryset=Remark.objects.select_related(
+                        'doctor',
+                        'doctor__user'
+                    ).prefetch_related(
+                        Prefetch(
+                            'medicines',
+                            queryset=RemarkMedicine.objects.select_related('medicine')
+                        )
+                    ).order_by('-created_at')
+                )
+            ),
+            pk=appointment_id
+        )
+
+    remarks = appointment.remarks.all()
+    latest_remark = appointment.remarks.filter(doctor=doctor).first()
+    remark_medicines = latest_remark.medicines.all() if latest_remark else []
 
     return render(request, 'doctors/appointment_details.html', {
         'appointment': appointment,
         'medicines': medicines,
+        'remarks': remarks,
+        'latest_remark': latest_remark,
+        'remark_medicines': remark_medicines,
     })
-
 # EducationFormSet = inlineformset_factory(Doctor, Education, form=EducationForm, extra=1)
 # ExperienceFormSet = inlineformset_factory(Doctor, Experience, form=ExperienceForm, extra=1)
 # AwardsFormSet = inlineformset_factory(Doctor, Award, form=AwardForm, extra=1)

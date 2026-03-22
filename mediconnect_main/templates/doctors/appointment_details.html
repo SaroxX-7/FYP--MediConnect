@@ -120,6 +120,25 @@
         border-radius: 6px;
         border: 1px solid #ddd;
     }
+
+    .remark-card {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 18px;
+        margin-bottom: 20px;
+        background: #fafafa;
+    }
+
+    .remark-meta {
+        margin-bottom: 12px;
+        font-size: 14px;
+        color: #666;
+    }
+
+    .empty-text {
+        color: #888;
+        font-style: italic;
+    }
 </style>
 
 <div class="invoice-box">
@@ -165,39 +184,116 @@
         {% endif %}
     </table>
 
+    <div class="section-title">Current Remark</div>
+
+    {% if latest_remark %}
+        <div class="remark-card">
+            <div class="remark-meta">
+                {% if latest_remark.doctor %}
+                    <strong>By Dr. {{ latest_remark.doctor.user.first_name }} {{ latest_remark.doctor.user.last_name }}</strong>
+                {% endif %}
+                {% if latest_remark.created_at %}
+                    | Created: {{ latest_remark.created_at }}
+                {% endif %}
+                {% if latest_remark.updated_at %}
+                    | Updated: {{ latest_remark.updated_at }}
+                {% endif %}
+            </div>
+
+            <table class="details">
+                <tr>
+                    <th>Diagnosis:</th>
+                    <td>{{ latest_remark.diagnosis|default:"-" }}</td>
+                </tr>
+                <tr>
+                    <th>Symptoms:</th>
+                    <td>{{ latest_remark.symptoms|default:"-" }}</td>
+                </tr>
+                <tr>
+                    <th>Doctor Note:</th>
+                    <td>{{ latest_remark.note|default:"-" }}</td>
+                </tr>
+                <tr>
+                    <th>Advice:</th>
+                    <td>{{ latest_remark.advice|default:"-" }}</td>
+                </tr>
+                <tr>
+                    <th>Follow Up Date:</th>
+                    <td>{{ latest_remark.follow_up_date|default:"-" }}</td>
+                </tr>
+            </table>
+
+            <h4 style="margin-top: 15px;">Medicines</h4>
+            <table class="medicine-table">
+                <thead>
+                    <tr>
+                        <th>Medicine</th>
+                        <th>Dosage</th>
+                        <th>Quantity</th>
+                        <th>Frequency</th>
+                        <th>Duration</th>
+                        <th>Instruction</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for rm in remark_medicines %}
+                        <tr>
+                            <td>{{ rm.medicine.name }}</td>
+                            <td>{{ rm.dosage|default:"-" }}</td>
+                            <td>{{ rm.quantity|default:"-" }}</td>
+                            <td>{{ rm.frequency|default:"-" }}</td>
+                            <td>{{ rm.duration|default:"-" }}</td>
+                            <td>{{ rm.instruction|default:"-" }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="6" class="empty-text">No medicines added yet.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="empty-text">No remark added for this appointment yet.</p>
+    {% endif %}
+
     <form method="POST">
         {% csrf_token %}
 
-        <div class="section-title">Write Remark</div>
+        <div class="section-title">
+            {% if latest_remark %}Update Remark{% else %}Write Remark{% endif %}
+        </div>
+
         <table class="details">
             <tr>
                 <th>Diagnosis:</th>
                 <td>
-                    <textarea name="diagnosis" class="form-control" placeholder="Enter diagnosis"></textarea>
+                    <textarea name="diagnosis" class="form-control" placeholder="Enter diagnosis">{{ latest_remark.diagnosis|default:'' }}</textarea>
                 </td>
             </tr>
             <tr>
                 <th>Symptoms:</th>
                 <td>
-                    <textarea name="symptoms" class="form-control" placeholder="Enter symptoms"></textarea>
+                    <textarea name="symptoms" class="form-control" placeholder="Enter symptoms">{{ latest_remark.symptoms|default:'' }}</textarea>
                 </td>
             </tr>
             <tr>
                 <th>Doctor Note:</th>
                 <td>
-                    <textarea name="note" class="form-control" placeholder="Enter note"></textarea>
+                    <textarea name="note" class="form-control" placeholder="Enter note">{{ latest_remark.note|default:'' }}</textarea>
                 </td>
             </tr>
             <tr>
                 <th>Advice:</th>
                 <td>
-                    <textarea name="advice" class="form-control" placeholder="Enter advice"></textarea>
+                    <textarea name="advice" class="form-control" placeholder="Enter advice">{{ latest_remark.advice|default:'' }}</textarea>
                 </td>
             </tr>
             <tr>
                 <th>Follow Up Date:</th>
                 <td>
-                    <input type="date" name="follow_up_date" class="form-control">
+                    <input type="date" name="follow_up_date" class="form-control"
+                           value="{% if latest_remark and latest_remark.follow_up_date %}{{ latest_remark.follow_up_date|date:'Y-m-d' }}{% endif %}">
                 </td>
             </tr>
         </table>
@@ -216,27 +312,52 @@
                 </tr>
             </thead>
             <tbody id="medicine-body">
-                <tr>
-                    <td>
-                        <select name="medicine_id[]" class="form-control">
-                            <option value="">Select Medicine</option>
-                            {% for medicine in medicines %}
-                                <option value="{{ medicine.id }}">{{ medicine }}</option>
-                            {% endfor %}
-                        </select>
-                    </td>
-                    <td><input type="text" name="dosage[]" class="form-control" placeholder="e.g. 500mg"></td>
-                    <td><input type="number" name="quantity[]" class="form-control" value="1" min="1"></td>
-                    <td><input type="text" name="frequency[]" class="form-control" placeholder="e.g. 2 times a day"></td>
-                    <td><input type="text" name="duration[]" class="form-control" placeholder="e.g. 5 days"></td>
-                    <td><input type="text" name="instruction[]" class="form-control" placeholder="e.g. After meal"></td>
-                    <td><button type="button" class="btn btn-danger remove-row">Remove</button></td>
-                </tr>
+                {% if remark_medicines %}
+                    {% for rm in remark_medicines %}
+                    <tr>
+                        <td>
+                            <select name="medicine_id[]" class="form-control">
+                                <option value="">Select Medicine</option>
+                                {% for medicine in medicines %}
+                                    <option value="{{ medicine.id }}" {% if medicine.id == rm.medicine.id %}selected{% endif %}>
+                                        {{ medicine }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td><input type="text" name="dosage[]" class="form-control" value="{{ rm.dosage|default:'' }}" placeholder="e.g. 500mg"></td>
+                        <td><input type="number" name="quantity[]" class="form-control" value="{{ rm.quantity|default:1 }}" min="1"></td>
+                        <td><input type="text" name="frequency[]" class="form-control" value="{{ rm.frequency|default:'' }}" placeholder="e.g. 2 times a day"></td>
+                        <td><input type="text" name="duration[]" class="form-control" value="{{ rm.duration|default:'' }}" placeholder="e.g. 5 days"></td>
+                        <td><input type="text" name="instruction[]" class="form-control" value="{{ rm.instruction|default:'' }}" placeholder="e.g. After meal"></td>
+                        <td><button type="button" class="btn btn-danger remove-row">Remove</button></td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td>
+                            <select name="medicine_id[]" class="form-control">
+                                <option value="">Select Medicine</option>
+                                {% for medicine in medicines %}
+                                    <option value="{{ medicine.id }}">{{ medicine }}</option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td><input type="text" name="dosage[]" class="form-control" placeholder="e.g. 500mg"></td>
+                        <td><input type="number" name="quantity[]" class="form-control" value="1" min="1"></td>
+                        <td><input type="text" name="frequency[]" class="form-control" placeholder="e.g. 2 times a day"></td>
+                        <td><input type="text" name="duration[]" class="form-control" placeholder="e.g. 5 days"></td>
+                        <td><input type="text" name="instruction[]" class="form-control" placeholder="e.g. After meal"></td>
+                        <td><button type="button" class="btn btn-danger remove-row">Remove</button></td>
+                    </tr>
+                {% endif %}
             </tbody>
         </table>
 
         <button type="button" class="btn btn-success mt-3" id="add-medicine">+ Add More Medicine</button>
-        <button type="submit" class="btn btn-primary mt-3">Save Remark</button>
+        <button type="submit" class="btn btn-primary mt-3">
+            {% if latest_remark %}Update Remark{% else %}Save Remark{% endif %}
+        </button>
     </form>
 </div>
 
@@ -264,18 +385,25 @@ document.addEventListener('DOMContentLoaded', function() {
 
     document.getElementById('add-medicine').addEventListener('click', function() {
         let tableBody = document.getElementById('medicine-body');
-        let firstRow = tableBody.querySelector('tr');
-        let newRow = firstRow.cloneNode(true);
+        let newRow = document.createElement('tr');
 
-        newRow.querySelectorAll('input').forEach(input => {
-            if (input.type === 'number') {
-                input.value = 1;
-            } else {
-                input.value = '';
-            }
-        });
+        newRow.innerHTML = `
+            <td>
+                <select name="medicine_id[]" class="form-control">
+                    <option value="">Select Medicine</option>
+                    {% for medicine in medicines %}
+                        <option value="{{ medicine.id }}">{{ medicine }}</option>
+                    {% endfor %}
+                </select>
+            </td>
+            <td><input type="text" name="dosage[]" class="form-control" placeholder="e.g. 500mg"></td>
+            <td><input type="number" name="quantity[]" class="form-control" value="1" min="1"></td>
+            <td><input type="text" name="frequency[]" class="form-control" placeholder="e.g. 2 times a day"></td>
+            <td><input type="text" name="duration[]" class="form-control" placeholder="e.g. 5 days"></td>
+            <td><input type="text" name="instruction[]" class="form-control" placeholder="e.g. After meal"></td>
+            <td><button type="button" class="btn btn-danger remove-row">Remove</button></td>
+        `;
 
-        newRow.querySelector('select').selectedIndex = 0;
         tableBody.appendChild(newRow);
     });
 
