@@ -1,351 +1,441 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block content %}
-    {% load static %}
 
+<div class="breadcrumb-bar">
+    <div class="container-fluid">
+        <div class="row align-items-center">
+            <div class="col-md-12 col-12">
+                <nav aria-label="breadcrumb" class="page-breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="index-2.html">Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Profile Settings</li>
+                    </ol>
+                </nav>
+                <h2 class="breadcrumb-title">Profile Settings</h2>
+            </div>
+        </div>
+    </div>
+</div>
 
-			<!-- Breadcrumb -->
-			<div class="breadcrumb-bar">
-				<div class="container-fluid">
-					<div class="row align-items-center">
-						<div class="col-md-12 col-12">
-							<nav aria-label="breadcrumb" class="page-breadcrumb">
-								<ol class="breadcrumb">
-									<li class="breadcrumb-item"><a href="index-2.html">Home</a></li>
-									<li class="breadcrumb-item active" aria-current="page">Profile Settings</li>
-								</ol>
-							</nav>
-							<h2 class="breadcrumb-title">Profile Settings</h2>
-						</div>
-					</div>
-				</div>
-			</div>
-			<!-- /Breadcrumb -->
-			
-			<!-- Page Content -->
-			<div class="content">
-				<div class="container-fluid">
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-5 col-lg-4 col-xl-3 theiaStickySidebar">
+                {% include 'includes/d_sidebar.html' %}
+            </div>
 
-					<div class="row">
-						<div class="col-md-5 col-lg-4 col-xl-3 theiaStickySidebar">
-						
-							{% include 'includes/d_sidebar.html' %}
-							
-						</div>
-						<div class="col-md-7 col-lg-8 col-xl-9">
-                        <form id="doctor-form" action="{% url 'dprofile' %}" method="POST" enctype="multipart/form-data">
-                                {% csrf_token %}
+            <div class="col-md-7 col-lg-8 col-xl-9">
+                <form id="doctor-form" action="{% url 'dprofile' %}" method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
 
-							<!-- Basic Information -->
-							<div class="card">
-								<div class="card-body">
-
-									<h4 class="card-title">Basic Information</h4>
-									<div class="row form-row">
-										<div class="col-md-12">
-											<div class="form-group">
-												<div class="change-avatar">
-														<div class="profile-img">
-                                                        <img id="profilePicture-doctor" src="{% if user_profile.profile_picture %}{{ user_profile.profile_picture.url }}{% else %}{% static 'img/patients/patient.jpg' %}{% endif %}" alt="Profile Picture">
-														</div>
-														<div class="upload-img">
-                                                            <div class="change-photo-btn">
-                                                                <span><i class="fa fa-upload"></i> Upload Photo</span>
-                                                                <!-- Hidden original input -->
-                                                                <div style="display: none;">
-                                                                    {{profile_form.profile_picture}}
-                                                                </div>
-                                                                <!-- Custom file input trigger -->
-                                                                <input type="file" class="upload" style="display: none;">
-                                                            </div>
-                                                            <small class="form-text text-muted">Allowed JPG, GIF or PNG. Max size of 2MB</small>
-                                                        </div>
-													</div>
-											</div>
-										</div>
-										<div class="col-md-6">
-											<div class="form-group">
-												<label>Username <span class="text-danger">*</span></label>
-												<input type="text" class="form-control" name="username" id="id_username" {% if user_form.username.value %} value="{{ user_form.username.value }}" {% else%}value="" {% endif %} readonly>
-												    {% if user_form.username.errors %}
-                                                        <div class="error">{{ user_form.username.errors.as_text }}</div>
-                                                    {% endif %}
-											</div>
-										</div>
-										<div class="col-md-6">
-											<div class="form-group">
-												<label>Email <span class="text-danger">*</span></label>
-												<input type="text" class="form-control" name="email" id="id_email" {% if user_form.email.value %} value="{{ user_form.email.value }}" {% else%}value="" {% endif %} readonly>
-												    {% if user_form.email.errors %}
-                                                        <div class="error">{{ user_form.email.errors.as_text }}</div>
-                                                    {% endif %}
-											</div>
-										</div>
-										<div class="col-md-6">
-											<div class="form-group">
-													<label>First Name</label>
-                                                    <input type="text" class="form-control" name="first_name" id="id_first_name" {% if user_form.first_name.value %} value="{{ user_form.first_name.value }}" {% else%}value="" {% endif %}>
-												    {% if user_form.first_name.errors %}
-                                                        <div class="error">{{ user_form.first_name.errors.as_text }}</div>
-                                                    {% endif %}
-                                                </div>
-										</div>
-										<div class="col-md-6">
-											<div class="form-group">
-													<label>Last Name</label>
-                                                    <input type="text" class="form-control" name="last_name" id="id_last_name" {% if user_form.last_name.value %} value="{{ user_form.last_name.value }}" {% else%}value="" {% endif %}>
-												    {% if user_form.last_name.errors %}
-                                                        <div class="error">{{ user_form.last_name.errors.as_text }}</div>
-                                                    {% endif %}
-                                                </div>
-										</div>
-										<div class="col-md-6">
-											<div class="form-group">
-													<label>Phone</label>
-                                                    <input type="tel" pattern="[0-9]{10}" class="form-control" name="phone_number" id="id_phone_number" {% if user_form.phone_number.value %} value="{{ user_form.phone_number.value }}" {% else%}value="" {% endif %}>
-												    {% if user_form.phone_number.errors %}
-                                                        <div class="error">{{ user_form.phone_number.errors.as_text }}</div>
-                                                    {% endif %}
+                    <!-- Basic Information -->
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title">Basic Information</h4>
+                            <div class="row form-row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <div class="change-avatar">
+                                            <div class="profile-img">
+                                                <img id="profilePicture-doctor"
+                                                     src="{% if profile_form.instance.profile_picture %}{{ profile_form.instance.profile_picture.url }}{% else %}{% static 'img/patients/patient.jpg' %}{% endif %}"
+                                                     alt="Profile Picture">
                                             </div>
-										</div>
-										<div class="col-md-6">
-											<div class="form-group">
-                                                <div class="form-group">
-                                                    <label>Gender</label>
-                                                    <select class="form-control select" name="gender" id="id_gender">
-                                                        <option>Select</option>
-                                                        <option {% if profile_form.gender.value == "Male" %}selected{% endif %}>Male</option>
-                                                        <option {% if profile_form.gender.value == "Female" %}selected{% endif %}>Female</option>
-                                                    </select>
-                                                    {% if profile_form.gender.errors %}
-                                                        <div class="error">{{ profile_form.gender.errors.as_text }}</div>
-                                                    {% endif %}
-                                                </div>
-											</div>
-										</div>
-										<div class="col-md-6">
-											<div class="form-group mb-0">
-                                                    <label>Date of Birth</label>
-                                                        <input type="date" name="date_of_birth" value="{{ profile_form.instance.date_of_birth|date:"Y-m-d" }}" class="form-control" id="id_date_of_birth">                                                    {% if profile_form.date_of_birth.errors %}
-                                                        <div class="error">{{ profile_form.date_of_birth.errors.as_text }}</div>
-                                                    {% endif %}
-                                                </div>
-										</div>
-                                        <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <div class="form-group">
-                                                        <label>Department</label>
-                                                        <select class="form-control select" name="department" id="id_department">
-                                                            <option value="">Select</option>
-                                                            {% for department in departments %}
-                                                            <option value="{{ department.id }}" {% if doctor_form.department.value|default_if_none:"" == department.id|stringformat:"s" %}selected{% endif %}>
-                                                                {{ department.name }}
-                                                            </option>
-                                                            {% endfor %}
-                                                        </select>
-                                                        {% if doctor_form.department.errors %}
-                                                            <div class="error">{{ doctor_form.department.errors.as_text }}</div>
-                                                        {% endif %}
+                                            <div class="upload-img">
+                                                <div class="change-photo-btn">
+                                                    <span><i class="fa fa-upload"></i> Upload Photo</span>
+                                                    <div style="display: none;">
+                                                        {{ profile_form.profile_picture }}
                                                     </div>
+                                                    <input type="file" class="upload" style="display: none;">
                                                 </div>
-                                            </div>
-									</div>
-								</div>
-							</div>
-							<!-- /Basic Information -->
-							
-							<!-- About Me -->
-							<div class="card">
-								<div class="card-body">
-									<h4 class="card-title">About Me</h4>
-									<div class="form-group mb-0">
-										<label>Biography</label>
-                                        <textarea rows="5" class="form-control" name="biography" id="id_biography" >{% if doctor_form.biography.value %}{{ doctor_form.biography.value }}{% else %}{% endif %}</textarea>
-                                            {% if doctor_form.biography.errors %}
-                                                <div class="error">{{ doctor_form.biography.errors.as_text }}</div>
-                                            {% endif %}
-									</div>
-								</div>
-							</div>
-							<!-- /About Me -->
-							
-							<!-- Clinic Info -->
-							<div class="card">
-								<div class="card-body">
-									<h4 class="card-title">Clinic Info</h4>
-									<div class="row form-row">
-										<div class="col-md-6">
-											<div class="form-group">
-													<label>Clinic Name</label>
-                                                    <input type="text" class="form-control" name="clinic_name" id="id_clinic_name" {% if doctor_form.clinic_name.value %} value="{{ doctor_form.clinic_name.value }}" {% else %}value="" {% endif %}>
-												    {% if doctor_form.clinic_name.errors %}
-                                                        <div class="error">{{ doctor_form.doctor_name.errors.as_text }}</div>
-                                                    {% endif %}
-                                                </div>
-										</div>
-										<div class="col-md-6">
-											<div class="form-group">
-                                                <label>Clinic Address</label>
-                                                <input type="text" class="form-control" name="clinic_address" id="id_clinic_address" {% if doctor_form.clinic_address.value %} value="{{ doctor_form.clinic_address.value }}" {% else%}value="" {% endif %}>
-                                                {% if doctor_form.clinic_address.errors %}
-                                                    <div class="error">{{ doctor_form.clinic_address.errors.as_text }}</div>
-                                                {% endif %}
-                                            </div>
-										</div>
-                                        <div class="col-12 col-md-6">
-                                            <div class="form-group">
-                                                <label>Latitude</label>
-                                                <input type="text" class="form-control" name="clinic_latitude" id="id_clinic_latitude" {% if doctor_form.clinic_latitude.value %} value="{{ doctor_form.clinic_latitude.value }}" {% else%}value="" {% endif %}>
-                                                {% if doctor_form.clinic_latitude.errors %}
-                                                    <div class="error">{{ doctor_form.clinic_latitude.errors.as_text }}</div>
+                                                <small class="form-text text-muted">Allowed JPG, GIF or PNG. Max size of 2MB</small>
+                                                {% if profile_form.profile_picture.errors %}
+                                                    <div class="error">{{ profile_form.profile_picture.errors.as_text }}</div>
                                                 {% endif %}
                                             </div>
                                         </div>
-                                        <div class="col-12 col-md-6">
-                                            <div class="form-group">
-                                                <label>Longitude</label>
-                                                <input type="text" class="form-control" name="clinic_longitude" id="id_clinic_longitude" {% if doctor_form.clinic_longitude.value %} value="{{ doctor_form.clinic_longitude.value }}" {% else%}value="" {% endif %}>
-                                                {% if doctor_form.clinic_longitude.errors %}
-                                                    <div class="error">{{ doctor_form.clinic_longitude.errors.as_text }}</div>
-                                                {% endif %}
-                                            </div>
-                                        </div>
-									</div>
-								</div>
-							</div>
-							<!-- /Clinic Info -->
+                                    </div>
+                                </div>
 
-							<!-- Contact Details -->
-							<div class="card contact-card">
-								<div class="card-body">
-									<h4 class="card-title">Contact Details</h4>
-									<div class="row form-row">
-										<div class="col-md-12">
-											<div class="form-group">
-                                                <label>Address</label>
-                                                <input type="text" class="form-control" name="address" id="id_address" {% if profile_form.address.value %} value="{{ profile_form.address.value }}" {% else%}value="" {% endif %}>
-                                                {% if profile_form.address.errors %}
-                                                    <div class="error">{{ profile_form.address.errors.as_text }}</div>
-                                                {% endif %}
-                                            </div>
-										</div>
-										<div class="col-md-6">
-											<div class="form-group">
-                                                <label>City</label>
-                                                <input type="text" class="form-control" name="city" id="id_city" {% if profile_form.city.value %} value="{{ profile_form.city.value }}" {% else%}value="" {% endif %}>
-                                                {% if profile_form.city.errors %}
-                                                    <div class="error">{{ profile_form.city.errors.as_text }}</div>
-                                                {% endif %}
-                                            </div>
-										</div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Username <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" name="username" id="id_username"
+                                               value="{{ user_form.username.value|default:'' }}" readonly>
+                                        {% if user_form.username.errors %}
+                                            <div class="error">{{ user_form.username.errors.as_text }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
 
-										<div class="col-md-6">
-											<div class="form-group">
-                                                <label>State</label>
-                                                <input type="text" class="form-control" name="state" id="id_state" {% if profile_form.state.value %} value="{{ profile_form.state.value }}" {% else%}value="" {% endif %}>
-                                                {% if profile_form.state.errors %}
-                                                    <div class="error">{{ profile_form.state.errors.as_text }}</div>
-                                                {% endif %}
-                                            </div>
-										</div>
-										<div class="col-md-6">
-											<div class="form-group">
-                                                <label>Country</label>
-                                                <input type="text" class="form-control" name="country" id="id_country" {% if profile_form.country.value %} value="{{ profile_form.country.value }}" {% else%}value="" {% endif %}>
-                                                {% if profile_form.country.errors %}
-                                                    <div class="error">{{ profile_form.country.errors.as_text }}</div>
-                                                {% endif %}
-                                            </div>
-										</div>
-										<div class="col-md-6">
-											<div class="form-group">
-                                                <label>Zip Code</label>
-                                                <input type="text" class="form-control" name="pin_code" id="id_pin_code" {% if profile_form.pin_code.value %} value="{{ profile_form.pin_code.value }}" {% else%}value="" {% endif %}>
-                                                {% if profile_form.pin_code.errors %}
-                                                    <div class="error">{{ profile_form.pin_code.errors.as_text }}</div>
-                                                {% endif %}
-                                            </div>
-										</div>
-                                        <div class="col-12 col-md-6">
-                                            <div class="form-group">
-                                                <label>Latitude</label>
-                                                <input type="text" class="form-control" name="latitude" id="id_latitude" {% if profile_form.latitude.value %} value="{{ profile_form.latitude.value }}" {% else%}value="" {% endif %}>
-                                                {% if profile_form.latitude.errors %}
-                                                    <div class="error">{{ profile_form.latitude.errors.as_text }}</div>
-                                                {% endif %}
-                                            </div>
-                                        </div>
-                                        <div class="col-12 col-md-6">
-                                            <div class="form-group">
-                                                <label>Longitude</label>
-                                                <input type="text" class="form-control" name="longitude" id="id_longitude" {% if profile_form.longitude.value %} value="{{ profile_form.longitude.value }}" {% else%}value="" {% endif %}>
-                                                {% if profile_form.longitude.errors %}
-                                                    <div class="error">{{ profile_form.longitude.errors.as_text }}</div>
-                                                {% endif %}
-                                            </div>
-                                        </div>
-                                     <div class="col-12 col-md-6">
-                                            <div class="form-group">
-                                                <label>Contact Email</label>
-                                                <input type="text" class="form-control" name="contact_email" id="id_contact_email" {% if doctor_form.contact_email.value %} value="{{ doctor_form.contact_email.value }}" {% else%}value="" {% endif %}>
-                                                {% if doctor_form.contact_email.errors %}
-                                                    <div class="error">{{ doctor_form.contact_email.errors.as_text }}</div>
-                                                {% endif %}
-                                            </div>
-                                        </div>
-                                        <div class="col-12 col-md-6">
-                                            <div class="form-group">
-                                                <label>Contact Phone</label>
-                                                <input type="text" class="form-control" name="contact_phone" id="id_contact_phone" {% if doctor_form.contact_phone.value %} value="{{ doctor_form.contact_phone.value }}" {% else%}value="" {% endif %}>
-                                                {% if doctor_form.contact_phone.errors %}
-                                                    <div class="error">{{ doctor_form.contact_phone.errors.as_text }}</div>
-                                                {% endif %}
-                                            </div>
-                                        </div>
-									</div>
-								</div>
-							</div>
-							<!-- /Contact Details -->
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Email <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" name="email" id="id_email"
+                                               value="{{ user_form.email.value|default:'' }}" readonly>
+                                        {% if user_form.email.errors %}
+                                            <div class="error">{{ user_form.email.errors.as_text }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
 
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>First Name</label>
+                                        <input type="text" class="form-control" name="first_name" id="id_first_name"
+                                               value="{{ user_form.first_name.value|default:'' }}">
+                                        {% if user_form.first_name.errors %}
+                                            <div class="error">{{ user_form.first_name.errors.as_text }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
 
-							
-							<div class="submit-section">
-{#								<button type="submit" class="btn btn-primary submit-btn">Save Changes</button>#}
-                                <button type="button" onclick="submitFormManually()">Save Changes</button>
-							</div>
-                        </form>
-						</div>
-					</div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Last Name</label>
+                                        <input type="text" class="form-control" name="last_name" id="id_last_name"
+                                               value="{{ user_form.last_name.value|default:'' }}">
+                                        {% if user_form.last_name.errors %}
+                                            <div class="error">{{ user_form.last_name.errors.as_text }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
 
-				</div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Phone</label>
+                                        <input type="tel" pattern="[0-9]{10}" class="form-control" name="phone_number" id="id_phone_number"
+                                               value="{{ user_form.phone_number.value|default:'' }}">
+                                        {% if user_form.phone_number.errors %}
+                                            <div class="error">{{ user_form.phone_number.errors.as_text }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
 
-			</div>		
-			<!-- /Page Content -->
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Gender</label>
+                                        <select class="form-control select" name="gender" id="id_gender">
+                                            <option value="">Select</option>
+                                            <option value="Male" {% if profile_form.gender.value == "Male" %}selected{% endif %}>Male</option>
+                                            <option value="Female" {% if profile_form.gender.value == "Female" %}selected{% endif %}>Female</option>
+                                        </select>
+                                        {% if profile_form.gender.errors %}
+                                            <div class="error">{{ profile_form.gender.errors.as_text }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group mb-0">
+                                        <label>Date of Birth</label>
+                                        <input type="date" name="date_of_birth"
+                                               value="{{ profile_form.instance.date_of_birth|date:'Y-m-d' }}"
+                                               class="form-control" id="id_date_of_birth">
+                                        {% if profile_form.date_of_birth.errors %}
+                                            <div class="error">{{ profile_form.date_of_birth.errors.as_text }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Department</label>
+                                        <select class="form-control select" name="department" id="id_department">
+                                            <option value="">Select</option>
+                                            {% for department in departments %}
+                                                <option value="{{ department.id }}"
+                                                    {% if doctor_form.department.value|default_if_none:"" == department.id|stringformat:"s" %}selected{% endif %}>
+                                                    {{ department.name }}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                        {% if doctor_form.department.errors %}
+                                            <div class="error">{{ doctor_form.department.errors.as_text }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /Basic Information -->
+
+                    <!-- About Me -->
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title">About Me</h4>
+                            <div class="form-group mb-0">
+                                <label>Biography</label>
+                                <textarea rows="5" class="form-control" name="biography" id="id_biography">{{ doctor_form.biography.value|default:'' }}</textarea>
+                                {% if doctor_form.biography.errors %}
+                                    <div class="error">{{ doctor_form.biography.errors.as_text }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /About Me -->
+
+                    <!-- Clinic Info -->
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title">Clinic Info</h4>
+                            <div class="row form-row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Clinic Name</label>
+                                        <input type="text" class="form-control" name="clinic_name" id="id_clinic_name"
+                                               value="{{ doctor_form.clinic_name.value|default:'' }}">
+                                        {% if doctor_form.clinic_name.errors %}
+                                            <div class="error">{{ doctor_form.clinic_name.errors.as_text }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Clinic Address</label>
+                                        <input type="text" class="form-control" name="clinic_address" id="id_clinic_address"
+                                               value="{{ doctor_form.clinic_address.value|default:'' }}">
+                                        {% if doctor_form.clinic_address.errors %}
+                                            <div class="error">{{ doctor_form.clinic_address.errors.as_text }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <div class="col-12 col-md-6">
+                                    <div class="form-group">
+                                        <label>Clinic Latitude</label>
+                                        <input type="text" class="form-control" name="clinic_latitude" id="id_clinic_latitude"
+                                               value="{{ doctor_form.clinic_latitude.value|default:'' }}">
+                                        {% if doctor_form.clinic_latitude.errors %}
+                                            <div class="error">{{ doctor_form.clinic_latitude.errors.as_text }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <div class="col-12 col-md-6">
+                                    <div class="form-group">
+                                        <label>Clinic Longitude</label>
+                                        <input type="text" class="form-control" name="clinic_longitude" id="id_clinic_longitude"
+                                               value="{{ doctor_form.clinic_longitude.value|default:'' }}">
+                                        {% if doctor_form.clinic_longitude.errors %}
+                                            <div class="error">{{ doctor_form.clinic_longitude.errors.as_text }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /Clinic Info -->
+
+                    <!-- Contact Details -->
+                    <div class="card contact-card">
+                        <div class="card-body">
+                            <h4 class="card-title">Contact Details</h4>
+                            <div class="row form-row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Address</label>
+                                        <input type="text" class="form-control" name="address" id="id_address"
+                                               value="{{ profile_form.address.value|default:'' }}">
+                                        {% if profile_form.address.errors %}
+                                            <div class="error">{{ profile_form.address.errors.as_text }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>City</label>
+                                        <input type="text" class="form-control" name="city" id="id_city"
+                                               value="{{ profile_form.city.value|default:'' }}">
+                                        {% if profile_form.city.errors %}
+                                            <div class="error">{{ profile_form.city.errors.as_text }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>State</label>
+                                        <input type="text" class="form-control" name="state" id="id_state"
+                                               value="{{ profile_form.state.value|default:'' }}">
+                                        {% if profile_form.state.errors %}
+                                            <div class="error">{{ profile_form.state.errors.as_text }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Country</label>
+                                        <input type="text" class="form-control" name="country" id="id_country"
+                                               value="{{ profile_form.country.value|default:'' }}">
+                                        {% if profile_form.country.errors %}
+                                            <div class="error">{{ profile_form.country.errors.as_text }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Zip Code</label>
+                                        <input type="text" class="form-control" name="pin_code" id="id_pin_code"
+                                               value="{{ profile_form.pin_code.value|default:'' }}">
+                                        {% if profile_form.pin_code.errors %}
+                                            <div class="error">{{ profile_form.pin_code.errors.as_text }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <div class="col-12 col-md-6">
+                                    <div class="form-group">
+                                        <label>Latitude</label>
+                                        <input type="text" class="form-control" name="latitude" id="id_latitude"
+                                               value="{{ profile_form.latitude.value|default:'' }}">
+                                        {% if profile_form.latitude.errors %}
+                                            <div class="error">{{ profile_form.latitude.errors.as_text }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <div class="col-12 col-md-6">
+                                    <div class="form-group">
+                                        <label>Longitude</label>
+                                        <input type="text" class="form-control" name="longitude" id="id_longitude"
+                                               value="{{ profile_form.longitude.value|default:'' }}">
+                                        {% if profile_form.longitude.errors %}
+                                            <div class="error">{{ profile_form.longitude.errors.as_text }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <div class="col-12 col-md-6">
+                                    <div class="form-group">
+                                        <label>Contact Email</label>
+                                        <input type="text" class="form-control" name="contact_email" id="id_contact_email"
+                                               value="{{ doctor_form.contact_email.value|default:'' }}">
+                                        {% if doctor_form.contact_email.errors %}
+                                            <div class="error">{{ doctor_form.contact_email.errors.as_text }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <div class="col-12 col-md-6">
+                                    <div class="form-group">
+                                        <label>Contact Phone</label>
+                                        <input type="text" class="form-control" name="contact_phone" id="id_contact_phone"
+                                               value="{{ doctor_form.contact_phone.value|default:'' }}">
+                                        {% if doctor_form.contact_phone.errors %}
+                                            <div class="error">{{ doctor_form.contact_phone.errors.as_text }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /Contact Details -->
+<!-- Billing Details -->
+<div class="card">
+    <div class="card-body">
+        <h4 class="card-title">Billing Details</h4>
+        <div class="row form-row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Consultation Charge for 30 Minutes (Rs.)</label>
+                    <input type="text"
+                           class="form-control"
+                           name="consultation_fee"
+                           id="id_consultation_fee"
+                           value="{{ billing_form.consultation_fee.value|default:'' }}"
+                           placeholder="Enter amount in rupees">
+                    {% if billing_form.consultation_fee.errors %}
+                        <div class="error">{{ billing_form.consultation_fee.errors.as_text }}</div>
+                    {% endif %}
+                    <small class="form-text text-muted">Enter the consultation charge in Nepalese Rupees.</small>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>eSewa Number / ID</label>
+                    <input type="text"
+                           class="form-control"
+                           name="esewa_number"
+                           id="id_esewa_number"
+                           value="{{ billing_form.esewa_number.value|default:'' }}"
+                           placeholder="Enter eSewa number">
+                    {% if billing_form.esewa_number.errors %}
+                        <div class="error">{{ billing_form.esewa_number.errors.as_text }}</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="col-md-12">
+                <div class="form-group form-check mt-2">
+                    <input type="checkbox"
+                           class="form-check-input"
+                           name="esewa_enabled"
+                           id="id_esewa_enabled"
+                           {% if billing_form.esewa_enabled.value %}checked{% endif %}>
+                    <label class="form-check-label" for="id_esewa_enabled">
+                        Enable eSewa payment
+                    </label>
+                    {% if billing_form.esewa_enabled.errors %}
+                        <div class="error">{{ billing_form.esewa_enabled.errors.as_text }}</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Billing Details -->
+                    <div class="submit-section">
+                        <button type="button" class="btn btn-primary submit-btn" onclick="submitFormManually()">
+                            Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
-document.querySelector('.change-photo-btn span').addEventListener('click', function() {
-    // Trigger the original input
-    document.querySelector('.upload-img input[type="file"]').click();
-});
+    const hiddenOriginalInput = document.querySelector('#id_profile_picture');
+    const customUploadTrigger = document.querySelector('.upload-img input[type="file"]');
+    const uploadLabel = document.querySelector('.change-photo-btn span');
+    const profilePreview = document.getElementById('profilePicture-doctor');
 
-document.querySelector('.upload-img input[type="file"]').addEventListener('change', function() {
-    // Handle file selection UI feedback here, if needed
-    var fileName = this.files[0].name;
-    document.querySelector('.change-photo-btn span').textContent = fileName; // Example UI feedback
-
-    // Update the profile picture in the UI instantly
-    if (this.files && this.files[0]) {
-        var reader = new FileReader();
-
-        reader.onload = function(e) {
-            document.getElementById('profilePicture-doctor').src = e.target.result;
-        };
-
-        reader.readAsDataURL(this.files[0]);
+    if (uploadLabel && customUploadTrigger) {
+        uploadLabel.addEventListener('click', function () {
+            customUploadTrigger.click();
+        });
     }
-});
 
+    if (customUploadTrigger && hiddenOriginalInput) {
+        customUploadTrigger.addEventListener('change', function () {
+            if (this.files && this.files[0]) {
+                const dt = new DataTransfer();
+                dt.items.add(this.files[0]);
+                hiddenOriginalInput.files = dt.files;
 
-function submitFormManually() {
-        document.getElementById("doctor-form").submit(); // Replace "yourFormId" with your form's actual ID
+                uploadLabel.textContent = this.files[0].name;
+
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    profilePreview.src = e.target.result;
+                };
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+    }
+
+    function submitFormManually() {
+        document.getElementById("doctor-form").submit();
     }
 </script>
+
 {% endblock %}

@@ -21,95 +21,430 @@
 <div class="content">
   <div class="container-fluid">
 
-    <div class="row">
+    <!-- Main Content Grid -->
+    <div class="row mt-4">
+      <!-- Medicines Section -->
       <div class="col-md-12">
-        <div class="card">
-          <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center">
-              <h4 class="mb-0">Medicines</h4>
-              <a class="btn btn-primary" href="{% url 'medicine_create' %}"><i class="fas fa-plus"></i> Add Medicine</a>
+        <div class="confidential-card dashboard-card">
+          <div class="card-header-confidential">
+            <div class="header-left">
+              <i class="fas fa-pills"></i>
+              <h4>Medicine Inventory</h4>
+              <span class="confidential-tag">RESTRICTED ACCESS</span>
             </div>
-            <div class="table-responsive mt-3">
-              <table class="table table-hover mb-0">
-                <thead>
-                  <tr>
-                    <th>Image</th>
-                    <th>Name</th>
-                    <th>Form</th>
-                    <th>Strength</th>
-                    <th>Price</th>
-                    <th>Stock</th>
-                    <th>Status</th>
-                    <th></th>
+            <a class="btn-add-medicine" href="{% url 'medicine_create' %}">
+              <i class="fas fa-plus"></i> Add Medicine
+            </a>
+          </div>
+          
+          <div class="table-responsive confidential-table">
+            <table class="table table-hover mb-0">
+              <thead>
+                <tr>
+                  <th><i class="fas fa-image"></i> Image</th>
+                  <th><i class="fas fa-tag"></i> Name</th>
+                  <th><i class="fas fa-tablets"></i> Form</th>
+                  <th><i class="fas fa-weight-hanging"></i> Strength</th>
+                  <th><i class="fas fa-rupee-sign"></i> Price</th>
+                  <th><i class="fas fa-box"></i> Stock</th>
+                  <th><i class="fas fa-shield-alt"></i> Status</th>
+                  <th><i class="fas fa-cog"></i> Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for m in medicines %}
+                  <tr class="{% if m.stock_qty <= 5 %}low-stock-row{% endif %}">
+                    <td class="image-cell">
+                      {% if m.image %}
+                        <div class="medicine-thumb">
+                          <img src="{{ m.image.url }}" alt="{{ m.name }}">
+                        </div>
+                      {% else %}
+                        <div class="medicine-thumb placeholder-thumb">
+                          <i class="fas fa-capsule"></i>
+                        </div>
+                      {% endif %}
+                    </td>
+                    <td class="medicine-name">{{ m.name }}</td>
+                    <td>{{ m.dosage_form|default:"-" }}</td>
+                    <td>{{ m.strength|default:"-" }}</td>
+                    <td class="price-cell">₹{{ m.unit_price }}</td>
+                    <td>
+                      <span class="stock-indicator {% if m.stock_qty <= 5 %}stock-low{% elif m.stock_qty <= 15 %}stock-medium{% else %}stock-good{% endif %}">
+                        {{ m.stock_qty }} units
+                      </span>
+                    </td>
+                    <td>
+                      {% if m.is_active %}
+                        <span class="status-badge active"><i class="fas fa-check-circle"></i> Active</span>
+                      {% else %}
+                        <span class="status-badge inactive"><i class="fas fa-ban"></i> Inactive</span>
+                      {% endif %}
+                    </td>
+                    <td class="action-cell">
+                      <a class="action-btn edit-btn" href="{% url 'medicine_edit' m.id %}" title="Edit Medicine">
+                        <i class="fas fa-edit"></i> Edit
+                      </a>
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {% for m in medicines %}
-                    <tr>
-                      <td>
-                        {% if m.image %}
-                          <img src="{{ m.image.url }}" alt="{{ m.name }}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px;">
-                        {% endif %}
-                      </td>
-                      <td>{{ m.name }}</td>
-                      <td>{{ m.dosage_form|default:"-" }}</td>
-                      <td>{{ m.strength|default:"-" }}</td>
-                      <td>{{ m.unit_price }}</td>
-                      <td>{{ m.stock_qty }}</td>
-                      <td>{% if m.is_active %}Active{% else %}Inactive{% endif %}</td>
-                      <td class="text-right">
-                        <a class="btn btn-sm bg-info-light" href="{% url 'medicine_edit' m.id %}"><i class="far fa-edit"></i> Edit</a>
-                      </td>
-                    </tr>
-                  {% empty %}
-                    <tr><td colspan="8">No medicines added yet.</td></tr>
-                  {% endfor %}
-                </tbody>
-              </table>
+                {% empty %}
+                  <tr class="empty-row">
+                    <td colspan="8">
+                      <div class="empty-state-confidential">
+                        <i class="fas fa-box-open"></i>
+                        <p>No medicines in inventory</p>
+                        <small>Add medicines to start managing your pharmacy</small>
+                      </div>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          
+          <div class="card-footer-confidential">
+            <div class="footer-left">
+              <i class="fas fa-lock"></i> This data is confidential and restricted to authorized personnel
+            </div>
+            <div class="footer-right">
+              <span class="last-updated"><i class="fas fa-clock"></i> Last sync: {% now "d M Y H:i" %}</span>
             </div>
           </div>
         </div>
-
-        <div class="card">
-          <div class="card-body">
-            <h4 class="mb-3">Recent Prescriptions</h4>
-            <div class="table-responsive">
-              <table class="table table-hover mb-0">
-                <thead>
-                  <tr>
-                    <th>Rx #</th>
-                    <th>Patient</th>
-                    <th>Doctor</th>
-                    <th>Status</th>
-                    <th>Created</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for rx in prescriptions %}
-                    <tr>
-                      <td>#{{ rx.id }}</td>
-                      <td>{{ rx.patient.first_name }} {{ rx.patient.last_name }}</td>
-                      <td>{{ rx.doctor.user.first_name }} {{ rx.doctor.user.last_name }}</td>
-                      <td>{{ rx.get_status_display }}</td>
-                      <td>{{ rx.created_at|date:"d M Y" }}</td>
-                      <td class="text-right">
-                        <a class="btn btn-sm bg-info-light" href="{% url 'pharmacy_prescription_detail' rx.id %}"><i class="far fa-eye"></i> View</a>
-                      </td>
-                    </tr>
-                  {% empty %}
-                    <tr><td colspan="6">No prescriptions yet.</td></tr>
-                  {% endfor %}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
       </div>
     </div>
 
   </div>
 </div>
+
+<style>
+:root {
+  --primary-blue: #2c5f8a;
+  --primary-dark: #1a3a5c;
+  --primary-light: #4a7fa8;
+  --primary-soft: #e8f0f8;
+  --accent-warning: #e67e22;
+  --accent-danger: #c0392b;
+  --accent-success: #27ae60;
+  --confidential-bg: #0d1b2a;
+  --glass-bg: rgba(255, 255, 255, 0.98);
+  --border-glow: rgba(44, 95, 138, 0.2);
+  --shadow-confidential: 0 20px 35px -12px rgba(0, 0, 0, 0.15);
+}
+
+/* Main Dashboard Card */
+.dashboard-card {
+  border-radius: 24px;
+  overflow: hidden;
+  background: var(--glass-bg);
+  box-shadow: var(--shadow-confidential);
+  border: 1px solid var(--border-glow);
+}
+
+.card-header-confidential {
+  background: linear-gradient(135deg, var(--primary-dark), var(--primary-blue));
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.header-left i {
+  font-size: 1.5rem;
+  color: white;
+}
+
+.header-left h4 {
+  margin: 0;
+  color: white;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+}
+
+.confidential-tag {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 0.2rem 0.6rem;
+  border-radius: 30px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: #ffd966;
+  letter-spacing: 0.5px;
+}
+
+.btn-add-medicine {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 0.5rem 1.2rem;
+  border-radius: 40px;
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-add-medicine:hover {
+  background: white;
+  color: var(--primary-blue);
+  transform: translateY(-1px);
+}
+
+/* Confidential Table */
+.confidential-table {
+  margin: 0;
+}
+
+.confidential-table table {
+  margin-bottom: 0;
+}
+
+.confidential-table thead th {
+  background: #f0f4f9;
+  color: var(--primary-dark);
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 1rem 1rem;
+  border-bottom: 2px solid var(--primary-soft);
+}
+
+.confidential-table tbody tr {
+  transition: all 0.2s;
+  border-bottom: 1px solid #edf2f7;
+}
+
+.confidential-table tbody tr:hover {
+  background: rgba(44, 95, 138, 0.04);
+}
+
+.confidential-table tbody td {
+  padding: 0.9rem 1rem;
+  vertical-align: middle;
+  font-size: 0.85rem;
+}
+
+/* Image Thumbnail */
+.medicine-thumb {
+  width: 45px;
+  height: 45px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #f0f4f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.medicine-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.placeholder-thumb {
+  color: var(--primary-light);
+  font-size: 1.2rem;
+}
+
+.medicine-name {
+  font-weight: 600;
+  color: var(--primary-dark);
+}
+
+.price-cell {
+  font-weight: 700;
+  color: var(--primary-blue);
+}
+
+/* Stock Indicators */
+.stock-indicator {
+  display: inline-block;
+  padding: 0.25rem 0.7rem;
+  border-radius: 30px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.stock-good {
+  background: #d5f4e6;
+  color: #1e7b48;
+}
+
+.stock-medium {
+  background: #fff3e0;
+  color: #e67e22;
+}
+
+.stock-low {
+  background: #fee9e7;
+  color: #c0392b;
+  animation: pulseWarning 1.5s infinite;
+}
+
+@keyframes pulseWarning {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.low-stock-row {
+  background: rgba(192, 57, 43, 0.03);
+}
+
+/* Status Badges */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.25rem 0.7rem;
+  border-radius: 30px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.status-badge.active {
+  background: #d5f4e6;
+  color: #1e7b48;
+}
+
+.status-badge.inactive {
+  background: #e8e8e8;
+  color: #7f8c8d;
+}
+
+/* Action Buttons */
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 1rem;
+  background: var(--primary-soft);
+  color: var(--primary-blue);
+  border-radius: 30px;
+  text-decoration: none;
+  font-size: 0.75rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.action-btn:hover {
+  background: var(--primary-blue);
+  color: white;
+  transform: translateY(-1px);
+}
+
+/* Card Footer */
+.card-footer-confidential {
+  background: #f8fafc;
+  padding: 0.75rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  border-top: 1px solid #e2e8f0;
+  font-size: 0.7rem;
+  color: #7f8c8d;
+}
+
+.footer-left i, .footer-right i {
+  margin-right: 0.3rem;
+  color: var(--primary-light);
+}
+
+/* Empty State */
+.empty-state-confidential {
+  text-align: center;
+  padding: 3rem;
+  color: #95a5a6;
+}
+
+.empty-state-confidential i {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  color: var(--primary-light);
+}
+
+.empty-state-confidential p {
+  margin-bottom: 0.25rem;
+  font-weight: 500;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .card-header-confidential {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .confidential-table {
+    overflow-x: auto;
+  }
+  
+  .card-footer-confidential {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+/* Confidential Hover Effect */
+.confidential-card {
+  position: relative;
+}
+
+.confidential-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 20px;
+  pointer-events: none;
+  transition: all 0.3s;
+}
+
+.confidential-card:hover::before {
+  box-shadow: inset 0 0 0 1px rgba(44, 95, 138, 0.3);
+}
+
+/* Keep existing breadcrumb styles */
+.breadcrumb-bar {
+  background: linear-gradient(135deg, var(--primary-dark), var(--primary-blue));
+  padding: 1rem 0;
+  margin-bottom: 1.5rem;
+}
+
+.breadcrumb-title {
+  color: white;
+  margin-bottom: 0;
+  font-weight: 600;
+}
+
+.page-breadcrumb .breadcrumb {
+  background: transparent;
+  padding: 0;
+  margin-bottom: 0.5rem;
+}
+
+.page-breadcrumb .breadcrumb-item a {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.page-breadcrumb .breadcrumb-item.active {
+  color: white;
+}
+</style>
 
 {% endblock %}

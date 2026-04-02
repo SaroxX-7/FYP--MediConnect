@@ -1,0 +1,590 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    .chat-page-helper {
+        min-height: 200px;
+    }
+
+    .chat-launcher {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 62px;
+        height: 62px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: none;
+        padding: 0;
+        background: #0d6efd;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+        z-index: 1050;
+        cursor: pointer;
+    }
+
+    .chat-launcher img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .chat-launcher-badge {
+        position: absolute;
+        top: -2px;
+        right: -2px;
+        min-width: 22px;
+        height: 22px;
+        padding: 0 6px;
+        border-radius: 11px;
+        background: #dc3545;
+        color: #fff;
+        font-size: 12px;
+        font-weight: 700;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid #fff;
+    }
+
+    .chat-widget {
+        position: fixed;
+        bottom: 95px;
+        right: 20px;
+        width: 350px;
+        max-width: calc(100vw - 24px);
+        height: 500px;
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18);
+        overflow: hidden;
+        z-index: 1051;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .chat-widget.d-none {
+        display: none !important;
+    }
+
+    .chat-widget-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 14px;
+        border-bottom: 1px solid #e9ecef;
+        background: #ffffff;
+    }
+
+    .chat-widget-user {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 0;
+    }
+
+    .chat-widget-user img {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        object-fit: cover;
+        flex-shrink: 0;
+    }
+
+    .chat-widget-user-info {
+        min-width: 0;
+    }
+
+    .chat-widget-user-name {
+        font-weight: 600;
+        font-size: 14px;
+        line-height: 1.2;
+        color: #212529;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .chat-widget-user-subtitle {
+        font-size: 12px;
+        color: #6c757d;
+    }
+
+    .chat-widget-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .chat-widget-action-btn {
+        border: none;
+        background: transparent;
+        font-size: 18px;
+        line-height: 1;
+        color: #6c757d;
+        cursor: pointer;
+        padding: 4px 6px;
+    }
+
+    .chat-widget-body {
+        flex: 1;
+        overflow-y: auto;
+        padding: 14px;
+        background: #f8f9fa;
+    }
+
+    .chat-empty {
+        text-align: center;
+        color: #6c757d;
+        font-size: 14px;
+        margin-top: 24px;
+    }
+
+    .chat-message-row {
+        margin-bottom: 10px;
+        display: flex;
+    }
+
+    .chat-message-row.self {
+        justify-content: flex-end;
+    }
+
+    .chat-bubble {
+        max-width: 82%;
+        padding: 10px 12px;
+        border-radius: 14px;
+        word-wrap: break-word;
+    }
+
+    .chat-bubble.other {
+        background: #ffffff;
+        border: 1px solid #dee2e6;
+        color: #212529;
+    }
+
+    .chat-bubble.self {
+        background: #0d6efd;
+        color: #ffffff;
+    }
+
+    .chat-message-text {
+        font-size: 14px;
+        margin-bottom: 4px;
+        white-space: pre-wrap;
+    }
+
+    .chat-message-meta,
+    .chat-message-status {
+        display: block;
+        font-size: 11px;
+        line-height: 1.3;
+    }
+
+    .chat-bubble.other .chat-message-meta,
+    .chat-bubble.other .chat-message-status {
+        color: #6c757d;
+    }
+
+    .chat-bubble.self .chat-message-meta,
+    .chat-bubble.self .chat-message-status {
+        color: rgba(255, 255, 255, 0.88);
+    }
+
+    .chat-widget-footer {
+        padding: 12px;
+        border-top: 1px solid #e9ecef;
+        background: #fff;
+    }
+
+    .chat-input-group {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .chat-input-group input {
+        flex: 1;
+        border-radius: 999px;
+        border: 1px solid #ced4da;
+        padding: 10px 14px;
+        outline: none;
+        font-size: 14px;
+    }
+
+    .chat-send-btn {
+        border: none;
+        background: #0d6efd;
+        color: #fff;
+        border-radius: 999px;
+        padding: 10px 16px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .chat-send-btn:disabled {
+        opacity: 0.65;
+        cursor: not-allowed;
+    }
+
+    @media (max-width: 576px) {
+        .chat-widget {
+            right: 12px;
+            bottom: 84px;
+            width: calc(100vw - 24px);
+            height: 70vh;
+        }
+
+        .chat-launcher {
+            right: 12px;
+            bottom: 12px;
+        }
+    }
+</style>
+
+<div class="content">
+    <div class="container-fluid">
+        <div class="chat-page-helper">
+            <div class="alert alert-info">
+                Chat is ready. Use the floating widget at the bottom-right to continue the conversation.
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if request.user == conversation.appointment.patient %}
+    {% with other_user=conversation.appointment.doctor.user %}
+        <button id="chat-launcher" class="chat-launcher" type="button" aria-label="Open chat">
+            <img
+                src="{% if other_user.userprofile.profile_picture %}{{ other_user.userprofile.profile_picture.url }}{% else %}{% static 'img/favicon.png' %}{% endif %}"
+                alt="Chat User"
+            >
+            <span id="chat-launcher-badge" class="chat-launcher-badge">0</span>
+        </button>
+
+        <div id="chat-widget" class="chat-widget">
+            <div class="chat-widget-header">
+                <div class="chat-widget-user">
+                    <img
+                        src="{% if other_user.userprofile.profile_picture %}{{ other_user.userprofile.profile_picture.url }}{% else %}{% static 'img/favicon.png' %}{% endif %}"
+                        alt="Doctor"
+                    >
+                    <div class="chat-widget-user-info">
+                        <div class="chat-widget-user-name">
+                            Dr. {{ other_user.first_name }} {{ other_user.last_name }}
+                        </div>
+                        <div class="chat-widget-user-subtitle">
+                            Appointment chat
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chat-widget-actions">
+                    <button id="chat-minimize-btn" class="chat-widget-action-btn" type="button" title="Minimize">−</button>
+                </div>
+            </div>
+
+            <div id="chat-log" class="chat-widget-body">
+                {% for message in messages %}
+                    <div
+                        class="chat-message-row {% if message.sender == request.user %}self{% endif %}"
+                        data-message-id="{{ message.id }}"
+                        data-sender-id="{{ message.sender.id }}"
+                    >
+                        <div class="chat-bubble {% if message.sender == request.user %}self{% else %}other{% endif %}">
+                            <div class="chat-message-text">{{ message.text }}</div>
+                            <small class="chat-message-meta">
+                                {{ message.sender.first_name }} {{ message.sender.last_name }} • {{ message.created_at|date:"d M Y, g:i A" }}
+                            </small>
+
+                            {% if message.sender == request.user %}
+                                <small
+                                    class="chat-message-status"
+                                    data-status-for-message="{{ message.id }}"
+                                >
+                                    {% if message.is_read %}
+                                        Seen{% if message.read_at %} • {{ message.read_at|date:"d M Y, g:i A" }}{% endif %}
+                                    {% else %}
+                                        Unseen
+                                    {% endif %}
+                                </small>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% empty %}
+                    <div id="chat-empty" class="chat-empty">No messages yet. Start the conversation.</div>
+                {% endfor %}
+            </div>
+
+            <div class="chat-widget-footer">
+                <div class="chat-input-group">
+                    <input id="chat-message-input" type="text" placeholder="Type your message...">
+                    <button id="chat-message-submit" class="chat-send-btn" type="button">Send</button>
+                </div>
+            </div>
+        </div>
+    {% endwith %}
+{% else %}
+    {% with other_user=conversation.appointment.patient %}
+        <button id="chat-launcher" class="chat-launcher" type="button" aria-label="Open chat">
+            <img
+                src="{% if other_user.userprofile.profile_picture %}{{ other_user.userprofile.profile_picture.url }}{% else %}{% static 'img/favicon.png' %}{% endif %}"
+                alt="Chat User"
+            >
+            <span id="chat-launcher-badge" class="chat-launcher-badge">0</span>
+        </button>
+
+        <div id="chat-widget" class="chat-widget">
+            <div class="chat-widget-header">
+                <div class="chat-widget-user">
+                    <img
+                        src="{% if other_user.userprofile.profile_picture %}{{ other_user.userprofile.profile_picture.url }}{% else %}{% static 'img/favicon.png' %}{% endif %}"
+                        alt="Patient"
+                    >
+                    <div class="chat-widget-user-info">
+                        <div class="chat-widget-user-name">
+                            {{ other_user.first_name }} {{ other_user.last_name }}
+                        </div>
+                        <div class="chat-widget-user-subtitle">
+                            Appointment chat
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chat-widget-actions">
+                    <button id="chat-minimize-btn" class="chat-widget-action-btn" type="button" title="Minimize">−</button>
+                </div>
+            </div>
+
+            <div id="chat-log" class="chat-widget-body">
+                {% for message in messages %}
+                    <div
+                        class="chat-message-row {% if message.sender == request.user %}self{% endif %}"
+                        data-message-id="{{ message.id }}"
+                        data-sender-id="{{ message.sender.id }}"
+                    >
+                        <div class="chat-bubble {% if message.sender == request.user %}self{% else %}other{% endif %}">
+                            <div class="chat-message-text">{{ message.text }}</div>
+                            <small class="chat-message-meta">
+                                {{ message.sender.first_name }} {{ message.sender.last_name }} • {{ message.created_at|date:"d M Y, g:i A" }}
+                            </small>
+
+                            {% if message.sender == request.user %}
+                                <small
+                                    class="chat-message-status"
+                                    data-status-for-message="{{ message.id }}"
+                                >
+                                    {% if message.is_read %}
+                                        Seen{% if message.read_at %} • {{ message.read_at|date:"d M Y, g:i A" }}{% endif %}
+                                    {% else %}
+                                        Unseen
+                                    {% endif %}
+                                </small>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% empty %}
+                    <div id="chat-empty" class="chat-empty">No messages yet. Start the conversation.</div>
+                {% endfor %}
+            </div>
+
+            <div class="chat-widget-footer">
+                <div class="chat-input-group">
+                    <input id="chat-message-input" type="text" placeholder="Type your message...">
+                    <button id="chat-message-submit" class="chat-send-btn" type="button">Send</button>
+                </div>
+            </div>
+        </div>
+    {% endwith %}
+{% endif %}
+
+{{ conversation.id|json_script:"conversation-id" }}
+{{ request.user.id|json_script:"current-user-id" }}
+
+<script>
+    const conversationId = JSON.parse(document.getElementById('conversation-id').textContent);
+    const currentUserId = JSON.parse(document.getElementById('current-user-id').textContent);
+
+    const chatLauncher = document.getElementById('chat-launcher');
+    const chatLauncherBadge = document.getElementById('chat-launcher-badge');
+    const chatWidget = document.getElementById('chat-widget');
+    const chatMinimizeBtn = document.getElementById('chat-minimize-btn');
+    const chatLog = document.getElementById('chat-log');
+    const messageInput = document.getElementById('chat-message-input');
+    const submitButton = document.getElementById('chat-message-submit');
+
+    let widgetOpen = true;
+    let unreadCount = 0;
+
+    const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+    const chatSocket = new WebSocket(
+        protocol + window.location.host + '/ws/chat/' + conversationId + '/'
+    );
+
+    function scrollToBottom() {
+        chatLog.scrollTop = chatLog.scrollHeight;
+    }
+
+    function updateLauncherBadge() {
+        if (unreadCount > 0) {
+            chatLauncherBadge.style.display = 'flex';
+            chatLauncherBadge.textContent = unreadCount > 99 ? '99+' : unreadCount;
+        } else {
+            chatLauncherBadge.style.display = 'none';
+            chatLauncherBadge.textContent = '0';
+        }
+    }
+
+    function openWidget() {
+        widgetOpen = true;
+        chatWidget.classList.remove('d-none');
+        unreadCount = 0;
+        updateLauncherBadge();
+        scrollToBottom();
+        messageInput.focus();
+
+        if (chatSocket.readyState === WebSocket.OPEN) {
+            chatSocket.send(JSON.stringify({
+                action: 'mark_seen'
+            }));
+        }
+    }
+
+    function closeWidget() {
+        widgetOpen = false;
+        chatWidget.classList.add('d-none');
+    }
+
+    function formatStatusText(readAt) {
+        return readAt ? `Seen • ${readAt}` : 'Seen';
+    }
+
+    function removeEmptyState() {
+        const emptyState = document.getElementById('chat-empty');
+        if (emptyState) {
+            emptyState.remove();
+        }
+    }
+
+    function appendMessage(data) {
+        removeEmptyState();
+
+        const isSelf = parseInt(data.sender_id) === parseInt(currentUserId);
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'chat-message-row' + (isSelf ? ' self' : '');
+        wrapper.setAttribute('data-message-id', data.message_id);
+        wrapper.setAttribute('data-sender-id', data.sender_id);
+
+        const bubble = document.createElement('div');
+        bubble.className = 'chat-bubble ' + (isSelf ? 'self' : 'other');
+
+        const textDiv = document.createElement('div');
+        textDiv.className = 'chat-message-text';
+        textDiv.textContent = data.message;
+
+        const meta = document.createElement('small');
+        meta.className = 'chat-message-meta';
+        meta.textContent = `${data.sender_email} • ${data.created_at}`;
+
+        bubble.appendChild(textDiv);
+        bubble.appendChild(meta);
+
+        if (isSelf) {
+            const status = document.createElement('small');
+            status.className = 'chat-message-status';
+            status.setAttribute('data-status-for-message', data.message_id);
+            status.textContent = data.is_read ? formatStatusText(data.read_at) : 'Unseen';
+            bubble.appendChild(status);
+        }
+
+        wrapper.appendChild(bubble);
+        chatLog.appendChild(wrapper);
+
+        scrollToBottom();
+    }
+
+    function markMessagesSeenInUi(messageIds, readAt) {
+        messageIds.forEach(function(messageId) {
+            const statusEl = document.querySelector(`[data-status-for-message="${messageId}"]`);
+            if (statusEl) {
+                statusEl.textContent = formatStatusText(readAt);
+            }
+        });
+    }
+
+    scrollToBottom();
+    updateLauncherBadge();
+
+    chatLauncher.addEventListener('click', function() {
+        if (widgetOpen) {
+            closeWidget();
+        } else {
+            openWidget();
+        }
+    });
+
+    chatMinimizeBtn.addEventListener('click', function() {
+        closeWidget();
+    });
+
+    chatSocket.onopen = function() {
+        chatSocket.send(JSON.stringify({
+            action: 'mark_seen'
+        }));
+    };
+
+    chatSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+
+        if (data.event_type === 'message') {
+            appendMessage(data);
+
+            const isFromOtherUser = parseInt(data.sender_id) !== parseInt(currentUserId);
+
+            if (isFromOtherUser) {
+                if (widgetOpen) {
+                    chatSocket.send(JSON.stringify({
+                        action: 'mark_seen'
+                    }));
+                } else {
+                    unreadCount += 1;
+                    updateLauncherBadge();
+                }
+            }
+        }
+
+        if (data.event_type === 'seen_update') {
+            markMessagesSeenInUi(data.message_ids, data.read_at);
+        }
+    };
+
+    chatSocket.onclose = function() {
+        console.error('Chat socket closed unexpectedly');
+    };
+
+    messageInput.focus();
+
+    messageInput.addEventListener('keyup', function(e) {
+        if (e.key === 'Enter') {
+            submitButton.click();
+        }
+    });
+
+    submitButton.addEventListener('click', function() {
+        const message = messageInput.value.trim();
+
+        if (!message) {
+            return;
+        }
+
+        chatSocket.send(JSON.stringify({
+            action: 'message',
+            message: message
+        }));
+
+        messageInput.value = '';
+        messageInput.focus();
+    });
+</script>
+{% endblock %}

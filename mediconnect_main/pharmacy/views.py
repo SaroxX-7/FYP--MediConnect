@@ -156,7 +156,7 @@ def patient_prescriptions(request):
 
 
 @login_required(login_url='login')
-@user_passes_test(check_role_customer)
+# @user_passes_test(check_role_customer)
 def pharmacy_store(request):
     medicines = Medicine.objects.all().order_by('name')
 

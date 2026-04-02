@@ -20,6 +20,8 @@ from django.db.models import Prefetch
 from appointment.models import Appointment, Remark, RemarkMedicine
 from pharmacy.models import Medicine
 from doctor.models import Doctor
+from doctor.models import Doctor, DoctorBilling
+from doctor.forms import DoctorForm, DoctorBillingForm
 
 def doctor_appointment_details(request, appointment_id):
     appointment = get_object_or_404(
@@ -204,21 +206,30 @@ RegistrationFormSet = inlineformset_factory(Doctor, Registration, form=Registrat
 def dprofile(request):
     profile = get_object_or_404(UserProfile, user=request.user)
     doctor = get_object_or_404(Doctor, user=request.user)
+    billing, created = DoctorBilling.objects.get_or_create(doctor=doctor)
+
     departments = Department.objects.all()
+
     if request.method == 'POST':
         profile_form = UserProfileForm(request.POST, request.FILES, instance=profile)
         user_form = UserInfoForm(request.POST, instance=request.user)
         doctor_form = DoctorForm(request.POST, request.FILES, instance=doctor)
+        billing_form = DoctorBillingForm(request.POST, instance=billing)
 
-        # Validate and save main forms first
-        main_forms_valid = doctor_form.is_valid() and profile_form.is_valid() and user_form.is_valid()
+        main_forms_valid = (
+            doctor_form.is_valid()
+            and profile_form.is_valid()
+            and user_form.is_valid()
+            and billing_form.is_valid()
+        )
+
         if main_forms_valid:
             doctor_form.save()
             profile_form.save()
             user_form.save()
-            messages.success(request, "Profile information updated successfully.")
+            billing_form.save()
+            messages.success(request, "Profile and billing information updated successfully.")
 
-        # Handle formsets separately
         formsets = [
             EducationFormSet(request.POST, instance=doctor),
             ExperienceFormSet(request.POST, instance=doctor),
@@ -226,23 +237,29 @@ def dprofile(request):
             MembershipFormSet(request.POST, instance=doctor),
             RegistrationFormSet(request.POST, instance=doctor),
         ]
+
         formsets_valid = all(fs.is_valid() for fs in formsets)
+
         if formsets_valid:
             for fs in formsets:
                 fs.save()
             if main_forms_valid:
                 messages.success(request, "Full profile updated successfully.")
         elif not formsets_valid and main_forms_valid:
-            messages.info(request,
-                          "Main profile information saved, but some additional details were not updated due to errors or being left blank.")
+            messages.info(
+                request,
+                "Main profile and billing information were saved, but some additional details were not updated due to errors or blank values."
+            )
 
         if not main_forms_valid:
-            messages.error(request, "There was an error with the main profile information.")
+            messages.error(request, "There was an error in the profile or billing information.")
+
     else:
-        # Initialize forms and formsets for GET request
         profile_form = UserProfileForm(instance=profile)
         user_form = UserInfoForm(instance=request.user)
         doctor_form = DoctorForm(instance=doctor)
+        billing_form = DoctorBillingForm(instance=billing)
+
         formsets = [
             EducationFormSet(instance=doctor),
             ExperienceFormSet(instance=doctor),
@@ -255,11 +272,11 @@ def dprofile(request):
         'user_form': user_form,
         'profile_form': profile_form,
         'doctor_form': doctor_form,
+        'billing_form': billing_form,
         'formsets': formsets,
         'departments': departments,
     }
     return render(request, 'doctors/dprofile.html', context)
-
 
 def doctor_detail(request, doctor_slug):
 

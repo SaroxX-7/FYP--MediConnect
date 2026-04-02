@@ -217,13 +217,13 @@ def login(request):
             if user.is_doctor():
                 doctor = Doctor.objects.get(user=user)
                 if not doctor.clinic_address or not doctor.contact_phone or not doctor.department:
-                    return redirect('dprofile')
+                    return redirect('doctor')
 
             # Check if user is a customer
             elif user.is_customer():
                 user_profile = UserProfile.objects.get(user=user)
                 if not user_profile.gender or not user_profile.address:
-                    return redirect('cprofile')
+                    return redirect('customer')
 
             return redirect('myAccount')
         else:
@@ -248,16 +248,34 @@ def myAccount(request):
 
 @login_required(login_url='login')
 @user_passes_test(check_role_customer)
+@login_required(login_url='login')
+@user_passes_test(check_role_customer)
 def custDashboard(request):
     profile = UserProfile.objects.get(user=request.user)
     customer = User.objects.get(pk=request.user.id)
-    appointments = Appointment.objects.filter(patient=customer).order_by('-appointment_date')
+
+    appointments = Appointment.objects.select_related(
+        'doctor',
+        'doctor__user',
+        'doctor__user__userprofile',
+        'patient'
+    ).filter(
+        patient=customer
+    ).order_by('-appointment_date')
+
+    for appointment in appointments:
+        if hasattr(appointment, 'conversation'):
+            appointment.has_conversation = True
+            appointment.conversation_id = appointment.conversation.id
+        else:
+            appointment.has_conversation = False
+            appointment.conversation_id = ''
+
     context = {
         'profile': profile,
         'appointments': appointments
     }
     return render(request, 'accounts/custDashboard.html', context)
-
 @login_required(login_url='login')
 @user_passes_test(check_role_pharmacist)
 def pharmacistDashboard(request):
@@ -271,10 +289,19 @@ def doctorDashboard(request):
     doctor = Doctor.objects.get(user=request.user)
 
     appointments = Appointment.objects.select_related(
-        'patient'
+        'patient',
+        'patient__userprofile'
     ).filter(
         doctor=doctor
     ).order_by('-appointment_date')
+
+    for appointment in appointments:
+        if hasattr(appointment, 'conversation'):
+            appointment.has_conversation = True
+            appointment.conversation_id = appointment.conversation.id
+        else:
+            appointment.has_conversation = False
+            appointment.conversation_id = ''
 
     appointment_count = appointments.count()
 
@@ -296,7 +323,6 @@ def doctorDashboard(request):
     }
 
     return render(request, 'accounts/doctorDashboard.html', context)
-
 
 def forgot_password(request):
     if request.method == 'POST':

@@ -10,6 +10,329 @@
 .table-hover tr.missed:hover {
     background-color: #f8d7da;
 }
+
+/* ── Chat Launcher ── */
+.chat-launcher {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 60px;
+    height: 60px;
+    border: none;
+    padding: 0;
+    background: transparent;
+    box-shadow: none;
+    z-index: 1050;
+    cursor: pointer;
+    display: none;
+    overflow: visible;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.chat-launcher-image-wrap {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    overflow: hidden;
+    display: block;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15), 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
+}
+
+.chat-launcher:hover .chat-launcher-image-wrap {
+    transform: scale(1.05);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+}
+
+.chat-launcher:active .chat-launcher-image-wrap {
+    transform: scale(0.95);
+}
+
+.chat-launcher img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.chat-launcher:hover img {
+    transform: scale(1.1);
+}
+
+/* ── Badge ── */
+.chat-launcher-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 6px;
+    border-radius: 11px;
+    background: linear-gradient(135deg, #ff6b6b, #ff4444);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    z-index: 1051;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    box-sizing: content-box;
+}
+
+.chat-launcher-badge.has-notification {
+    animation: badgePop 0.3s ease-out, badgePulse 1.5s ease-in-out infinite;
+}
+
+/* ── Chat Widget ── */
+.chat-widget {
+    position: fixed;
+    bottom: 96px;
+    right: 24px;
+    width: 380px;
+    max-width: calc(100vw - 32px);
+    height: 520px;
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15), 0 8px 16px rgba(0,0,0,0.1);
+    overflow: hidden;
+    z-index: 1051;
+    display: none;
+    flex-direction: column;
+    animation: slideInUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.chat-widget-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.chat-widget-header:hover {
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+}
+
+.chat-widget-user {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.chat-widget-user img {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(255,255,255,0.3);
+    transition: transform 0.3s ease;
+}
+
+.chat-widget-user img:hover {
+    transform: scale(1.05);
+}
+
+.chat-widget-user-name {
+    font-weight: 600;
+    font-size: 16px;
+    color: #fff;
+    letter-spacing: -0.3px;
+}
+
+.chat-widget-user-subtitle {
+    font-size: 12px;
+    color: rgba(255,255,255,0.8);
+    margin-top: 2px;
+}
+
+.chat-widget-action-btn {
+    border: none;
+    background: rgba(255,255,255,0.2);
+    border-radius: 8px;
+    font-size: 20px;
+    color: #fff;
+    cursor: pointer;
+    padding: 6px 10px;
+    transition: all 0.2s ease;
+    line-height: 1;
+}
+
+.chat-widget-action-btn:hover {
+    background: rgba(255,255,255,0.3);
+    transform: scale(1.05);
+}
+
+.chat-widget-action-btn:active {
+    transform: scale(0.95);
+}
+
+.chat-widget-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    background: #f8f9fa;
+    scroll-behavior: smooth;
+}
+
+.chat-widget-body::-webkit-scrollbar { width: 6px; }
+.chat-widget-body::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+.chat-widget-body::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 10px; }
+.chat-widget-body::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
+
+.chat-empty {
+    text-align: center;
+    color: #adb5bd;
+    font-size: 14px;
+    margin-top: 32px;
+    animation: fadeInUp 0.3s ease-out;
+}
+
+/* ── Messages ── */
+.chat-message-row {
+    margin-bottom: 16px;
+    display: flex;
+    animation: messageSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.chat-message-row.self {
+    justify-content: flex-end;
+}
+
+.chat-bubble {
+    max-width: 82%;
+    padding: 10px 14px;
+    border-radius: 18px;
+    word-wrap: break-word;
+    position: relative;
+}
+
+.chat-bubble.other {
+    background: #fff;
+    border: 1px solid #e9ecef;
+    color: #212529;
+    border-bottom-left-radius: 4px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.chat-bubble.self {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    border-bottom-right-radius: 4px;
+    box-shadow: 0 2px 8px rgba(102,126,234,0.3);
+}
+
+.chat-message-text {
+    font-size: 14px;
+    margin-bottom: 4px;
+    white-space: pre-wrap;
+    line-height: 1.4;
+}
+
+.chat-message-meta {
+    display: block;
+    font-size: 10px;
+    line-height: 1.3;
+    margin-top: 2px;
+}
+
+.chat-bubble.other .chat-message-meta { color: #868e96; }
+.chat-bubble.self .chat-message-meta { color: rgba(255,255,255,0.7); }
+
+.chat-message-status {
+    display: inline-block;
+    font-size: 10px;
+    line-height: 1.3;
+    margin-left: 6px;
+}
+
+/* ── Footer ── */
+.chat-widget-footer {
+    padding: 16px;
+    border-top: 1px solid #e9ecef;
+    background: #fff;
+}
+
+.chat-input-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.chat-input-group input {
+    flex: 1;
+    border-radius: 24px;
+    border: 1.5px solid #e9ecef;
+    padding: 10px 16px;
+    outline: none;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    background: #f8f9fa;
+}
+
+.chat-input-group input:focus {
+    border-color: #667eea;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+}
+
+.chat-input-group input::placeholder { color: #adb5bd; }
+
+.chat-send-btn {
+    border: none;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    border-radius: 24px;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.chat-send-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(102,126,234,0.3);
+}
+
+.chat-send-btn:active { transform: translateY(0); }
+
+/* ── Keyframes ── */
+@keyframes badgePop {
+    0%   { transform: scale(0); opacity: 0; }
+    50%  { transform: scale(1.2); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes badgePulse {
+    0%   { transform: scale(1); box-shadow: 0 0 0 0 rgba(255,68,68,0.7); }
+    70%  { transform: scale(1.05); box-shadow: 0 0 0 8px rgba(255,68,68,0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255,68,68,0); }
+}
+
+@keyframes slideInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes messageSlideIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
 </style>
 
 <div class="breadcrumb-bar">
@@ -18,12 +341,8 @@
             <div class="col-md-12 col-12">
                 <nav aria-label="breadcrumb" class="page-breadcrumb">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item">
-                            <a href="{% url 'home' %}">Home</a>
-                        </li>
-                        <li class="breadcrumb-item active" aria-current="page">
-                            Dashboard
-                        </li>
+                        <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
                     </ol>
                 </nav>
                 <h2 class="breadcrumb-title">Dashboard</h2>
@@ -107,7 +426,6 @@
                         <div class="card card-table mb-0">
                             <div class="card-body">
                                 <div class="table-responsive">
-
                                     <table class="table table-hover table-center mb-0">
                                         <thead>
                                             <tr>
@@ -119,7 +437,6 @@
                                                 <th class="text-center">Actions</th>
                                             </tr>
                                         </thead>
-
                                         <tbody>
                                             {% for appointment in appointments %}
                                                 {% with appointment_date=appointment.appointment_date|date:"Y-m-d" %}
@@ -138,63 +455,51 @@
                                                                         alt="Patient"
                                                                     >
                                                                 </a>
-
-                                                                <a href="#">
-                                                                    {{ appointment.patient.first_name }} {{ appointment.patient.last_name }}
-                                                                </a>
+                                                                <a href="#">{{ appointment.patient.first_name }} {{ appointment.patient.last_name }}</a>
                                                             </h2>
                                                         </td>
 
                                                         <td>
                                                             {{ appointment.appointment_date|date:"d M Y" }}
-                                                            <span class="d-block text-info">
-                                                                {{ appointment.time_slot.start_time|time:"g:i A" }}
-                                                            </span>
+                                                            <span class="d-block text-info">{{ appointment.time_slot.start_time|time:"g:i A" }}</span>
                                                         </td>
 
                                                         <td>{{ appointment.get_appointment_type_display }}</td>
-
                                                         <td>{{ appointment.get_appointment_status_display }}</td>
 
                                                         <td>
-                                                            {% if appointment.patient.phone_number %}
-                                                                <a
-                                                                    href="https://wa.me/{{ appointment.patient.phone_number|cut:'+'|cut:' ' }}?text=Hello%20{{ appointment.patient.first_name }}%20{{ appointment.patient.last_name }},%20this%20is%20Dr.%20{{ request.user.first_name }}%20regarding%20your%20appointment%20on%20{{ appointment.appointment_date|date:'d%20M%20Y' }}."
-                                                                    target="_blank"
-                                                                    style="color:#25D366;font-weight:600;"
-                                                                >
-                                                                    <i class="fab fa-whatsapp"></i>
-                                                                    {{ appointment.patient.phone_number }}
-                                                                </a>
-                                                            {% else %}
-                                                                N/A
-                                                            {% endif %}
+                                                            <button
+                                                                type="button"
+                                                                class="btn btn-sm btn-primary start-chat-btn"
+                                                                data-appointment-id="{{ appointment.id }}"
+                                                                data-other-name="{{ appointment.patient.first_name }} {{ appointment.patient.last_name }}"
+                                                                data-other-image="{% if appointment.patient.userprofile.profile_picture %}{{ appointment.patient.userprofile.profile_picture.url }}{% else %}{% static 'doctors/doctor-01.jpg' %}{% endif %}"
+                                                                data-has-conversation="{% if appointment.has_conversation %}1{% else %}0{% endif %}"
+                                                                data-conversation-id="{{ appointment.conversation_id }}"
+                                                            >
+                                                                <i class="fas fa-comments"></i>
+                                                                {% if appointment.has_conversation %}Open Chat{% else %}Start Chatting{% endif %}
+                                                            </button>
                                                         </td>
 
                                                         <td class="text-right">
                                                             <div class="table-action">
                                                                 {% if appointment.appointment_status != "pending" or appointment_date >= now|date:"Y-m-d" %}
-
                                                                     <a href="{% url 'doctor_appointment_details' appointment_id=appointment.id %}" class="btn btn-sm bg-info-light">
                                                                         <i class="far fa-eye"></i> View
                                                                     </a>
-
                                                                     {% if appointment.appointment_status != 'confirmed' and appointment.appointment_status != 'cancelled' %}
                                                                         <a href="{% url 'accept_appointment' appointment_id=appointment.id %}" class="btn btn-sm bg-success-light">
                                                                             <i class="fas fa-check"></i> Accept
                                                                         </a>
                                                                     {% endif %}
-
                                                                     {% if appointment.appointment_status != 'cancelled' %}
                                                                         <a href="{% url 'reject_appointment' appointment_id=appointment.id %}" class="btn btn-sm bg-danger-light">
                                                                             <i class="fas fa-times"></i> Cancel
                                                                         </a>
                                                                     {% endif %}
-
                                                                 {% else %}
-                                                                    <span class="text-danger">
-                                                                        <i class="fas fa-times"></i> Missed
-                                                                    </span>
+                                                                    <span class="text-danger"><i class="fas fa-times"></i> Missed</span>
                                                                 {% endif %}
                                                             </div>
                                                         </td>
@@ -208,7 +513,6 @@
                                             {% endfor %}
                                         </tbody>
                                     </table>
-
                                 </div>
                             </div>
                         </div>
@@ -221,4 +525,273 @@
     </div>
 </div>
 
+<!-- Chat Launcher -->
+<button id="chat-launcher" class="chat-launcher" type="button" aria-label="Open chat">
+    <div class="chat-launcher-image-wrap">
+        <img id="chat-launcher-image" src="{% static 'img/favicon.png' %}" alt="Chat User">
+    </div>
+    <!-- <span id="chat-launcher-badge" class="chat-launcher-badge">0</span> -->
+</button>
+
+<!-- Chat Widget -->
+<div id="chat-widget" class="chat-widget">
+    <div class="chat-widget-header">
+        <div class="chat-widget-user">
+            <img id="chat-header-image" src="{% static 'img/favicon.png' %}" alt="Chat User">
+            <div>
+                <div id="chat-header-name" class="chat-widget-user-name">Chat</div>
+                <div class="chat-widget-user-subtitle">Appointment chat</div>
+            </div>
+        </div>
+        <button id="chat-minimize-btn" class="chat-widget-action-btn" type="button">−</button>
+    </div>
+
+    <div id="chat-log" class="chat-widget-body">
+        <div class="chat-empty">Start a conversation.</div>
+    </div>
+
+    <div class="chat-widget-footer">
+        <div class="chat-input-group">
+            <input id="chat-message-input" type="text" placeholder="Type your message...">
+            <button id="chat-message-submit" class="chat-send-btn" type="button">Send</button>
+        </div>
+    </div>
+</div>
+
+{{ request.user.id|json_script:"current-user-id" }}
+
+<script>
+    const currentUserId = JSON.parse(document.getElementById('current-user-id').textContent);
+
+    const startChatButtons = document.querySelectorAll('.start-chat-btn');
+    const chatLauncher     = document.getElementById('chat-launcher');
+    const chatLauncherImage = document.getElementById('chat-launcher-image');
+    const chatLauncherBadge = document.getElementById('chat-launcher-badge');
+    const chatWidget       = document.getElementById('chat-widget');
+    const chatHeaderImage  = document.getElementById('chat-header-image');
+    const chatHeaderName   = document.getElementById('chat-header-name');
+    const chatMinimizeBtn  = document.getElementById('chat-minimize-btn');
+    const chatLog          = document.getElementById('chat-log');
+    const messageInput     = document.getElementById('chat-message-input');
+    const submitButton     = document.getElementById('chat-message-submit');
+
+    let currentConversationId = null;
+    let chatSocket  = null;
+    let widgetOpen  = false;
+    let unreadCount = 0;
+
+    function updateLauncherBadge() {
+        if (unreadCount > 0) {
+            chatLauncherBadge.style.display = 'flex';
+            chatLauncherBadge.textContent = unreadCount > 99 ? '99+' : unreadCount;
+            chatLauncherBadge.classList.add('has-notification');
+            setTimeout(() => chatLauncherBadge.classList.remove('has-notification'), 1600);
+        } else {
+            chatLauncherBadge.style.display = 'none';
+            chatLauncherBadge.classList.remove('has-notification');
+        }
+    }
+
+    function scrollToBottom() {
+        chatLog.scrollTop = chatLog.scrollHeight;
+    }
+
+    function formatStatusText(readAt) {
+        return readAt ? `Seen • ${readAt}` : 'Seen';
+    }
+
+    function clearMessages() {
+        chatLog.innerHTML = '';
+    }
+
+    function renderEmpty() {
+        chatLog.innerHTML = '<div class="chat-empty">No messages yet. Start the conversation.</div>';
+    }
+
+    function renderMessage(message) {
+        const isSelf = parseInt(message.sender_id) === parseInt(currentUserId);
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'chat-message-row' + (isSelf ? ' self' : '');
+        wrapper.setAttribute('data-message-id', message.id);
+
+        const bubble = document.createElement('div');
+        bubble.className = 'chat-bubble ' + (isSelf ? 'self' : 'other');
+
+        const textDiv = document.createElement('div');
+        textDiv.className = 'chat-message-text';
+        textDiv.textContent = message.text;
+
+        const meta = document.createElement('small');
+        meta.className = 'chat-message-meta';
+        meta.textContent = `${message.sender_name} • ${message.created_at}`;
+
+        bubble.appendChild(textDiv);
+        bubble.appendChild(meta);
+
+        if (isSelf) {
+            const status = document.createElement('small');
+            status.className = 'chat-message-status';
+            status.setAttribute('data-status-for-message', message.id);
+            status.textContent = message.is_read ? formatStatusText(message.read_at) : 'Unseen';
+            bubble.appendChild(status);
+        }
+
+        wrapper.appendChild(bubble);
+        chatLog.appendChild(wrapper);
+    }
+
+    function markMessagesSeenInUi(messageIds, readAt) {
+        messageIds.forEach(function(messageId) {
+            const statusEl = document.querySelector(`[data-status-for-message="${messageId}"]`);
+            if (statusEl) statusEl.textContent = formatStatusText(readAt);
+        });
+    }
+
+    function openWidget() {
+        widgetOpen = true;
+        chatWidget.style.display = 'flex';
+        chatLauncher.style.display = 'block';
+        unreadCount = 0;
+        updateLauncherBadge();
+        scrollToBottom();
+        messageInput.focus();
+
+        if (chatSocket && chatSocket.readyState === WebSocket.OPEN) {
+            chatSocket.send(JSON.stringify({ action: 'mark_seen' }));
+        }
+    }
+
+    function closeWidget() {
+        widgetOpen = false;
+        chatWidget.style.display = 'none';
+        chatLauncher.style.display = 'block';
+    }
+
+    async function loadMessages(conversationId) {
+        const response = await fetch(`/chat/conversation/${conversationId}/messages/`);
+        const data = await response.json();
+
+        clearMessages();
+
+        if (!data.messages || !data.messages.length) {
+            renderEmpty();
+            return;
+        }
+
+        data.messages.forEach(renderMessage);
+        scrollToBottom();
+    }
+
+    function connectSocket(conversationId) {
+        if (chatSocket) chatSocket.close();
+
+        const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+        chatSocket = new WebSocket(protocol + window.location.host + '/ws/chat/' + conversationId + '/');
+
+        chatSocket.onopen = function() {
+            chatSocket.send(JSON.stringify({ action: 'mark_seen' }));
+        };
+
+        chatSocket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+
+            if (data.event_type === 'message') {
+                const empty = chatLog.querySelector('.chat-empty');
+                if (empty) empty.remove();
+
+                renderMessage({
+                    id: data.message_id,
+                    text: data.message,
+                    sender_id: data.sender_id,
+                    sender_name: data.sender_email,
+                    created_at: data.created_at,
+                    is_read: data.is_read,
+                    read_at: data.read_at,
+                });
+
+                const isFromOtherUser = parseInt(data.sender_id) !== parseInt(currentUserId);
+
+                if (isFromOtherUser) {
+                    if (widgetOpen) {
+                        chatSocket.send(JSON.stringify({ action: 'mark_seen' }));
+                    } else {
+                        unreadCount += 1;
+                        updateLauncherBadge();
+                    }
+                }
+
+                scrollToBottom();
+            }
+
+            if (data.event_type === 'seen_update') {
+                markMessagesSeenInUi(data.message_ids, data.read_at);
+            }
+        };
+    }
+
+    async function startChat(appointmentId, otherName, otherImage) {
+        const response = await fetch(`/chat/start/${appointmentId}/`);
+        const data = await response.json();
+
+        currentConversationId = data.conversation_id;
+
+        chatHeaderName.textContent  = data.other_user_name  || otherName;
+        chatHeaderImage.src         = data.other_user_image || otherImage;
+        chatLauncherImage.src       = data.other_user_image || otherImage;
+
+        chatLauncher.style.display = 'block';
+
+        await loadMessages(currentConversationId);
+        connectSocket(currentConversationId);
+        openWidget();
+    }
+
+    function preloadExistingConversation() {
+        const existingButton = document.querySelector('.start-chat-btn[data-has-conversation="1"]');
+        if (!existingButton) return;
+
+        currentConversationId     = existingButton.dataset.conversationId;
+        chatHeaderName.textContent = existingButton.dataset.otherName;
+        chatHeaderImage.src        = existingButton.dataset.otherImage;
+        chatLauncherImage.src      = existingButton.dataset.otherImage;
+        chatLauncher.style.display = 'block';
+
+        loadMessages(currentConversationId);
+        connectSocket(currentConversationId);
+    }
+
+    startChatButtons.forEach(function(button) {
+        button.addEventListener('click', function() {
+            startChat(this.dataset.appointmentId, this.dataset.otherName, this.dataset.otherImage);
+        });
+    });
+
+    chatLauncher.addEventListener('click', function() {
+        if (widgetOpen) {
+            closeWidget();
+        } else if (currentConversationId) {
+            openWidget();
+        }
+    });
+
+    chatMinimizeBtn.addEventListener('click', function() {
+        closeWidget();
+    });
+
+    messageInput.addEventListener('keyup', function(e) {
+        if (e.key === 'Enter') submitButton.click();
+    });
+
+    submitButton.addEventListener('click', function() {
+        const message = messageInput.value.trim();
+        if (!message || !chatSocket || chatSocket.readyState !== WebSocket.OPEN) return;
+
+        chatSocket.send(JSON.stringify({ action: 'message', message: message }));
+        messageInput.value = '';
+        messageInput.focus();
+    });
+
+    preloadExistingConversation();
+</script>
 {% endblock %}

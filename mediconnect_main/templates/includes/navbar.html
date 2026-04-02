@@ -10,6 +10,7 @@
                     <span></span>
                 </span>
             </a>
+            
             <a href="{% url 'home' %}" class="navbar-brand logo">
                 MediConnect
             </a>
@@ -27,7 +28,9 @@
 
             <ul class="main-nav">
                 <li class="{% if request.path == '/' %}active{% endif %}">
+                    {% if request.user.role != 3 %}
                     <a href="{% url 'home' %}">Home</a>
+                    {% endif %}
                 </li>
 
                 <li class="{% if '/custDashboard/' in request.path %}active{% endif %}">
@@ -86,7 +89,15 @@
                         </div>
                         <div class="user-text">
                             <h6>{{ request.user.first_name }} {{ request.user.last_name }}</h6>
-                            <p class="text-muted mb-0">Patient</p>
+                            <p class="text-muted mb-0">
+    {% if request.user.role == 1 %}
+        Doctor
+    {% elif request.user.role == 3 %}
+        Pharmacist
+    {% else %}
+        Patient
+    {% endif %}
+</p>
                         </div>
                     </div>
                     <a class="dropdown-item" href="{% url 'custDashboard' %}">Dashboard</a>

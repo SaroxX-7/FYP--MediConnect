@@ -1,29 +1,78 @@
 {% extends 'base.html' %}
-{% block content %}
 {% load static %}
+{% block content %}
 
 <style>
     body {
         font-family: Arial, sans-serif;
+        background: #f8f9fa;
     }
 
     .invoice-box {
-        max-width: 900px;
-        margin: auto;
+        max-width: 950px;
+        margin: 30px auto;
         padding: 30px;
         border: 1px solid #eee;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.12);
         font-size: 16px;
         line-height: 24px;
         color: #555;
         background: #fff;
+        border-radius: 10px;
+    }
+
+    .top-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 20px;
     }
 
     .header {
         color: #333;
-        font-size: 24px;
+        font-size: 28px;
         font-weight: bold;
-        margin-bottom: 20px;
+        margin: 0;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .pdf-btn,
+    .cart-btn {
+        display: inline-block;
+        padding: 10px 16px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+    }
+
+    .pdf-btn {
+        background: #dc3545;
+        color: #fff;
+    }
+
+    .pdf-btn:hover {
+        background: #bb2d3b;
+        color: #fff;
+        text-decoration: none;
+    }
+
+    .cart-btn {
+        background: #0d6efd;
+        color: #fff;
+    }
+
+    .cart-btn:hover {
+        background: #0b5ed7;
     }
 
     .section-title {
@@ -95,10 +144,43 @@
         border-radius: 6px;
         border: 1px solid #ddd;
     }
+
+    .sub-title {
+        font-size: 18px;
+        font-weight: bold;
+        margin-top: 20px;
+        margin-bottom: 10px;
+        color: #333;
+    }
+
+    @media (max-width: 768px) {
+        .top-bar {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .details th,
+        .details td {
+            display: block;
+            width: 100%;
+        }
+
+        .details th {
+            padding-bottom: 0;
+        }
+    }
 </style>
 
 <div class="invoice-box">
-    <div class="header">Appointment Details</div>
+    <div class="top-bar">
+        <h1 class="header">Appointment Details</h1>
+
+        <div class="action-buttons">
+            <a href="{% url 'download_prescription_pdf' appointment.id %}" class="pdf-btn" target="_blank">
+                Download Prescription PDF
+            </a>
+        </div>
+    </div>
 
     <div class="section-title">Basic Information</div>
     <table class="details">
@@ -116,11 +198,11 @@
         </tr>
         <tr>
             <th>Appointment Type:</th>
-            <td>{{ appointment.appointment_type }}</td>
+            <td>{{ appointment.appointment_type|default:"-" }}</td>
         </tr>
         <tr>
             <th>Status:</th>
-            <td>{{ appointment.appointment_status }}</td>
+            <td>{{ appointment.appointment_status|default:"-" }}</td>
         </tr>
         <tr>
             <th>Appointment Time:</th>
@@ -143,78 +225,78 @@
 
     <div class="section-title">Doctor Remarks</div>
 
-{% for remark in appointment.remarks.all %}
-    <div class="remark-box">
-        <table class="details">
-            <tr>
-                <th>Doctor:</th>
-                <td>Dr. {{ remark.doctor.user.first_name }} {{ remark.doctor.user.last_name }}</td>
-            </tr>
-            <tr>
-                <th>Diagnosis:</th>
-                <td>{{ remark.diagnosis|default:"-" }}</td>
-            </tr>
-            <tr>
-                <th>Symptoms:</th>
-                <td>{{ remark.symptoms|default:"-" }}</td>
-            </tr>
-            <tr>
-                <th>Note:</th>
-                <td>{{ remark.note|default:"-" }}</td>
-            </tr>
-            <tr>
-                <th>Advice:</th>
-                <td>{{ remark.advice|default:"-" }}</td>
-            </tr>
-            <tr>
-                <th>Follow Up Date:</th>
-                <td>{{ remark.follow_up_date|default:"-" }}</td>
-            </tr>
-            <tr>
-                <th>Created At:</th>
-                <td>{{ remark.created_at }}</td>
-            </tr>
-        </table>
-
-        <form method="POST" action="{% url 'add_remark_medicines_to_cart' remark.id %}" style="margin-top: 15px;">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-primary">Add All Medicines to Cart</button>
-        </form>
-
-        <div class="section-title" style="font-size:18px; margin-top:20px;">Medicines</div>
-
-        <table class="medicine-table">
-            <thead>
+    {% for remark in appointment.remarks.all %}
+        <div class="remark-box">
+            <table class="details">
                 <tr>
-                    <th>Medicine</th>
-                    <th>Dosage</th>
-                    <th>Quantity</th>
-                    <th>Frequency</th>
-                    <th>Duration</th>
-                    <th>Instruction</th>
+                    <th>Doctor:</th>
+                    <td>Dr. {{ remark.doctor.user.first_name }} {{ remark.doctor.user.last_name }}</td>
                 </tr>
-            </thead>
-            <tbody>
-                {% for med in remark.medicines.all %}
                 <tr>
-                    <td>{{ med.medicine }}</td>
-                    <td>{{ med.dosage|default:"-" }}</td>
-                    <td>{{ med.quantity }}</td>
-                    <td>{{ med.frequency|default:"-" }}</td>
-                    <td>{{ med.duration|default:"-" }}</td>
-                    <td>{{ med.instruction|default:"-" }}</td>
+                    <th>Diagnosis:</th>
+                    <td>{{ remark.diagnosis|default:"-" }}</td>
                 </tr>
-                {% empty %}
                 <tr>
-                    <td colspan="6">No medicines added.</td>
+                    <th>Symptoms:</th>
+                    <td>{{ remark.symptoms|default:"-" }}</td>
                 </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-{% empty %}
-    <p class="empty-text">No remarks added yet.</p>
-{% endfor %}
+                <tr>
+                    <th>Note:</th>
+                    <td>{{ remark.note|default:"-" }}</td>
+                </tr>
+                <tr>
+                    <th>Advice:</th>
+                    <td>{{ remark.advice|default:"-" }}</td>
+                </tr>
+                <tr>
+                    <th>Follow Up Date:</th>
+                    <td>{{ remark.follow_up_date|default:"-" }}</td>
+                </tr>
+                <tr>
+                    <th>Created At:</th>
+                    <td>{{ remark.created_at }}</td>
+                </tr>
+            </table>
+
+            <form method="POST" action="{% url 'add_remark_medicines_to_cart' remark.id %}" style="margin-top: 15px;">
+                {% csrf_token %}
+                <button type="submit" class="cart-btn">Add All Medicines to Cart</button>
+            </form>
+
+            <div class="sub-title">Medicines</div>
+
+            <table class="medicine-table">
+                <thead>
+                    <tr>
+                        <th>Medicine</th>
+                        <th>Dosage</th>
+                        <th>Quantity</th>
+                        <th>Frequency</th>
+                        <th>Duration</th>
+                        <th>Instruction</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for med in remark.medicines.all %}
+                    <tr>
+                        <td>{{ med.medicine }}</td>
+                        <td>{{ med.dosage|default:"-" }}</td>
+                        <td>{{ med.quantity|default:"-" }}</td>
+                        <td>{{ med.frequency|default:"-" }}</td>
+                        <td>{{ med.duration|default:"-" }}</td>
+                        <td>{{ med.instruction|default:"-" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6">No medicines added.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% empty %}
+        <p class="empty-text">No remarks added yet.</p>
+    {% endfor %}
 </div>
 
 <script>
@@ -240,4 +322,5 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
+
 {% endblock %}

@@ -39,3 +39,30 @@ class RegistrationForm(forms.ModelForm):
         model = Registration
         fields = ['registration_number', 'year']
 
+
+from django import forms
+from doctor.models import DoctorBilling
+
+
+class DoctorBillingForm(forms.ModelForm):
+    class Meta:
+        model = DoctorBilling
+        fields = ['consultation_fee', 'esewa_number', 'esewa_enabled']
+        widgets = {
+            'consultation_fee': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Charge per 30 mins'
+            }),
+            'esewa_number': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter eSewa ID / number'
+            }),
+            'esewa_enabled': forms.CheckboxInput(attrs={
+                'class': 'form-check-input'
+            }),
+        }
+        labels = {
+            'consultation_fee': 'Charge per 30 mins',
+            'esewa_number': 'eSewa ID / Number',
+            'esewa_enabled': 'Enable eSewa Payment',
+        }

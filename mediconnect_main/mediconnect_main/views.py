@@ -7,7 +7,9 @@ from accounts.models import UserProfile, Department, Disease
 
 def home(request):
     user_authenticated = request.user.is_authenticated
-    department = Department.objects.all()
+    department = Department.objects.all().distinct()
+    print(department)
+
     diseases = Disease.objects.all()
     diseases_json = serialize('json', diseases)
     department_json = serialize('json', department)

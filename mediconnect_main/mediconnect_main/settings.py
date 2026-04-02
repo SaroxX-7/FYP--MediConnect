@@ -34,6 +34,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -47,6 +48,7 @@ INSTALLED_APPS = [
     'dashboard',
     'pharmacy',
     'django.contrib.gis',
+    'chat',
 ]
 
 MIDDLEWARE = [
@@ -301,3 +303,9 @@ os.environ['PATH'] = os.path.join(BASE_DIR, 'env/Lib/site-packages/osgeo') + ';'
 os.environ['PROJ_LIB'] = os.path.join(BASE_DIR, 'env/Lib/site-packages/osgeo/data/proj') + ';' + os.environ['PATH']
 GDAL_LIBRARY_PATH = os.path.join(BASE_DIR, 'env/Lib/site-packages/osgeo/gdal.dll')
 '''
+ASGI_APPLICATION = "mediconnect_main.asgi.application"
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    },
+}

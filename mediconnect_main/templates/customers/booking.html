@@ -1,208 +1,418 @@
 {% extends 'base.html' %}
+{% load static %}
+{% load custom_tags %}
+ 
 {% block content %}
-    {% load static %}
-    {% load custom_tags %}
-
-    <style>
-
+ 
+<style>
+    .booking-doc-info {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+ 
+    .booking-doc-img img {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 50%;
+    }
+ 
+    .payment-summary-card {
+        border: 1px solid #e5e5e5;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 25px;
+        background: #fff;
+    }
+ 
+    .payment-summary-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+        font-size: 15px;
+    }
+ 
+    .payment-summary-row.total {
+        font-weight: 700;
+        font-size: 17px;
+        border-top: 1px solid #eee;
+        padding-top: 12px;
+        margin-top: 12px;
+    }
+ 
+    .payment-note {
+        font-size: 13px;
+        color: #666;
+        margin-top: 10px;
+    }
+ 
     .timing.available {
-    color: green !important;/* Or any color indicating availability */
-    cursor: pointer;
-}
-
-.timing.unavailable {
-    color: red !important; /* Or any color indicating unavailability */
-    cursor: not-allowed;
-}
-
-.past .timing{
-    color: #ccc !important;
-    pointer-events: none;
-    cursor: default;
-}
-
-.timing.available {
-    color: #4CAF50; /* Example: green color for available slots */
-}
-
-    </style>
-		<!-- Main Wrapper -->
-		<div class="main-wrapper">
-
-    <!-- Breadcrumb -->
-			<div class="breadcrumb-bar">
-				<div class="container-fluid">
-					<div class="row align-items-center">
-						<div class="col-md-12 col-12">
-							<nav aria-label="breadcrumb" class="page-breadcrumb">
-								<ol class="breadcrumb">
-									<li class="breadcrumb-item"><a href="index-2.html">Home</a></li>
-									<li class="breadcrumb-item active" aria-current="page">Booking</li>
-								</ol>
-							</nav>
-							<h2 class="breadcrumb-title">Booking</h2>
-						</div>
-					</div>
-				</div>
-			</div>
-			<!-- /Breadcrumb -->
-
-			<!-- Page Content -->
-			<div class="content">
-				<div class="container">
-
-					<div class="row">
-						<div class="col-12">
-
-							<div class="card">
-								<div class="card-body">
-									<div class="booking-doc-info">
-										<a href="doctor-profile.html" class="booking-doc-img">
-										<img src="{% if doctor.user.userprofile.profile_picture %}{{ doctor.user.userprofile.profile_picture.url }}{% else %}{% endif %}" class="img-fluid" alt="User Image">
-										</a>
-										<div class="booking-info">
-											<h4><a href="doctor-profile.html">Dr. {{ doctor.user.first_name }} {{ doctor.user.last_name }}</a></h4>
-											<p class="text-muted mb-0"><i class="fas fa-map-marker-alt"></i> {{ doctor.user.userprofile.address }}</p>
-										</div>
-									</div>
-								</div>
-							</div>
-
-							<!-- Schedule Widget -->
-<div class="card booking-schedule schedule-widget">
-
-    <!-- Schedule Header -->
-    <div class="schedule-header">
-        <div class="row">
-            <div class="col-md-12">
-
-                <!-- Day Slot -->
-                <div class="day-slot">
-                    <ul>
-
-                        {% for date in week_dates %}
-                            <li>
-                                <span>{{ date|date:"D" }}</span>
-                                <span class="slot-date">{{ date|date:"d M" }} <small class="slot-year">{{ date|date:"Y" }}</small></span>
-                            </li>
-                        {% endfor %}
-                    </ul>
+        display: block;
+        color: #28a745 !important;
+        cursor: pointer;
+        margin-bottom: 8px;
+        border: 1px solid #28a745;
+        padding: 8px 12px;
+        border-radius: 6px;
+        background: #fff;
+        text-align: center;
+        text-decoration: none;
+        transition: 0.2s ease;
+    }
+ 
+    .timing.available:hover {
+        background: #28a745;
+        color: #fff !important;
+        text-decoration: none;
+    }
+ 
+    .timing.booked {
+        display: block;
+        color: #dc3545 !important;
+        cursor: not-allowed;
+        margin-bottom: 8px;
+        border: 1px solid #dc3545;
+        padding: 8px 12px;
+        border-radius: 6px;
+        background: #fff5f5;
+        text-align: center;
+    }
+ 
+    .slot-empty {
+        color: #999;
+        font-size: 14px;
+        display: block;
+        text-align: center;
+        padding: 8px 12px;
+    }
+ 
+    .amount-box {
+        border: 1px solid #eee;
+        border-radius: 6px;
+        background: #fafafa;
+        padding: 15px;
+    }
+ 
+    .past .timing.available {
+        pointer-events: none;
+        cursor: default;
+        color: #bbb !important;
+        border-color: #ddd;
+        background: #f7f7f7;
+    }
+</style>
+ 
+<div class="main-wrapper">
+ 
+    <div class="breadcrumb-bar">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col-md-12 col-12">
+                    <nav aria-label="breadcrumb" class="page-breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="#">Home</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Booking</li>
+                        </ol>
+                    </nav>
+                    <h2 class="breadcrumb-title">Book Appointment</h2>
                 </div>
-                <!-- /Day Slot -->
-
             </div>
         </div>
     </div>
-    <!-- /Schedule Header -->
-
-    <!-- Schedule Content -->
-<div class="schedule-cont">
-    <div class="row">
-        <div class="col-md-12">
-            <div class="time-slot">
-                <ul class="clearfix">
-                    {% with today=now|date:"Y-m-d" %}
-{% for date in week_dates %}
-<li class="{% if date|date:'Y-m-d' < current_date %}past{% else %}current{% endif %}">
-    <div class="day-column">
-        <div class="day-slots">
-            {% with day_name=date|date:"l"|lower %}
-            {% with day_slots=time_slots|get_item:day_name %}
-            {% for entry in day_slots %}
-                {% if entry.is_booked %}
-                    <div class="timing booked">
-                        <span>{{ entry.slot.start_time|date:"g:i A" }}</span> -
-                        <span>{{ entry.slot.end_time|date:"g:i A" }}</span> (Unavailable)
+ 
+    <div class="content">
+        <div class="container">
+ 
+            <div class="row">
+                <div class="col-12">
+ 
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="booking-doc-info">
+                                <a href="#" class="booking-doc-img">
+                                    <img src="{% if doctor.user.userprofile.profile_picture %}{{ doctor.user.userprofile.profile_picture.url }}{% else %}{% static 'img/doctors/doctor-thumb-02.jpg' %}{% endif %}" alt="Doctor Image">
+                                </a>
+ 
+                                <div class="booking-info">
+                                    <h4 class="mb-1">
+                                        Dr. {{ doctor.user.first_name }} {{ doctor.user.last_name }}
+                                    </h4>
+ 
+                                    {% if doctor.department %}
+                                        <p class="text-muted mb-1">{{ doctor.department.name }}</p>
+                                    {% endif %}
+ 
+                                    {% if doctor.clinic_address %}
+                                        <p class="text-muted mb-0">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                            {{ doctor.clinic_address }}
+                                        </p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                {% else %}
-                    <a class="timing available" href="#appointmentModal" data-toggle="modal" data-time-slot-id="{{ entry.slot.id }}" data-doctor-id="{{ doctor.id }}" data-appointment-date="{{ date|date:'Y-m-d' }}">
-                        <span>{{ entry.slot.start_time|date:"g:i A" }}</span> -
-                        <span>{{ entry.slot.end_time|date:"g:i A" }}</span>
-                    </a>
-                {% endif %}
-            {% empty %}
-                <div class="timing">No slots available</div>
-            {% endfor %}
-            {% endwith %}
-            {% endwith %}
-        </div>
-    </div>
-</li>
-{% endfor %}
-
-                    {% endwith %}
-                </ul>
+ 
+                    <div class="payment-summary-card">
+                        <h4 class="mb-3">Payment Summary</h4>
+ 
+                        <div class="payment-summary-row">
+                            <span>Consultation Fee</span>
+                            <span>Rs. {{ consultation_fee }}</span>
+                        </div>
+ 
+                        <div class="payment-summary-row">
+                            <span>MediConnect Fee ({{ mediconnect_percentage }}%)</span>
+                            <span>Rs. {{ mediconnect_fee }}</span>
+                        </div>
+ 
+                        <div class="payment-summary-row total">
+                            <span>Total Amount</span>
+                            <span>Rs. {{ total_amount }}</span>
+                        </div>
+ 
+                        {% if esewa_enabled and esewa_number %}
+                            <div class="payment-note">
+                                eSewa payment is available for this doctor.
+                            </div>
+                        {% else %}
+                            <div class="payment-note">
+                                Only cash booking is available right now.
+                            </div>
+                        {% endif %}
+                    </div>
+ 
+                    <div class="card booking-schedule schedule-widget">
+                        <div class="schedule-header">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="day-slot">
+                                        <ul>
+                                            {% for date in week_dates %}
+                                                <li>
+                                                    <span>{{ date|date:"D" }}</span>
+                                                    <span class="slot-date">
+                                                        {{ date|date:"d M" }}
+                                                        <small class="slot-year">{{ date|date:"Y" }}</small>
+                                                    </span>
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+ 
+                        <div class="schedule-cont">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="time-slot">
+                                        <ul class="clearfix">
+                                            {% for date in week_dates %}
+                                                <li class="{% if date|date:'Y-m-d' < current_date %}past{% else %}current{% endif %}">
+                                                    <div class="day-column">
+                                                        <div class="day-slots">
+                                                            {% with day_name=date|date:"l"|lower %}
+                                                            {% with day_slots=time_slots|get_item:day_name %}
+                                                                {% for entry in day_slots %}
+                                                                    {% if entry.is_booked %}
+                                                                        <div class="timing booked">
+                                                                            {{ entry.slot.start_time|time:"g:i A" }} - {{ entry.slot.end_time|time:"g:i A" }}
+                                                                            <br>
+                                                                            <small>Unavailable</small>
+                                                                        </div>
+                                                                    {% else %}
+                                                                        <a href="javascript:void(0)"
+                                                                           class="timing available open-appointment-modal"
+                                                                           data-doctor-id="{{ doctor.id }}"
+                                                                           data-time-slot-id="{{ entry.slot.id }}"
+                                                                           data-appointment-date="{{ date|date:'Y-m-d' }}"
+                                                                           data-time-range="{{ entry.slot.start_time|time:'g:i A' }} - {{ entry.slot.end_time|time:'g:i A' }}">
+                                                                            {{ entry.slot.start_time|time:"g:i A" }} - {{ entry.slot.end_time|time:"g:i A" }}
+                                                                        </a>
+                                                                    {% endif %}
+                                                                {% empty %}
+                                                                    <span class="slot-empty">No slots available</span>
+                                                                {% endfor %}
+                                                            {% endwith %}
+                                                            {% endwith %}
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /Schedule Widget -->
+ 
+                </div>
             </div>
+ 
         </div>
     </div>
 </div>
-<!-- /Schedule Content -->
-
-
-</div>
-<!-- /Schedule Widget -->
-</div>
-
-
-						</div>
-					</div>
-				</div>
-
-			</div>
-			<!-- /Page Content -->
-        </div>
-    <!-- Modal for Booking Appointment -->
-<div class="modal fade" id="appointmentModal" tabindex="-1" role="dialog" aria-labelledby="appointmentModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+ 
+<!-- Appointment Modal -->
+<div class="modal fade custom-modal" id="appointmentModal" tabindex="-1" role="dialog" aria-labelledby="appointmentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="appointmentModalLabel">Book Appointment</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <form action="{% url 'book_appointment' %}" method="post" enctype="multipart/form-data">
+            <form action="{% url 'book_appointment' %}" method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
+ 
+                <div class="modal-header">
+                    <h5 class="modal-title" id="appointmentModalLabel">Confirm Appointment</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span>&times;</span>
+                    </button>
+                </div>
+ 
                 <div class="modal-body">
                     <input type="hidden" name="doctor_id" id="modal-doctor-id">
                     <input type="hidden" name="time_slot_id" id="modal-time-slot-id">
                     <input type="hidden" name="appointment_date" id="modal-appointment-date">
+ 
+                    <div class="mb-3">
+                        <p class="mb-1"><strong>Doctor:</strong> Dr. {{ doctor.user.first_name }} {{ doctor.user.last_name }}</p>
+                        <p class="mb-1"><strong>Date:</strong> <span id="selected-appointment-date-text">-</span></p>
+                        <p class="mb-0"><strong>Time:</strong> <span id="selected-time-slot-text">-</span></p>
+                    </div>
+ 
                     <div class="form-group">
-                        <label for="appointment_type">Appointment Type:</label>
+                        <label for="appointment_type">Appointment Type</label>
                         <select name="appointment_type" id="appointment_type" class="form-control">
                             <option value="followup">Follow Up</option>
                             <option value="checkup">Check Up</option>
                         </select>
                     </div>
+ 
                     <div class="form-group">
-                        <label for="message">Message (optional):</label>
-                        <textarea name="message" id="message" class="form-control"></textarea>
+                        <label for="payment_method">Payment Method</label>
+                        <select name="payment_method" id="payment_method" class="form-control">
+                            <option value="cash">Cash</option>
+                            {% if esewa_enabled and esewa_number %}
+                                <option value="esewa">eSewa</option>
+                            {% endif %}
+                        </select>
+                        <small class="form-text text-muted">
+                            For now, this only saves payment details in the database.
+                        </small>
                     </div>
+ 
+                    <div class="amount-box mb-3">
+                        <div class="payment-summary-row">
+                            <span>Consultation Fee</span>
+                            <span>Rs. {{ consultation_fee }}</span>
+                        </div>
+ 
+                        <div class="payment-summary-row">
+                            <span>MediConnect Fee ({{ mediconnect_percentage }}%)</span>
+                            <span>Rs. {{ mediconnect_fee }}</span>
+                        </div>
+ 
+                        <div class="payment-summary-row total">
+                            <span>Total Payable</span>
+                            <span>Rs. {{ total_amount }}</span>
+                        </div>
+                    </div>
+ 
                     <div class="form-group">
-                        <label for="image">Upload Image (optional):</label>
+                        <label for="message">Message (optional)</label>
+                        <textarea name="message" id="message" rows="4" class="form-control"></textarea>
+                    </div>
+ 
+                    <div class="form-group">
+                        <label for="image_upload">Upload Image (optional)</label>
                         <input type="file" name="image_upload" id="image_upload" class="form-control">
+                    </div>
                 </div>
+ 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Book Appointment</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Book Now</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
-
+ 
 <script>
-$(document).ready(function() {
-    $('.timing').click(function() {
-        var timeSlotId = $(this).data('time-slot-id');
-        console.log(timeSlotId);
-        var doctorId = $(this).data('doctor-id');
-        var appointmentDate = $(this).data('appointment-date');
-        $('#modal-time-slot-id').val(timeSlotId);
-        $('#modal-doctor-id').val(doctorId);
-        $('#modal-appointment-date').val(appointmentDate);
+    function openAppointmentModal(doctorId, timeSlotId, appointmentDate, timeRange) {
+        // Populate hidden inputs
+        document.getElementById('modal-doctor-id').value        = doctorId;
+        document.getElementById('modal-time-slot-id').value     = timeSlotId;
+        document.getElementById('modal-appointment-date').value = appointmentDate;
+ 
+        // Update visible display text
+        document.getElementById('selected-appointment-date-text').textContent = appointmentDate;
+        document.getElementById('selected-time-slot-text').textContent        = timeRange;
+ 
+        var modalEl = document.getElementById('appointmentModal');
+ 
+        if (typeof $ !== 'undefined' && typeof $.fn !== 'undefined' && typeof $.fn.modal !== 'undefined') {
+            // Bootstrap 3 or 4 with jQuery plugin loaded
+            $('#appointmentModal').modal('show');
+        } else if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+            // Bootstrap 5
+            var bsModal = bootstrap.Modal.getOrCreateInstance(modalEl);
+            bsModal.show();
+        } else {
+            // Fallback: manually show the modal with CSS
+            modalEl.style.display = 'block';
+            modalEl.removeAttribute('aria-hidden');
+            modalEl.setAttribute('aria-modal', 'true');
+            modalEl.classList.add('show');
+            document.body.classList.add('modal-open');
+ 
+            // Inject backdrop
+            if (!document.getElementById('manual-backdrop')) {
+                var backdrop = document.createElement('div');
+                backdrop.className = 'modal-backdrop fade show';
+                backdrop.id = 'manual-backdrop';
+                document.body.appendChild(backdrop);
+            }
+        }
+    }
+ 
+    function closeModalFallback() {
+        var modalEl  = document.getElementById('appointmentModal');
+        var backdrop = document.getElementById('manual-backdrop');
+        modalEl.style.display = '';
+        modalEl.classList.remove('show');
+        modalEl.setAttribute('aria-hidden', 'true');
+        modalEl.removeAttribute('aria-modal');
+        document.body.classList.remove('modal-open');
+        if (backdrop) backdrop.remove();
+    }
+ 
+    document.addEventListener('DOMContentLoaded', function () {
+        // Attach click handler to slot links
+        document.querySelectorAll('.open-appointment-modal').forEach(function (el) {
+            el.addEventListener('click', function (e) {
+                e.preventDefault();
+                openAppointmentModal(
+                    this.getAttribute('data-doctor-id'),
+                    this.getAttribute('data-time-slot-id'),
+                    this.getAttribute('data-appointment-date'),
+                    this.getAttribute('data-time-range')
+                );
+            });
+        });
+ 
+        // Fallback close: [data-dismiss="modal"] buttons inside the modal
+        document.querySelectorAll('#appointmentModal [data-dismiss="modal"]').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                // Only needed if the CSS fallback was used; Bootstrap handles its own close
+                if (!document.getElementById('manual-backdrop') === false) {
+                    closeModalFallback();
+                }
+            });
+        });
     });
-});
 </script>
-
+ 
 {% endblock %}

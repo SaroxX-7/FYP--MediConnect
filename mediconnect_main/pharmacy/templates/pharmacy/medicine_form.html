@@ -1,6 +1,165 @@
 {% extends 'base.html' %}
 {% block content %}
 
+<style>
+  .medicine-form-section {
+    padding: 20px 0 50px;
+  }
+
+  .medicine-form-card {
+    border: none;
+    border-radius: 18px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+  }
+
+  .medicine-form-card .card-body {
+    padding: 36px;
+  }
+
+  .medicine-form-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px 24px;
+  }
+
+  .form-group-custom {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .form-group-custom.full-width {
+    grid-column: 1 / -1;
+  }
+
+  .form-label-custom {
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #1f2937;
+    font-size: 14px;
+  }
+
+  .medicine-form-card input[type="text"],
+  .medicine-form-card input[type="number"],
+  .medicine-form-card input[type="file"],
+  .medicine-form-card textarea,
+  .medicine-form-card select {
+    width: 100%;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 14px;
+    background: #fff;
+    transition: all 0.2s ease;
+    outline: none;
+  }
+
+  .medicine-form-card textarea {
+    min-height: 120px;
+    resize: vertical;
+  }
+
+  .medicine-form-card input:focus,
+  .medicine-form-card textarea:focus,
+  .medicine-form-card select:focus {
+    border-color: #0de0fe;
+    box-shadow: 0 0 0 3px rgba(13, 224, 254, 0.15);
+  }
+
+  .checkbox-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-top: 6px;
+  }
+
+  .checkbox-wrapper input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+  }
+
+  .current-image {
+    margin-top: 10px;
+  }
+
+  .current-image img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+  }
+
+  .form-errors {
+    color: #dc3545;
+    font-size: 12px;
+    margin-top: 4px;
+  }
+
+  .form-actions {
+    margin-top: 24px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .btn-save-custom {
+    background: #0de0fe;
+    border: none;
+    color: #fff;
+    padding: 10px 22px;
+    border-radius: 10px;
+    font-weight: 600;
+    transition: 0.2s ease;
+    font-size: 14px;
+  }
+
+  .btn-save-custom:hover {
+    background: #08c7e1;
+    color: #fff;
+  }
+
+  .btn-cancel-custom {
+    background: #6c757d;
+    color: #fff;
+    padding: 10px 22px;
+    border-radius: 10px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: 0.2s ease;
+    font-size: 14px;
+    display: inline-block;
+    text-align: center;
+  }
+
+  .btn-cancel-custom:hover {
+    background: #5a6268;
+    color: #fff;
+    text-decoration: none;
+  }
+
+  .breadcrumb-bar {
+    margin-bottom: 10px;
+  }
+
+  @media (max-width: 991px) {
+    .medicine-form-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 768px) {
+    .medicine-form-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .medicine-form-card .card-body {
+      padding: 20px;
+    }
+  }
+</style>
+
 <div class="breadcrumb-bar">
   <div class="container-fluid">
     <div class="row align-items-center">
@@ -11,17 +170,102 @@
   </div>
 </div>
 
-<div class="content">
+<div class="content medicine-form-section">
   <div class="container-fluid">
     <div class="row">
-      <div class="col-md-8">
-        <div class="card">
+      <div class="col-12">
+        <div class="card medicine-form-card">
           <div class="card-body">
             <form method="post" enctype="multipart/form-data">
               {% csrf_token %}
-              {{ form.as_p }}
-              <button type="submit" class="btn btn-primary">Save</button>
-              <a href="{% url 'pharmacist_dashboard' %}" class="btn btn-secondary">Cancel</a>
+
+              <div class="medicine-form-grid">
+                <div class="form-group-custom">
+                  <label class="form-label-custom" for="{{ form.name.id_for_label }}">Medicine Name</label>
+                  {{ form.name }}
+                  {% if form.name.errors %}
+                    <div class="form-errors">{{ form.name.errors }}</div>
+                  {% endif %}
+                </div>
+
+                <div class="form-group-custom">
+                  <label class="form-label-custom" for="{{ form.generic_name.id_for_label }}">Generic Name</label>
+                  {{ form.generic_name }}
+                  {% if form.generic_name.errors %}
+                    <div class="form-errors">{{ form.generic_name.errors }}</div>
+                  {% endif %}
+                </div>
+
+                <div class="form-group-custom">
+                  <label class="form-label-custom" for="{{ form.dosage_form.id_for_label }}">Dosage Form</label>
+                  {{ form.dosage_form }}
+                  {% if form.dosage_form.errors %}
+                    <div class="form-errors">{{ form.dosage_form.errors }}</div>
+                  {% endif %}
+                </div>
+
+                <div class="form-group-custom">
+                  <label class="form-label-custom" for="{{ form.strength.id_for_label }}">Strength</label>
+                  {{ form.strength }}
+                  {% if form.strength.errors %}
+                    <div class="form-errors">{{ form.strength.errors }}</div>
+                  {% endif %}
+                </div>
+
+                <div class="form-group-custom">
+                  <label class="form-label-custom" for="{{ form.unit_price.id_for_label }}">Unit Price</label>
+                  {{ form.unit_price }}
+                  {% if form.unit_price.errors %}
+                    <div class="form-errors">{{ form.unit_price.errors }}</div>
+                  {% endif %}
+                </div>
+
+                <div class="form-group-custom">
+                  <label class="form-label-custom" for="{{ form.stock_qty.id_for_label }}">Stock Quantity</label>
+                  {{ form.stock_qty }}
+                  {% if form.stock_qty.errors %}
+                    <div class="form-errors">{{ form.stock_qty.errors }}</div>
+                  {% endif %}
+                </div>
+
+                <div class="form-group-custom full-width">
+                  <label class="form-label-custom" for="{{ form.description.id_for_label }}">Description</label>
+                  {{ form.description }}
+                  {% if form.description.errors %}
+                    <div class="form-errors">{{ form.description.errors }}</div>
+                  {% endif %}
+                </div>
+
+                <div class="form-group-custom">
+                  <label class="form-label-custom" for="{{ form.image.id_for_label }}">Medicine Image</label>
+                  {{ form.image }}
+                  {% if form.image.errors %}
+                    <div class="form-errors">{{ form.image.errors }}</div>
+                  {% endif %}
+
+                  {% if form.instance.image %}
+                    <div class="current-image">
+                      <img src="{{ form.instance.image.url }}" alt="{{ form.instance.name }}">
+                    </div>
+                  {% endif %}
+                </div>
+
+                <div class="form-group-custom">
+                  <label class="form-label-custom">Status</label>
+                  <div class="checkbox-wrapper">
+                    {{ form.is_active }}
+                    <span>Active</span>
+                  </div>
+                  {% if form.is_active.errors %}
+                    <div class="form-errors">{{ form.is_active.errors }}</div>
+                  {% endif %}
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <button type="submit" class="btn btn-save-custom">Save Medicine</button>
+                <a href="{% url 'pharmacist_dashboard' %}" class="btn-cancel-custom">Cancel</a>
+              </div>
             </form>
           </div>
         </div>

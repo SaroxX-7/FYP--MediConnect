@@ -2,53 +2,577 @@
 {% block content %}
 
 <div class="container mt-4">
-    <h2>Pharmacy Store</h2>
+    <div class="store-header">
+        <h2><i class="bi bi-capsule"></i> Pharmacy Store</h2>
+        <p class="header-subtitle">Quality medicines • Trusted care</p>
+        {% if request.user.role == 2 %}
+            <a href="{% url 'view_cart' %}" class="cart-link">
+                <i class="bi bi-cart-fill"></i> View Cart
+                <span class="cart-badge">🛒</span>
+            </a>
+        {% endif %}
+    </div>
 
-    <div class="row">
+    <div class="medicine-grid">
         {% for medicine in medicines %}
-            <div class="col-md-4 mb-4">
-                <div class="card h-100 shadow-sm">
-                    {% if medicine.image %}
-                        <img src="{{ medicine.image.url }}" class="card-img-top" style="height: 220px; object-fit: cover;">
-                    {% endif %}
+            <div class="med-card" data-medicine-id="{{ medicine.id }}">
+                {% if medicine.image %}
+                    <div class="card-img-wrapper">
+                        <img src="{{ medicine.image.url }}" alt="{{ medicine.name }}">
+                    </div>
+                {% else %}
+                    <div class="card-img-wrapper placeholder-img">
+                        <i class="bi bi-capsule"></i>
+                    </div>
+                {% endif %}
 
-                    <div class="card-body">
-                        <h5 class="card-title">{{ medicine.name }}</h5>
-                        <p><strong>Category:</strong> {{ medicine.category|default:"-" }}</p>
-                        <p><strong>Description:</strong> {{ medicine.description|default:"No description" }}</p>
-                        <p><strong>Price:</strong> Rs. {{ medicine.price }}</p>
-                        <p><strong>Stock:</strong> {{ medicine.stock_qty }}</p>
-
+                <div class="card-body-compact">
+                    <h5 class="med-title">{{ medicine.name }}</h5>
+                    
+                    <div class="med-meta">
+                        <span class="meta-badge">{{ medicine.dosage_form|default:"Tablet" }}</span>
+                        <span class="meta-badge">{{ medicine.strength|default:"-" }}</span>
+                    </div>
+                    
+                    <div class="generic-row">
+                        <span class="generic-label">Generic Name:</span>
+                        <span>{{ medicine.generic_name|default:"-" }}</span>
+                    </div>
+                    
+                    <div class="price-stock">
+                        <div class="price">
+                            ₹{{ medicine.unit_price }}<small>/unit</small>
+                        </div>
+                        <div class="stock-badge {% if medicine.stock_qty > 0 %}in-stock{% else %}out-stock{% endif %}">
+                            <i class="bi bi-box-seam"></i> 
+                            {% if medicine.stock_qty > 0 %}
+                                {{ medicine.stock_qty }} left
+                            {% else %}
+                                Out of Stock
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Description with See More/Less toggle -->
+                    <div class="desc-wrapper">
+                        <div class="desc-preview" id="preview-{{ medicine.id }}">
+                            {{ medicine.description|default:"No description available"|truncatewords:20 }}
+                        </div>
+                        <div class="desc-full" id="full-{{ medicine.id }}" style="display: none;">
+                            {{ medicine.description|default:"No description available" }}
+                        </div>
+                        {% if medicine.description and medicine.description|length > 100 %}
+                            <button class="see-more-btn" data-id="{{ medicine.id }}">
+                                <span>See more</span> <i class="bi bi-chevron-down"></i>
+                            </button>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Add to Cart Section -->
+                    <div class="cart-control">
                         {% if medicine.stock_qty > 0 %}
-                            <form method="POST" action="{% url 'add_to_cart' medicine.id %}">
+                            <form method="POST" action="{% url 'add_to_cart' medicine.id %}" class="add-to-cart-form">
                                 {% csrf_token %}
-                                
-                                <div class="mb-2">
-                                    <label><strong>Quantity:</strong></label>
-                                    <input type="number"
-                                           name="quantity"
-                                           class="form-control"
-                                           value="1"
-                                           min="1"
+                                <div class="qty-group">
+                                    <input type="number" 
+                                           name="quantity" 
+                                           class="qty-input-modern" 
+                                           value="1" 
+                                           min="1" 
                                            max="{{ medicine.stock_qty }}">
+                                    <button type="submit" class="btn-add-cart">
+                                        <i class="bi bi-bag-plus"></i> Add to Cart
+                                    </button>
                                 </div>
-
-                                <button type="submit" class="btn btn-primary">
-                                    Add to Cart
-                                </button>
                             </form>
                         {% else %}
-                            <button class="btn btn-secondary" disabled>Out of Stock</button>
+                            <div class="btn-out-stock">
+                                <i class="bi bi-x-circle"></i> Out of Stock
+                            </div>
                         {% endif %}
                     </div>
                 </div>
             </div>
         {% empty %}
-            <p>No medicines available.</p>
+            <div class="empty-state">
+                <i class="bi bi-emoji-frown"></i>
+                <p>No medicines available.</p>
+            </div>
         {% endfor %}
     </div>
-
-    <a href="{% url 'view_cart' %}" class="btn btn-success">View Cart</a>
 </div>
+
+<style>
+    /* ========== BLUE THEME CSS ========== */
+    :root {
+        --primary-dark: #1a3a5c;
+        --primary: #2c5f8a;
+        --primary-light: #4a7fa8;
+        --primary-soft: #e8f0f8;
+        --accent: #e67e22;
+        --gray-bg: #f4f7fc;
+        --card-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.1);
+        --card-hover-shadow: 0 30px 45px -16px rgba(0, 0, 0, 0.2);
+    }
+
+    body {
+        font-family: 'Inter', sans-serif;
+        background: linear-gradient(135deg, #eef2f7 0%, #e0e8f0 100%);
+        min-height: 100vh;
+    }
+
+    .container {
+        max-width: 1400px;
+        padding: 2rem 1.5rem;
+    }
+
+    /* Store Header */
+    .store-header {
+        margin-bottom: 2.5rem;
+        position: relative;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        justify-content: space-between;
+        border-bottom: 2px solid rgba(44, 95, 138, 0.15);
+        padding-bottom: 1rem;
+    }
+
+    .store-header h2 {
+        font-size: 2.2rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        margin-bottom: 0.25rem;
+    }
+
+    .store-header h2 i {
+        background: none;
+        -webkit-background-clip: unset;
+        background-clip: unset;
+        color: var(--primary);
+        margin-right: 8px;
+    }
+
+    .header-subtitle {
+        color: #6c7a74;
+        font-size: 0.85rem;
+        margin-left: 2px;
+        width: 100%;
+    }
+
+    .cart-link {
+        background: white;
+        border-radius: 60px;
+        padding: 0.6rem 1.4rem;
+        text-decoration: none;
+        font-weight: 600;
+        color: var(--primary-dark);
+        border: 1px solid rgba(0,0,0,0.05);
+        transition: all 0.25s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    }
+
+    .cart-link:hover {
+        background: var(--primary);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 12px 20px -10px rgba(44, 95, 138, 0.4);
+        border-color: transparent;
+    }
+
+    .cart-badge {
+        background: var(--accent);
+        color: white;
+        padding: 2px 8px;
+        border-radius: 30px;
+        font-size: 0.7rem;
+    }
+
+    /* Modern Grid */
+    .medicine-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.8rem;
+    }
+
+    /* Advanced Card Design */
+    .med-card {
+        background: rgba(255, 255, 255, 0.98);
+        border-radius: 28px;
+        overflow: hidden;
+        transition: all 0.35s cubic-bezier(0.2, 0, 0, 1);
+        box-shadow: 0 12px 28px -12px rgba(0, 0, 0, 0.12);
+        border: 1px solid rgba(255,255,255,0.6);
+        backdrop-filter: blur(0px);
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    .med-card:hover {
+        transform: translateY(-6px);
+        box-shadow: var(--card-hover-shadow);
+        border-color: rgba(44, 95, 138, 0.2);
+        background: white;
+    }
+
+    /* Image Wrapper */
+    .card-img-wrapper {
+        height: 170px;
+        background: linear-gradient(145deg, #f0f4f8, #e6edf2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .card-img-wrapper img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.4s ease;
+    }
+
+    .med-card:hover .card-img-wrapper img {
+        transform: scale(1.03);
+    }
+
+    .placeholder-img {
+        font-size: 3rem;
+        color: var(--primary-light);
+        background: linear-gradient(130deg, #e9ecef, #dee4e8);
+    }
+
+    /* Compact Card Body */
+    .card-body-compact {
+        padding: 1rem 1.2rem 1.2rem 1.2rem;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .med-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: var(--primary-dark);
+        letter-spacing: -0.3px;
+        margin-bottom: 0.6rem;
+        line-height: 1.3;
+    }
+
+    .med-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 0.7rem;
+    }
+
+    .meta-badge {
+        background: var(--primary-soft);
+        padding: 0.2rem 0.8rem;
+        border-radius: 40px;
+        color: var(--primary);
+        font-size: 0.7rem;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+    }
+
+    .generic-row {
+        font-size: 0.78rem;
+        color: #4a5b56;
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.6rem;
+        padding-bottom: 0.4rem;
+        border-bottom: 1px dashed #e2e8f0;
+    }
+
+    .generic-label {
+        font-weight: 700;
+        color: #2d3e39;
+    }
+
+    /* Price + Stock Section */
+    .price-stock {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin: 0.5rem 0 0.7rem 0;
+        background: #f8faf5;
+        padding: 0.5rem 0.9rem;
+        border-radius: 20px;
+    }
+
+    .price {
+        font-weight: 800;
+        font-size: 1.3rem;
+        color: var(--primary);
+    }
+
+    .price small {
+        font-size: 0.65rem;
+        font-weight: 500;
+        color: #7e8c86;
+    }
+
+    .stock-badge {
+        font-size: 0.7rem;
+        font-weight: 600;
+        background: white;
+        padding: 0.25rem 0.8rem;
+        border-radius: 30px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .in-stock {
+        color: #2c7a5e;
+    }
+    .out-stock {
+        color: #c0392b;
+        background: #fee9e7;
+    }
+
+    /* Description with See More */
+    .desc-wrapper {
+        margin: 0.2rem 0 0.5rem 0;
+    }
+    .desc-preview {
+        font-size: 0.78rem;
+        color: #4a5b56;
+        line-height: 1.45;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    .desc-full {
+        font-size: 0.78rem;
+        color: #2d3e39;
+        line-height: 1.5;
+        background: #f0f6fb;
+        padding: 0.7rem;
+        border-radius: 16px;
+        border-left: 3px solid var(--primary);
+        margin-top: 0.3rem;
+    }
+    .see-more-btn {
+        background: none;
+        border: none;
+        color: var(--primary);
+        font-weight: 600;
+        font-size: 0.7rem;
+        padding: 0.3rem 0 0.2rem 0;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .see-more-btn:hover {
+        color: var(--accent);
+        gap: 8px;
+    }
+
+    /* Add to Cart Controls */
+    .cart-control {
+        margin-top: auto;
+        padding-top: 0.6rem;
+    }
+    .qty-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 0;
+    }
+    .qty-input-modern {
+        width: 70px;
+        padding: 0.45rem 0.3rem;
+        text-align: center;
+        border-radius: 40px;
+        border: 1px solid #cfdfd9;
+        background: white;
+        font-weight: 500;
+        font-size: 0.8rem;
+        outline: none;
+        transition: 0.2s;
+    }
+    .qty-input-modern:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 2px rgba(44, 95, 138, 0.2);
+    }
+    .btn-add-cart {
+        background: linear-gradient(95deg, var(--primary), var(--primary-dark));
+        border: none;
+        padding: 0.5rem 0.9rem;
+        border-radius: 40px;
+        font-weight: 600;
+        font-size: 0.8rem;
+        color: white;
+        transition: all 0.2s;
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+    .btn-add-cart:hover {
+        background: linear-gradient(95deg, var(--primary-dark), #0f2e47);
+        transform: scale(0.98);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .btn-out-stock {
+        background: #f2f4f2;
+        border: 1px solid #e0e6e2;
+        color: #9aaba2;
+        font-weight: 500;
+        border-radius: 40px;
+        width: 100%;
+        padding: 0.55rem;
+        font-size: 0.8rem;
+        text-align: center;
+        cursor: default;
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        background: white;
+        border-radius: 48px;
+        padding: 3rem;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        grid-column: 1 / -1;
+    }
+    .empty-state i {
+        font-size: 3rem;
+        color: var(--primary-light);
+        margin-bottom: 1rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+        .container {
+            padding: 1.2rem;
+        }
+        .medicine-grid {
+            gap: 1rem;
+        }
+        .med-title {
+            font-size: 1.15rem;
+        }
+        .price {
+            font-size: 1.1rem;
+        }
+        .store-header h2 {
+            font-size: 1.6rem;
+        }
+    }
+
+    /* fade in animation */
+    .med-card {
+        animation: fadeInUp 0.45s ease-out forwards;
+        opacity: 0;
+    }
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(15px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    /* staggered animation via nth-child */
+    .med-card:nth-child(1) { animation-delay: 0.02s; }
+    .med-card:nth-child(2) { animation-delay: 0.07s; }
+    .med-card:nth-child(3) { animation-delay: 0.12s; }
+    .med-card:nth-child(4) { animation-delay: 0.17s; }
+    .med-card:nth-child(5) { animation-delay: 0.22s; }
+    .med-card:nth-child(6) { animation-delay: 0.27s; }
+</style>
+
+<script>
+    // See More / See Less functionality for each medicine card
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get all "See more" buttons
+        const seeMoreBtns = document.querySelectorAll('.see-more-btn');
+        
+        seeMoreBtns.forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const medicineId = this.getAttribute('data-id');
+                const previewDiv = document.getElementById(`preview-${medicineId}`);
+                const fullDiv = document.getElementById(`full-${medicineId}`);
+                
+                if (!previewDiv || !fullDiv) return;
+                
+                const isExpanded = fullDiv.style.display === 'block';
+                
+                if (isExpanded) {
+                    // Collapse
+                    fullDiv.style.display = 'none';
+                    previewDiv.style.display = '-webkit-box';
+                    this.innerHTML = '<span>See more</span> <i class="bi bi-chevron-down"></i>';
+                } else {
+                    // Expand
+                    previewDiv.style.display = 'none';
+                    fullDiv.style.display = 'block';
+                    this.innerHTML = '<span>See less</span> <i class="bi bi-chevron-up"></i>';
+                }
+            });
+        });
+        
+        // For cards where description is short, hide the see more button
+        const allCards = document.querySelectorAll('.med-card');
+        allCards.forEach(card => {
+            const medicineId = card.getAttribute('data-medicine-id');
+            const fullDescDiv = document.getElementById(`full-${medicineId}`);
+            if (fullDescDiv) {
+                const descText = fullDescDiv.innerText.trim();
+                if (descText.length <= 100) {
+                    const btn = card.querySelector('.see-more-btn');
+                    if (btn) btn.style.display = 'none';
+                    // Also ensure preview shows full description
+                    const previewDiv = document.getElementById(`preview-${medicineId}`);
+                    if (previewDiv) {
+                        previewDiv.style.webkitLineClamp = 'unset';
+                        previewDiv.style.display = 'block';
+                        previewDiv.innerText = descText;
+                    }
+                }
+            }
+        });
+        
+        // Enhance add to cart: optional quantity validation & feedback (already handles Django POST)
+        const forms = document.querySelectorAll('.add-to-cart-form');
+        forms.forEach(form => {
+            form.addEventListener('submit', function(e) {
+                const qtyInput = this.querySelector('input[name="quantity"]');
+                const maxStock = parseInt(qtyInput.getAttribute('max'));
+                let qty = parseInt(qtyInput.value);
+                if (isNaN(qty) || qty < 1) {
+                    e.preventDefault();
+                    alert('Please enter a valid quantity (at least 1).');
+                    return false;
+                }
+                if (maxStock && qty > maxStock) {
+                    e.preventDefault();
+                    alert(`Only ${maxStock} units available in stock.`);
+                    return false;
+                }
+                // Allow form to submit normally to Django backend
+                return true;
+            });
+        });
+    });
+</script>
 
 {% endblock %}

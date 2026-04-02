@@ -54,18 +54,18 @@
 
                                                         <!-- Get Connected -->
                                                         <td>
-                                                            {% if appointment.doctor.user.phone_number %}
-                                                                <a
-                                                                    href="https://wa.me/{{ appointment.doctor.user.phone_number|cut:'+'|cut:' ' }}?text=Hello%20Dr.%20{{ appointment.doctor.user.first_name }}%20{{ appointment.doctor.user.last_name }},%20I%20am%20{{ request.user.first_name }}%20{{ request.user.last_name }}%20regarding%20my%20appointment%20on%20{{ appointment.appointment_date|date:'d%20M%20Y' }}."
-                                                                    target="_blank"
-                                                                    style="color:#25D366;font-weight:600;"
-                                                                >
-                                                                    <i class="fab fa-whatsapp"></i>
-                                                                    {{ appointment.doctor.user.phone_number }}
-                                                                </a>
-                                                            {% else %}
-                                                                N/A
-                                                            {% endif %}
+                                                            <button
+                                                                type="button"
+                                                                class="btn btn-sm btn-primary start-chat-btn"
+                                                                data-appointment-id="{{ appointment.id }}"
+                                                                data-other-name="Dr. {{ appointment.doctor.user.first_name }} {{ appointment.doctor.user.last_name }}"
+                                                                data-other-image="{% if appointment.doctor.user.userprofile.profile_picture %}{{ appointment.doctor.user.userprofile.profile_picture.url }}{% else %}{% static 'img/favicon.png' %}{% endif %}"
+                                                                data-has-conversation="{% if appointment.has_conversation %}1{% else %}0{% endif %}"
+                                                                data-conversation-id="{{ appointment.conversation_id }}"
+                                                            >
+                                                                <i class="fas fa-comments"></i>
+                                                                {% if appointment.has_conversation %}Open Chat{% else %}Start Chatting{% endif %}
+                                                            </button>
                                                         </td>
 
                                                         <!-- Appointment Date and Time -->
@@ -112,7 +112,7 @@
 
                                                     {% empty %}
                                                     <tr>
-                                                        <td colspan="6">No appointments available</td>
+                                                        <td colspan="6" class="text-center">No appointments available</td>
                                                     </tr>
                                                     {% endfor %}
                                                 </tbody>
@@ -133,5 +133,775 @@
 
     </div>
 </div>
+
+<!-- ============================================
+     ENHANCED CSS - ORGANIZED & WELL STRUCTURED
+     ============================================ -->
+<style>
+    /* --------------------------------------------
+       1. GLOBAL & UTILITY CLASSES
+    -------------------------------------------- */
+    .content {
+        padding: 1.5rem 1rem;
+    }
+
+    .container-fluid {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    /* Card Modern Styling */
+    .card {
+        border: none;
+        border-radius: 1.25rem;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.02), 0 2px 6px rgba(0, 0, 0, 0.05);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        background: #ffffff;
+    }
+
+    .card-body {
+        padding: 1.5rem;
+    }
+
+    /* --------------------------------------------
+       2. TABLE & AVATAR STYLES
+    -------------------------------------------- */
+    .table {
+        margin-bottom: 0;
+    }
+
+    .table thead th {
+        border-bottom: 1px solid #eef2f6;
+        font-weight: 600;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        color: #5a6e8a;
+        background: #ffffff;
+        padding: 1rem 0.75rem;
+    }
+
+    .table tbody td {
+        vertical-align: middle;
+        padding: 1rem 0.75rem;
+        border-bottom: 1px solid #f0f2f8;
+        color: #1e2a3e;
+    }
+
+    .table-avatar {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .avatar {
+        position: relative;
+        display: inline-block;
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+
+    .avatar-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 2px solid #fff;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    /* --------------------------------------------
+       3. BADGE STYLES (Status Indicators)
+    -------------------------------------------- */
+    .badge-pill {
+        padding: 0.4rem 0.8rem;
+        border-radius: 30px;
+        font-weight: 500;
+        font-size: 0.75rem;
+        display: inline-block;
+        line-height: 1.2;
+        text-align: center;
+    }
+
+    .bg-warning-light {
+        background-color: #fff3e0;
+        color: #c47d2e;
+    }
+
+    .bg-success-light {
+        background-color: #e3f7ec;
+        color: #2b7e3a;
+    }
+
+    .bg-danger-light {
+        background-color: #fee9e6;
+        color: #cb3b2b;
+    }
+
+    .bg-secondary-light {
+        background-color: #eef2fa;
+        color: #4a627a;
+    }
+
+    /* --------------------------------------------
+       4. BUTTON STYLES
+    -------------------------------------------- */
+    .btn-sm {
+        padding: 0.4rem 0.9rem;
+        font-size: 0.75rem;
+        font-weight: 500;
+        border-radius: 40px;
+        transition: all 0.2s;
+    }
+
+    .btn-primary {
+        background: linear-gradient(105deg, #3b82f6 0%, #2563eb 100%);
+        border: none;
+        box-shadow: 0 2px 5px rgba(59, 130, 246, 0.2);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(105deg, #2563eb 0%, #1d4ed8 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
+    }
+
+    .bg-info-light {
+        background-color: #e8f0fe;
+        color: #2c6e9e;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+
+    .bg-info-light:hover {
+        background-color: #d9e6f9;
+        color: #1e4a76;
+        transform: translateY(-1px);
+    }
+
+    .start-chat-btn {
+        background: #f0f4ff;
+        border: none;
+        color: #2563eb;
+        font-weight: 500;
+        transition: all 0.2s;
+    }
+
+    .start-chat-btn:hover {
+        background: #e0e9ff;
+        transform: translateY(-1px);
+    }
+
+    .table-action a {
+        background: #f8fafc;
+        padding: 0.4rem 1rem;
+        border-radius: 30px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        transition: 0.2s;
+    }
+
+    /* --------------------------------------------
+       5. CHAT LAUNCHER (Floating Button)
+    -------------------------------------------- */
+    .chat-launcher {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: none;
+        padding: 0;
+        background: linear-gradient(135deg, #3b82f6, #7c3aed);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2), 0 2px 6px rgba(0, 0, 0, 0.05);
+        z-index: 1050;
+        cursor: pointer;
+        display: none;
+        transition: transform 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1), box-shadow 0.2s;
+    }
+
+    .chat-launcher:hover {
+        transform: scale(1.06);
+        box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25);
+    }
+
+    .chat-launcher:active {
+        transform: scale(0.96);
+    }
+
+    .chat-launcher img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.25s;
+    }
+
+    .chat-launcher:hover img {
+        transform: scale(1.08);
+    }
+
+    /* Chat Launcher Badge with Pulse Animation */
+    .chat-launcher-badge {
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        min-width: 24px;
+        height: 24px;
+        padding: 0 7px;
+        border-radius: 40px;
+        background: linear-gradient(145deg, #ff4d4f, #f5222d);
+        color: #fff;
+        font-size: 11px;
+        font-weight: 700;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid #ffffff;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    @keyframes badgePop {
+        0% { transform: scale(0); opacity: 0; }
+        70% { transform: scale(1.2); }
+        100% { transform: scale(1); opacity: 1; }
+    }
+
+    @keyframes pulseGlow {
+        0% { box-shadow: 0 0 0 0 rgba(245, 34, 45, 0.6); }
+        70% { box-shadow: 0 0 0 8px rgba(245, 34, 45, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(245, 34, 45, 0); }
+    }
+
+    .chat-launcher-badge.has-notification {
+        animation: badgePop 0.3s ease-out, pulseGlow 0.8s ease-in-out 1;
+    }
+
+    /* --------------------------------------------
+       6. CHAT WIDGET (Main Chat Window)
+    -------------------------------------------- */
+    .chat-widget {
+        position: fixed;
+        bottom: 100px;
+        right: 24px;
+        width: 390px;
+        max-width: calc(100vw - 32px);
+        height: 560px;
+        background: #ffffff;
+        border-radius: 28px;
+        box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.35), 0 4px 12px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+        z-index: 1051;
+        display: none;
+        flex-direction: column;
+        animation: slideUpWidget 0.28s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    }
+
+    @keyframes slideUpWidget {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Chat Widget Header */
+    .chat-widget-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px;
+        background: linear-gradient(115deg, #2563eb, #7c3aed);
+        color: white;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .chat-widget-header:hover {
+        background: linear-gradient(115deg, #1e40af, #6d28d9);
+    }
+
+    .chat-widget-user {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .chat-widget-user img {
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        transition: transform 0.2s;
+    }
+
+    .chat-widget-user-name {
+        font-weight: 700;
+        font-size: 1rem;
+        letter-spacing: -0.2px;
+    }
+
+    .chat-widget-user-subtitle {
+        font-size: 0.7rem;
+        opacity: 0.85;
+        margin-top: 2px;
+    }
+
+    .chat-widget-action-btn {
+        background: rgba(255, 255, 255, 0.18);
+        border: none;
+        border-radius: 30px;
+        font-size: 1.4rem;
+        width: 32px;
+        height: 32px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .chat-widget-action-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: scale(1.04);
+    }
+
+    /* Chat Widget Body (Messages Area) */
+    .chat-widget-body {
+        flex: 1;
+        overflow-y: auto;
+        padding: 18px 14px;
+        background: #f9fafc;
+        scroll-behavior: smooth;
+    }
+
+    .chat-widget-body::-webkit-scrollbar {
+        width: 5px;
+    }
+
+    .chat-widget-body::-webkit-scrollbar-track {
+        background: #eef2f6;
+        border-radius: 10px;
+    }
+
+    .chat-widget-body::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 10px;
+    }
+
+    .chat-empty {
+        text-align: center;
+        color: #8f9bb3;
+        font-size: 0.85rem;
+        margin-top: 40px;
+        padding: 1rem;
+    }
+
+    /* Message Bubbles */
+    .chat-message-row {
+        margin-bottom: 18px;
+        display: flex;
+        animation: fadeMessage 0.2s ease;
+    }
+
+    @keyframes fadeMessage {
+        from { opacity: 0; transform: translateY(8px);}
+        to { opacity: 1; transform: translateY(0);}
+    }
+
+    .chat-message-row.self {
+        justify-content: flex-end;
+    }
+
+    .chat-bubble {
+        max-width: 82%;
+        padding: 10px 14px;
+        border-radius: 22px;
+        word-wrap: break-word;
+        transition: background 0.2s;
+    }
+
+    .chat-bubble.other {
+        background: white;
+        border: 1px solid #eef2f9;
+        color: #1f2a44;
+        border-bottom-left-radius: 6px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    }
+
+    .chat-bubble.self {
+        background: linear-gradient(125deg, #3b82f6, #7c3aed);
+        color: white;
+        border-bottom-right-radius: 6px;
+        box-shadow: 0 4px 10px rgba(59, 130, 246, 0.2);
+    }
+
+    .chat-message-text {
+        font-size: 0.85rem;
+        line-height: 1.4;
+        margin-bottom: 4px;
+    }
+
+    .chat-message-meta {
+        display: block;
+        font-size: 0.65rem;
+        line-height: 1.3;
+        margin-top: 3px;
+    }
+
+    .chat-bubble.other .chat-message-meta {
+        color: #7c8ea0;
+    }
+
+    .chat-bubble.self .chat-message-meta {
+        color: rgba(255, 255, 255, 0.75);
+    }
+
+    .chat-message-status {
+        display: inline-block;
+        font-size: 0.6rem;
+        margin-left: 8px;
+        font-weight: 500;
+    }
+
+    /* Chat Widget Footer (Input Area) */
+    .chat-widget-footer {
+        padding: 12px 16px;
+        border-top: 1px solid #edf2f7;
+        background: #ffffff;
+    }
+
+    .chat-input-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .chat-input-group input {
+        flex: 1;
+        border-radius: 40px;
+        border: 1.5px solid #e4e9f2;
+        padding: 11px 16px;
+        font-size: 0.85rem;
+        background: #ffffff;
+        transition: all 0.2s;
+        outline: none;
+    }
+
+    .chat-input-group input:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    }
+
+    .chat-send-btn {
+        background: linear-gradient(115deg, #3b82f6, #7c3aed);
+        border: none;
+        border-radius: 40px;
+        padding: 10px 22px;
+        font-weight: 600;
+        font-size: 0.8rem;
+        color: white;
+        cursor: pointer;
+        transition: 0.2s;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    }
+
+    .chat-send-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 12px rgba(59, 130, 246, 0.3);
+    }
+
+    /* --------------------------------------------
+       7. RESPONSIVE DESIGN
+    -------------------------------------------- */
+    @media (max-width: 576px) {
+        .chat-widget {
+            width: 94vw;
+            right: 3vw;
+            bottom: 80px;
+            height: 520px;
+        }
+        .chat-launcher {
+            width: 56px;
+            height: 56px;
+            bottom: 16px;
+            right: 16px;
+        }
+        .table thead th, .table tbody td {
+            padding: 0.8rem 0.5rem;
+            font-size: 0.75rem;
+        }
+        .btn-sm {
+            padding: 0.25rem 0.7rem;
+        }
+        .table-avatar {
+            gap: 0.5rem;
+        }
+        .avatar {
+            width: 36px;
+            height: 36px;
+        }
+    }
+</style>
+
+<!-- ============================================
+     CHAT UI COMPONENTS
+     ============================================ -->
+<button id="chat-launcher" class="chat-launcher" type="button" aria-label="Open chat">
+    <img id="chat-launcher-image" src="{% static 'img/favicon.png' %}" alt="Chat User">
+    <span id="chat-launcher-badge" class="chat-launcher-badge"></span>
+</button>
+
+<div id="chat-widget" class="chat-widget">
+    <div class="chat-widget-header">
+        <div class="chat-widget-user">
+            <img id="chat-header-image" src="{% static 'img/favicon.png' %}" alt="Chat User">
+            <div>
+                <div id="chat-header-name" class="chat-widget-user-name">Chat</div>
+                <div class="chat-widget-user-subtitle">Appointment chat</div>
+            </div>
+        </div>
+        <button id="chat-minimize-btn" class="chat-widget-action-btn" type="button">−</button>
+    </div>
+    <div id="chat-log" class="chat-widget-body">
+        <div class="chat-empty">Start a conversation.</div>
+    </div>
+    <div class="chat-widget-footer">
+        <div class="chat-input-group">
+            <input id="chat-message-input" type="text" placeholder="Type your message...">
+            <button id="chat-message-submit" class="chat-send-btn" type="button">Send</button>
+        </div>
+    </div>
+</div>
+
+{{ request.user.id|json_script:"current-user-id" }}
+
+<!-- ============================================
+     JAVASCRIPT - CHAT FUNCTIONALITY
+     ============================================ -->
+<script>
+    const currentUserId = JSON.parse(document.getElementById('current-user-id').textContent);
+
+    const startChatButtons = document.querySelectorAll('.start-chat-btn');
+    const chatLauncher = document.getElementById('chat-launcher');
+    const chatLauncherImage = document.getElementById('chat-launcher-image');
+    const chatLauncherBadge = document.getElementById('chat-launcher-badge');
+    const chatWidget = document.getElementById('chat-widget');
+    const chatHeaderImage = document.getElementById('chat-header-image');
+    const chatHeaderName = document.getElementById('chat-header-name');
+    const chatMinimizeBtn = document.getElementById('chat-minimize-btn');
+    const chatLog = document.getElementById('chat-log');
+    const messageInput = document.getElementById('chat-message-input');
+    const submitButton = document.getElementById('chat-message-submit');
+
+    let currentConversationId = null;
+    let chatSocket = null;
+    let widgetOpen = false;
+    let unreadCount = 0;
+
+    function updateLauncherBadge() {
+        if (unreadCount > 0) {
+            chatLauncherBadge.style.display = 'flex';
+            chatLauncherBadge.textContent = unreadCount > 99 ? '99+' : unreadCount;
+            chatLauncherBadge.classList.add('has-notification');
+            setTimeout(() => {
+                chatLauncherBadge.classList.remove('has-notification');
+            }, 600);
+        } else {
+            chatLauncherBadge.style.display = 'none';
+            chatLauncherBadge.classList.remove('has-notification');
+        }
+    }
+
+    function scrollToBottom() {
+        chatLog.scrollTop = chatLog.scrollHeight;
+    }
+
+    function formatStatusText(readAt) {
+        return readAt ? `Seen • ${readAt}` : 'Seen';
+    }
+
+    function clearMessages() {
+        chatLog.innerHTML = '';
+    }
+
+    function renderEmpty() {
+        chatLog.innerHTML = '<div class="chat-empty">No messages yet. Start the conversation.</div>';
+    }
+
+    function renderMessage(message) {
+        const isSelf = parseInt(message.sender_id) === parseInt(currentUserId);
+        const wrapper = document.createElement('div');
+        wrapper.className = 'chat-message-row' + (isSelf ? ' self' : '');
+        wrapper.setAttribute('data-message-id', message.id);
+
+        const bubble = document.createElement('div');
+        bubble.className = 'chat-bubble ' + (isSelf ? 'self' : 'other');
+
+        const textDiv = document.createElement('div');
+        textDiv.className = 'chat-message-text';
+        textDiv.textContent = message.text;
+
+        const meta = document.createElement('small');
+        meta.className = 'chat-message-meta';
+        meta.textContent = `${message.created_at}`;
+
+        bubble.appendChild(textDiv);
+        bubble.appendChild(meta);
+
+        if (isSelf) {
+            const status = document.createElement('small');
+            status.className = 'chat-message-status';
+            status.setAttribute('data-status-for-message', message.id);
+            status.textContent = message.is_read ? formatStatusText(message.read_at) : 'Unseen';
+            bubble.appendChild(status);
+        }
+
+        wrapper.appendChild(bubble);
+        chatLog.appendChild(wrapper);
+    }
+
+    function markMessagesSeenInUi(messageIds, readAt) {
+        messageIds.forEach(function(messageId) {
+            const statusEl = document.querySelector(`[data-status-for-message="${messageId}"]`);
+            if (statusEl) statusEl.textContent = formatStatusText(readAt);
+        });
+    }
+
+    function openWidget() {
+        widgetOpen = true;
+        chatWidget.style.display = 'flex';
+        chatLauncher.style.display = 'block';
+        unreadCount = 0;
+        updateLauncherBadge();
+        scrollToBottom();
+        if(messageInput) messageInput.focus();
+        if (chatSocket && chatSocket.readyState === WebSocket.OPEN) {
+            chatSocket.send(JSON.stringify({ action: 'mark_seen' }));
+        }
+    }
+
+    function closeWidget() {
+        widgetOpen = false;
+        chatWidget.style.display = 'none';
+        chatLauncher.style.display = 'block';
+    }
+
+    async function loadMessages(conversationId) {
+        const response = await fetch(`/chat/conversation/${conversationId}/messages/`);
+        const data = await response.json();
+        clearMessages();
+        if (!data.messages || !data.messages.length) {
+            renderEmpty();
+            return;
+        }
+        data.messages.forEach(renderMessage);
+        scrollToBottom();
+    }
+
+    function connectSocket(conversationId) {
+        if (chatSocket) chatSocket.close();
+        const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+        chatSocket = new WebSocket(protocol + window.location.host + '/ws/chat/' + conversationId + '/');
+        chatSocket.onopen = function() {
+            chatSocket.send(JSON.stringify({ action: 'mark_seen' }));
+        };
+        chatSocket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            if (data.event_type === 'message') {
+                const empty = chatLog.querySelector('.chat-empty');
+                if (empty) empty.remove();
+                renderMessage({
+                    id: data.message_id,
+                    text: data.message,
+                    sender_id: data.sender_id,
+                    sender_name: data.sender_email,
+                    created_at: data.created_at,
+                    is_read: data.is_read,
+                    read_at: data.read_at,
+                });
+                const isFromOtherUser = parseInt(data.sender_id) !== parseInt(currentUserId);
+                if (isFromOtherUser) {
+                    if (widgetOpen) {
+                        chatSocket.send(JSON.stringify({ action: 'mark_seen' }));
+                    } else {
+                        unreadCount += 1;
+                        updateLauncherBadge();
+                    }
+                }
+                scrollToBottom();
+            }
+            if (data.event_type === 'seen_update') {
+                markMessagesSeenInUi(data.message_ids, data.read_at);
+            }
+        };
+    }
+
+    async function startChat(appointmentId, otherName, otherImage) {
+        const response = await fetch(`/chat/start/${appointmentId}/`);
+        const data = await response.json();
+        currentConversationId = data.conversation_id;
+        chatHeaderName.textContent = data.other_user_name || otherName;
+        chatHeaderImage.src = data.other_user_image || otherImage;
+        chatLauncherImage.src = data.other_user_image || otherImage;
+        chatLauncher.style.display = 'block';
+        await loadMessages(currentConversationId);
+        connectSocket(currentConversationId);
+        openWidget();
+    }
+
+    function preloadExistingConversation() {
+        const existingButton = document.querySelector('.start-chat-btn[data-has-conversation="1"]');
+        if (!existingButton) return;
+        currentConversationId = existingButton.dataset.conversationId;
+        chatHeaderName.textContent = existingButton.dataset.otherName;
+        chatHeaderImage.src = existingButton.dataset.otherImage;
+        chatLauncherImage.src = existingButton.dataset.otherImage;
+        chatLauncher.style.display = 'block';
+        loadMessages(currentConversationId);
+        connectSocket(currentConversationId);
+    }
+
+    startChatButtons.forEach(function(button) {
+        button.addEventListener('click', function() {
+            startChat(this.dataset.appointmentId, this.dataset.otherName, this.dataset.otherImage);
+        });
+    });
+
+    if(chatLauncher) {
+        chatLauncher.addEventListener('click', function() {
+            if (widgetOpen) closeWidget();
+            else if (currentConversationId) openWidget();
+        });
+    }
+    if(chatMinimizeBtn) chatMinimizeBtn.addEventListener('click', function() { closeWidget(); });
+    if(messageInput) messageInput.addEventListener('keyup', function(e) { if (e.key === 'Enter') submitButton.click(); });
+    if(submitButton) {
+        submitButton.addEventListener('click', function() {
+            const message = messageInput.value.trim();
+            if (!message || !chatSocket || chatSocket.readyState !== WebSocket.OPEN) return;
+            chatSocket.send(JSON.stringify({ action: 'message', message: message }));
+            messageInput.value = '';
+            messageInput.focus();
+        });
+    }
+
+    preloadExistingConversation();
+</script>
 
 {% endblock %}
