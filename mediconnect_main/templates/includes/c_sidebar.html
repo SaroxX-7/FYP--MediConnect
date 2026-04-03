@@ -1,55 +1,396 @@
-<!-- Profile Sidebar -->
-						<div class="col-md-5 col-lg-4 col-xl-3 theiaStickySidebar">
-							<div class="profile-sidebar">
-								<div class="widget-profile pro-widget-content">
-									<div class="profile-info-widget">
-										<a href="#" class="booking-doc-img">
-											<img src="{% if profile.profile_picture %}{{ profile.profile_picture.url }}{% else %}lifelink_main/static/img/favicon.png{% endif %}" alt="User Image">
-										</a>
-										<div class="profile-det-info">
-											<h3>{{ request.user.first_name }} {{ request.user.last_name }}</h3>
-											<div class="patient-details">
-												<h5><i class="fas fa-birthday-cake"></i> {{ profile.date_of_birth }}, {{ age }} years</h5>
-												<h5 class="mb-0"><i class="fas fa-map-marker-alt"></i> {{ profile.address }}</h5>
-											</div>
-										</div>
-									</div>
-								</div>
-								<div class="dashboard-widget">
-									<nav class="dashboard-menu">
-										<ul>
-											<li class="active">
-												<a href="{% url 'custDashboard' %}">
-													<i class="fas fa-columns"></i>
-													<span>Dashboard</span>
-												</a>
-											</li>
-{#											<li>#}
-{#                                                <a href="{% url 'chat-home' pk=request.user.id %}">Chat with Doctor</a>#}
-{#											</li>#}
-											<li>
-												<a href="{% url 'cprofile' %}">
-													<i class="fas fa-user-cog"></i>
-													<span>Profile Settings</span>
-												</a>
-											</li>
-											<li>
-												 <a href="{% url 'update_password' %}">
-													<i class="fas fa-lock"></i>
-													<span>Change Password</span>
-												</a>
-											</li>
-											
-											<li>
-												<a href="{% url 'logout' %}">
-													<i class="fas fa-sign-out-alt"></i>
-													<span>Logout</span>
-												</a>
-											</li>
-										</ul>
-									</nav>
-								</div>
+<style>
+    /* ========== CUSTOMER SIDEBAR - MODERN & STYLISH ========== */
 
-							</div>
-						</div>
-						<!-- / Profile Sidebar -->
+    .profile-sidebar {
+        background: #ffffff;
+        border-radius: 24px;
+        box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid rgba(226, 232, 240, 0.6);
+        position: relative;
+    }
+
+    .profile-sidebar:hover {
+        box-shadow: 0 25px 40px -12px rgba(0, 0, 0, 0.15);
+        transform: translateY(-2px);
+    }
+
+    /* Gradient top border on hover */
+    .profile-sidebar::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #2563eb, #8b5cf6, #ec489a);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        z-index: 1;
+    }
+
+    .profile-sidebar:hover::before {
+        opacity: 1;
+    }
+
+    /* ========== WIDGET PROFILE CARD ========== */
+    .widget-profile {
+        background: linear-gradient(135deg, #0f2b3d 0%, #1a4a6f 100%);
+        padding: 28px 24px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .widget-profile::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -30%;
+        width: 180px;
+        height: 180px;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 50%;
+        pointer-events: none;
+    }
+
+    .widget-profile::after {
+        content: '';
+        position: absolute;
+        bottom: -40%;
+        left: -20%;
+        width: 140px;
+        height: 140px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 50%;
+        pointer-events: none;
+    }
+
+    .profile-info-widget {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        position: relative;
+        z-index: 2;
+    }
+
+    .booking-doc-img {
+        flex-shrink: 0;
+    }
+
+    .booking-doc-img img {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        transition: transform 0.3s ease, border-color 0.3s ease;
+        background: #fff;
+    }
+
+    .booking-doc-img img:hover {
+        transform: scale(1.02);
+        border-color: #ffffff;
+    }
+
+    .profile-det-info {
+        flex: 1;
+    }
+
+    .profile-det-info h3 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #ffffff;
+        margin: 0 0 8px 0;
+        letter-spacing: -0.2px;
+        line-height: 1.3;
+    }
+
+    .patient-details {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .patient-details h5 {
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.85);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .patient-details h5 i {
+        width: 20px;
+        font-size: 0.75rem;
+        color: rgba(255, 255, 255, 0.7);
+    }
+
+    /* ========== DASHBOARD WIDGET / MENU ========== */
+    .dashboard-widget {
+        padding: 16px 0;
+        background: #ffffff;
+    }
+
+    .dashboard-menu {
+        width: 100%;
+    }
+
+    .dashboard-menu ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .dashboard-menu ul li {
+        margin: 4px 12px;
+        border-radius: 16px;
+        transition: all 0.25s ease;
+    }
+
+    .dashboard-menu ul li a {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 12px 18px;
+        color: #334155;
+        font-weight: 500;
+        font-size: 0.9375rem;
+        text-decoration: none;
+        border-radius: 16px;
+        transition: all 0.25s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .dashboard-menu ul li a i {
+        width: 24px;
+        font-size: 1.125rem;
+        color: #5b6e8c;
+        transition: all 0.25s ease;
+        text-align: center;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .dashboard-menu ul li a span {
+        flex: 1;
+        letter-spacing: -0.2px;
+    }
+
+    /* Active menu item */
+    .dashboard-menu ul li.active {
+        background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
+        box-shadow: 0 2px 6px rgba(37, 99, 235, 0.08);
+    }
+
+    .dashboard-menu ul li.active a {
+        color: #1e40af;
+    }
+
+    .dashboard-menu ul li.active a i {
+        color: #2563eb;
+    }
+
+    /* Hover effects for non-active items */
+    .dashboard-menu ul li:not(.active):hover {
+        background: #f8fafc;
+    }
+
+    .dashboard-menu ul li:not(.active):hover a {
+        color: #1e293b;
+        transform: translateX(4px);
+    }
+
+    .dashboard-menu ul li:not(.active):hover a i {
+        color: #2563eb;
+        transform: scale(1.05);
+    }
+
+    /* Logout special styling */
+    .dashboard-menu ul li:last-child {
+        margin-top: 12px;
+        border-top: 1px solid #e2e8f0;
+        padding-top: 8px;
+        border-radius: 0;
+    }
+
+    .dashboard-menu ul li:last-child a {
+        color: #dc2626;
+    }
+
+    .dashboard-menu ul li:last-child a i {
+        color: #ef4444;
+    }
+
+    .dashboard-menu ul li:last-child:hover {
+        background: #fef2f2;
+    }
+
+    .dashboard-menu ul li:last-child:hover a {
+        color: #b91c1c;
+    }
+
+    .dashboard-menu ul li:last-child:hover a i {
+        color: #dc2626;
+    }
+
+    /* ========== RESPONSIVE ADJUSTMENTS ========== */
+    @media (max-width: 991.98px) {
+        .profile-sidebar {
+            margin-bottom: 32px;
+            position: sticky;
+            top: 20px;
+        }
+
+        .widget-profile {
+            padding: 24px 20px;
+        }
+
+        .booking-doc-img img {
+            width: 70px;
+            height: 70px;
+        }
+
+        .profile-det-info h3 {
+            font-size: 1.125rem;
+        }
+
+        .dashboard-menu ul li a {
+            padding: 10px 16px;
+            font-size: 0.875rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .profile-info-widget {
+            flex-direction: column;
+            text-align: center;
+            gap: 12px;
+        }
+
+        .patient-details h5 {
+            justify-content: center;
+        }
+
+        .dashboard-menu ul li a {
+            justify-content: center;
+        }
+
+        .dashboard-menu ul li a i {
+            width: auto;
+        }
+    }
+
+    /* ========== ANIMATIONS ========== */
+    @keyframes slideInRight {
+        from {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    .profile-sidebar {
+        animation: slideInRight 0.4s ease-out;
+    }
+
+    .dashboard-menu ul li {
+        opacity: 0;
+        animation: slideInRight 0.3s ease-out forwards;
+    }
+
+    .dashboard-menu ul li:nth-child(1) { animation-delay: 0.05s; }
+    .dashboard-menu ul li:nth-child(2) { animation-delay: 0.1s; }
+    .dashboard-menu ul li:nth-child(3) { animation-delay: 0.15s; }
+    .dashboard-menu ul li:nth-child(4) { animation-delay: 0.2s; }
+
+    /* ========== SCROLLBAR STYLING ========== */
+    .dashboard-menu::-webkit-scrollbar { width: 4px; }
+    .dashboard-menu::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
+    .dashboard-menu::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+    /* ========== RIPPLE EFFECT ========== */
+    .dashboard-menu ul li a::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        background: rgba(37, 99, 235, 0.1);
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+        transition: width 0.4s, height 0.4s;
+    }
+
+    .dashboard-menu ul li a:active::after {
+        width: 200px;
+        height: 200px;
+    }
+
+    /* Focus styles for accessibility */
+    .dashboard-menu ul li a:focus {
+        outline: 2px solid #2563eb;
+        outline-offset: 2px;
+        border-radius: 16px;
+    }
+</style>
+
+<!-- Profile Sidebar -->
+<div class="col-md-5 col-lg-4 col-xl-3 theiaStickySidebar">
+    <div class="profile-sidebar">
+        <div class="widget-profile pro-widget-content">
+            <div class="profile-info-widget">
+                <a href="#" class="booking-doc-img">
+                    <img src="{% if profile.profile_picture %}{{ profile.profile_picture.url }}{% else %}lifelink_main/static/img/favicon.png{% endif %}" alt="User Image">
+                </a>
+                <div class="profile-det-info">
+                    <h3>{{ request.user.first_name }} {{ request.user.last_name }}</h3>
+                    <div class="patient-details">
+                        <h5><i class="fas fa-birthday-cake"></i> {{ profile.date_of_birth }}, {{ age }} years</h5>
+                        <h5 class="mb-0"><i class="fas fa-map-marker-alt"></i> {{ profile.address }}</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="dashboard-widget">
+            <nav class="dashboard-menu">
+                <ul>
+                    <li class="{% if request.resolver_match.url_name == 'custDashboard' %}active{% endif %}">
+                        <a href="{% url 'custDashboard' %}">
+                            <i class="fas fa-columns"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="{% if request.resolver_match.url_name == 'cprofile' %}active{% endif %}">
+                        <a href="{% url 'cprofile' %}">
+                            <i class="fas fa-user-cog"></i>
+                            <span>Profile Settings</span>
+                        </a>
+                    </li>
+                    <li class="{% if request.resolver_match.url_name == 'update_password' %}active{% endif %}">
+                        <a href="{% url 'update_password' %}">
+                            <i class="fas fa-lock"></i>
+                            <span>Change Password</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'logout' %}">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Logout</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+<!-- / Profile Sidebar -->

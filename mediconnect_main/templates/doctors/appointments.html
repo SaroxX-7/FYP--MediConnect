@@ -1,129 +1,572 @@
 {% extends 'base.html' %}
 {% block content %}
-    {% load static %}
-        <style>
+{% load static %}
+
+<style>
+    /* ========== DOCTOR DASHBOARD - COMPLETE STYLING ========== */
+    
+    /* Global Styles */
+    :root {
+        --primary: #2563eb;
+        --primary-dark: #1e40af;
+        --secondary: #64748b;
+        --success: #10b981;
+        --danger: #ef4444;
+        --warning: #f59e0b;
+        --info: #0ea5e9;
+        --dark: #0f2b3d;
+        --light: #f8fafc;
+        --gray-100: #f1f5f9;
+        --gray-200: #e2e8f0;
+        --gray-300: #cbd5e1;
+        --gray-600: #475569;
+        --gray-700: #334155;
+        --gray-800: #1e293b;
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        --radius-lg: 1rem;
+        --radius-xl: 1.5rem;
+    }
+    
+    /* Main Content */
+    .content {
+        padding: 2.5rem 0;
+        background: linear-gradient(135deg, #f0f9ff 0%, #f8fafc 100%);
+        min-height: calc(100vh - 200px);
+    }
+    
+    .container-fluid {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+    
+    /* Section Title */
+    h4.mb-4 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--dark);
+        margin-bottom: 1.5rem !important;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        letter-spacing: -0.3px;
+    }
+    
+    h4.mb-4::before {
+        content: "📋";
+        font-size: 1.5rem;
+    }
+    
+    /* Appointment Tab */
+    .appointment-tab {
+        background: transparent;
+    }
+    
+    .tab-content {
+        background: transparent;
+    }
+    
+    /* Card Table */
+    .card-table {
+        border: none;
+        border-radius: var(--radius-xl);
+        overflow: hidden;
+        box-shadow: var(--shadow-md);
+        transition: all 0.3s ease;
+        background: #ffffff;
+    }
+    
+    .card-table:hover {
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .card-table .card-body {
+        padding: 0;
+    }
+    
+    .table-responsive {
+        overflow-x: auto;
+    }
+    
+    /* Table Styles */
+    .table {
+        margin-bottom: 0;
+        width: 100%;
+    }
+    
+    .table thead th {
+        background: linear-gradient(135deg, var(--gray-100) 0%, #ffffff 100%);
+        color: var(--gray-700);
+        font-weight: 700;
+        font-size: 0.875rem;
+        padding: 1rem 1.25rem;
+        border-bottom: 2px solid var(--gray-200);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-family: 'Inter', system-ui, sans-serif;
+    }
+    
+    .table tbody td {
+        padding: 1rem 1.25rem;
+        vertical-align: middle;
+        border-bottom: 1px solid var(--gray-200);
+        color: var(--gray-600);
+        font-size: 0.875rem;
+    }
+    
+    .table-hover tbody tr:hover {
+        background-color: #fefce8;
+        transition: background-color 0.2s ease;
+    }
+    
+    /* Missed Appointment Row */
     .missed {
-    background-color: #f8d7da; /* light red for missed appointments */
-}
+        background-color: #fef2f2;
+        border-left: 4px solid var(--danger);
+        position: relative;
+    }
+    
+    .missed td:first-child {
+        position: relative;
+    }
+    
+    .missed td:first-child::before {
+        content: "⏰";
+        position: absolute;
+        left: -8px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 1rem;
+    }
+    
     .table-hover tr.missed:hover {
-    background-color: #f8d7da; /* or any preferred shade of red */
-}
-    </style>
-<!-- Breadcrumb -->
-			<div class="breadcrumb-bar">
-				<div class="container-fluid">
-					<div class="row align-items-center">
-						<div class="col-md-12 col-12">
-							<nav aria-label="breadcrumb" class="page-breadcrumb">
-								<ol class="breadcrumb">
-									<li class="breadcrumb-item"><a href="index-2.html">Home</a></li>
-									<li class="breadcrumb-item active" aria-current="page">Dashboard</li>
-								</ol>
-							</nav>
-							<h2 class="breadcrumb-title">Dashboard</h2>
-						</div>
-					</div>
-				</div>
-			</div>
-			<!-- /Breadcrumb -->
+        background-color: #fee2e2;
+    }
+    
+    /* Table Avatar */
+    .table-avatar {
+        display: flex;
+        align-items: center;
+        gap: 0.875rem;
+    }
+    
+    .avatar {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        flex-shrink: 0;
+        transition: transform 0.2s ease;
+    }
+    
+    .avatar-sm {
+        width: 44px;
+        height: 44px;
+    }
+    
+    .avatar-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 2px solid var(--gray-200);
+        transition: all 0.2s ease;
+    }
+    
+    .avatar-img:hover {
+        border-color: var(--primary);
+        transform: scale(1.05);
+    }
+    
+    .table-avatar a {
+        color: var(--gray-800);
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.2s ease;
+        font-size: 0.9375rem;
+    }
+    
+    .table-avatar a:hover {
+        color: var(--primary);
+    }
+    
+    /* Date/Time Styling */
+    .table tbody td:nth-child(2) {
+        font-weight: 500;
+    }
+    
+    .d-block {
+        display: block;
+    }
+    
+    .text-info {
+        color: var(--info) !important;
+        font-size: 0.75rem;
+        margin-top: 0.25rem;
+    }
+    
+    /* Status Badge */
+    .badge-status {
+        display: inline-block;
+        padding: 0.375rem 0.875rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: capitalize;
+    }
+    
+    .status-pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+    
+    .status-confirmed {
+        background: #dcfce7;
+        color: #166534;
+    }
+    
+    .status-completed {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+    
+    .status-cancelled {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+    
+    /* Action Buttons */
+    .table-action {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+    }
+    
+    .btn-sm {
+        padding: 0.375rem 0.875rem;
+        font-size: 0.75rem;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        font-weight: 500;
+        border: none;
+        cursor: pointer;
+    }
+    
+    .btn-sm:hover {
+        transform: translateY(-1px);
+    }
+    
+    .btn-sm:active {
+        transform: translateY(0);
+    }
+    
+    .bg-info-light {
+        background: #e0f2fe;
+        color: #0369a1;
+    }
+    
+    .bg-info-light:hover {
+        background: #bae6fd;
+        color: #0284c7;
+    }
+    
+    .bg-success-light {
+        background: #dcfce7;
+        color: #166534;
+    }
+    
+    .bg-success-light:hover {
+        background: #bbf7d0;
+        color: #14532d;
+    }
+    
+    .bg-danger-light {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+    
+    .bg-danger-light:hover {
+        background: #fecaca;
+        color: #7f1d1d;
+    }
+    
+    /* Missed text styling */
+    .text-danger {
+        color: var(--danger) !important;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        font-weight: 600;
+    }
+    
+    /* Empty State */
+    .table tbody tr td[colspan="5"] {
+        text-align: center;
+        padding: 3rem;
+        color: var(--gray-500);
+        font-size: 0.9375rem;
+    }
+    
+    /* ========== RESPONSIVE DESIGN ========== */
+    @media (max-width: 1199.98px) {
+        .container-fluid {
+            padding: 0 1.5rem;
+        }
+    }
+    
+    @media (max-width: 991.98px) {
+        .content {
+            padding: 1.5rem 0;
+        }
+        
+        h4.mb-4 {
+            font-size: 1.25rem;
+        }
+        
+        h4.mb-4::before {
+            font-size: 1.25rem;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .container-fluid {
+            padding: 0 1rem;
+        }
+        
+        .content {
+            padding: 1rem 0;
+        }
+        
+        /* Mobile responsive table */
+        .table thead {
+            display: none;
+        }
+        
+        .table tbody tr {
+            display: block;
+            margin-bottom: 1rem;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-lg);
+            background: white;
+            position: relative;
+        }
+        
+        .table tbody td {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--gray-200);
+            padding: 0.875rem 1rem;
+        }
+        
+        .table tbody td:last-child {
+            border-bottom: none;
+        }
+        
+        .table tbody td::before {
+            content: attr(data-label);
+            font-weight: 700;
+            color: var(--gray-700);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .table-avatar {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .table-action {
+            justify-content: center;
+        }
+        
+        .missed {
+            border-left: none;
+            border-top: 3px solid var(--danger);
+        }
+        
+        .missed td:first-child::before {
+            display: none;
+        }
+        
+        h4.mb-4 {
+            font-size: 1.125rem;
+            margin-bottom: 1rem !important;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .table tbody td {
+            flex-direction: column;
+            gap: 0.5rem;
+            align-items: flex-start;
+        }
+        
+        .table tbody td::before {
+            margin-bottom: 0.25rem;
+        }
+        
+        .table-action {
+            flex-direction: column;
+            width: 100%;
+        }
+        
+        .btn-sm {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .table-avatar {
+            width: 100%;
+        }
+    }
+    
+    /* Animation */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .card-table {
+        animation: fadeInUp 0.4s ease-out;
+    }
+    
+    /* Scrollbar Styling */
+    .table-responsive::-webkit-scrollbar {
+        height: 6px;
+    }
+    
+    .table-responsive::-webkit-scrollbar-track {
+        background: var(--gray-100);
+        border-radius: 10px;
+    }
+    
+    .table-responsive::-webkit-scrollbar-thumb {
+        background: var(--gray-300);
+        border-radius: 10px;
+    }
+    
+    .table-responsive::-webkit-scrollbar-thumb:hover {
+        background: var(--gray-400);
+    }
+    
+    /* Tooltip effect on buttons */
+    .btn-sm {
+        position: relative;
+    }
+    
+    /* Loading state for table */
+    .table tbody tr {
+        transition: all 0.2s ease;
+    }
+</style>
 
-			<!-- Page Content -->
-			<div class="content">
-				<div class="container-fluid">
+<!-- Page Content -->
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-5 col-lg-4 col-xl-3 theiaStickySidebar">
+                <!-- Profile Sidebar -->
+                {% include 'includes/d_sidebar.html' %}
+                <!-- /Profile Sidebar -->
+            </div>
 
-					<div class="row">
-						<div class="col-md-5 col-lg-4 col-xl-3 theiaStickySidebar">
-
-							<!-- Profile Sidebar -->
-							{% include 'includes/d_sidebar.html' %}
-							<!-- /Profile Sidebar -->
-
-						</div>
-
-						<div class="col-md-7 col-lg-8 col-xl-9">
-
-
-
-							<div class="row">
-								<div class="col-md-12">
-									<h4 class="mb-4">Patient Appoinment</h4>
-									<div class="appointment-tab">
-
-										<div class="tab-content">
-
-											<!-- Upcoming Appointment Tab -->
-											<div class="tab-pane show active" id="upcoming-appointments">
-												<div class="card card-table mb-0">
-													<div class="card-body">
-														<div class="table-responsive">
-															<table class="table table-hover table-center mb-0">
-    <thead>
-        <tr>
-            <th>Patient Name</th>
-            <th>Appt Date/Time</th>
-            <th>Type</th>
-            <th>Status</th>
-            <th class="text-center">Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for appointment in appointments %}
-        {% with appointment_date=appointment.appointment_date|date:"Y-m-d" %}
-        {% if appointment.get_appointment_status_display == "pending" and appointment_date < now|date:"Y-m-d" %}
-        <tr class="missed">  <!-- Adding the 'missed' class for styling -->
-        {% else %}
-        <tr>
-        {% endif %}
-            <td>
-                <h2 class="table-avatar">
-                    <a href="#" class="avatar avatar-sm mr-2">
-                        <img class="avatar-img rounded-circle" src="{{ appointment.patient.userprofile.profile_picture.url }}" alt="User Image">
-                    </a>
-                    <a href="#">
-                        {{ appointment.patient.first_name }} {{ appointment.patient.last_name }}
-                    </a>
-                </h2>
-            </td>
-            <td>
-                {{ appointment.appointment_date|date:"d M Y" }}
-                <span class="d-block text-info">{{ appointment.time_slot.start_time|date:"g:i A" }}</span>
-            </td>
-            <td>{{ appointment.get_appointment_type_display }}</td>
-            <td>{{ appointment.get_appointment_status_display }}</td>
-            <td class="text-right">
-                <div class="table-action">
-                    {% if appointment.get_appointment_status_display != "pending" or appointment_date >= now|date:"Y-m-d" %}
-                        <a href="{% url 'appointment_details' appointment_id=appointment.id %}" class="btn btn-sm bg-info-light">
-                            <i class="far fa-eye"></i> View
-                        </a>
-                        {% if appointment.appointment_status != 'confirmed' and appointment.appointment_status != 'cancelled' %}
-                        <a href="{% url 'accept_appointment' appointment_id=appointment.id %}" class="btn btn-sm bg-success-light">
-                            <i class="fas fa-check"></i> Accept
-                        </a>
-                        {% endif %}
-                        {% if appointment.appointment_status != 'cancelled' %}
-                        <a href="{% url 'reject_appointment' appointment_id=appointment.id %}" class="btn btn-sm bg-danger-light">
-                            <i class="fas fa-times"></i> Cancel
-                        </a>
-                        {% endif %}
-                    {% else %}
-                        <i class="fas fa-times"></i> Missed
-                    {% endif %}
-                </div>
-            </td>
-        </tr>
-        {% endwith %}
-        {% empty %}
-        <tr>
-            <td colspan="5">No appointments available</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-
-                                                        </div>
-                                                    </div>
-                                                </div>
+            <div class="col-md-7 col-lg-8 col-xl-9">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h4 class="mb-4">Patient Appointment</h4>
+                        <div class="appointment-tab">
+                            <div class="tab-content">
+                                <!-- Upcoming Appointment Tab -->
+                                <div class="tab-pane show active" id="upcoming-appointments">
+                                    <div class="card card-table mb-0">
+                                        <div class="card-body">
+                                            <div class="table-responsive">
+                                                <table class="table table-hover table-center mb-0">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Patient Name</th>
+                                                            <th>Appt Date/Time</th>
+                                                            <th>Type</th>
+                                                            <th>Status</th>
+                                                            <th class="text-center">Actions</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {% for appointment in appointments %}
+                                                        {% with appointment_date=appointment.appointment_date|date:"Y-m-d" %}
+                                                        <tr {% if appointment.get_appointment_status_display == "pending" and appointment_date < now|date:"Y-m-d" %}class="missed"{% endif %}>
+                                                            <td data-label="Patient Name">
+                                                                <h2 class="table-avatar">
+                                                                    <a href="#" class="avatar avatar-sm mr-2">
+                                                                        <img class="avatar-img rounded-circle" src="{{ appointment.patient.userprofile.profile_picture.url }}" alt="User Image">
+                                                                    </a>
+                                                                    <a href="#">
+                                                                        {{ appointment.patient.first_name }} {{ appointment.patient.last_name }}
+                                                                    </a>
+                                                                </h2>
+                                                            </td>
+                                                            <td data-label="Appt Date/Time">
+                                                                {{ appointment.appointment_date|date:"d M Y" }}
+                                                                <span class="d-block text-info">{{ appointment.time_slot.start_time|date:"g:i A" }}</span>
+                                                            </td>
+                                                            <td data-label="Type">{{ appointment.get_appointment_type_display }}</td>
+                                                            <td data-label="Status">
+                                                                <span class="badge-status 
+                                                                    {% if appointment.appointment_status == 'confirmed' %}status-confirmed
+                                                                    {% elif appointment.appointment_status == 'pending' %}status-pending
+                                                                    {% elif appointment.appointment_status == 'completed' %}status-completed
+                                                                    {% elif appointment.appointment_status == 'cancelled' %}status-cancelled
+                                                                    {% endif %}">
+                                                                    {{ appointment.get_appointment_status_display }}
+                                                                </span>
+                                                            </td>
+                                                            <td data-label="Actions" class="text-right">
+                                                                <div class="table-action">
+                                                                    {% if appointment.get_appointment_status_display != "pending" or appointment_date >= now|date:"Y-m-d" %}
+                                                                        <a href="{% url 'appointment_details' appointment_id=appointment.id %}" class="btn btn-sm bg-info-light">
+                                                                            <i class="far fa-eye"></i> View
+                                                                        </a>
+                                                                        {% if appointment.appointment_status != 'confirmed' and appointment.appointment_status != 'cancelled' %}
+                                                                        <a href="{% url 'accept_appointment' appointment_id=appointment.id %}" class="btn btn-sm bg-success-light">
+                                                                            <i class="fas fa-check"></i> Accept
+                                                                        </a>
+                                                                        {% endif %}
+                                                                        {% if appointment.appointment_status != 'cancelled' %}
+                                                                        <a href="{% url 'reject_appointment' appointment_id=appointment.id %}" class="btn btn-sm bg-danger-light">
+                                                                            <i class="fas fa-times"></i> Cancel
+                                                                        </a>
+                                                                        {% endif %}
+                                                                    {% else %}
+                                                                        <span class="text-danger">
+                                                                            <i class="fas fa-clock"></i> Missed
+                                                                        </span>
+                                                                    {% endif %}
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                        {% endwith %}
+                                                        {% empty %}
+                                                        <tr>
+                                                            <td colspan="5" class="text-center">No appointments available</td>
+                                                        </tr>
+                                                        {% endfor %}
+                                                    </tbody>
+                                                </table>
                                             </div>
                                         </div>
                                     </div>
@@ -133,5 +576,8 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
 
 {% endblock %}

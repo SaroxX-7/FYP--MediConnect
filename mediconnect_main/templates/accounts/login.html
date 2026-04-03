@@ -2,62 +2,393 @@
 {% load static %}
 {% block content %}
 
+<style>
+    /* ========== LOGIN PAGE - MODERN & STYLISH ========== */
+    
+    /* Page Content Background */
+    .content {
+        background: linear-gradient(135deg, #f0f9ff 0%, #eef2ff 100%);
+        min-height: calc(100vh - 200px);
+        display: flex;
+        align-items: center;
+        padding: 3rem 0;
+    }
+    
+    /* Account Content Container */
+    .account-content {
+        background: transparent;
+        padding: 0;
+    }
+    
+    /* Login Left Image Section */
+    .login-left {
+        animation: fadeInLeft 0.6s ease-out;
+    }
+    
+    .login-left img {
+        max-width: 100%;
+        height: auto;
+        filter: drop-shadow(0 10px 25px rgba(0, 0, 0, 0.1));
+        transition: transform 0.3s ease;
+    }
+    
+    .login-left img:hover {
+        transform: scale(1.02);
+    }
+    
+    /* Login Right Card */
+    .login-right {
+        background: #ffffff;
+        border-radius: 32px;
+        padding: 2.5rem;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+        animation: fadeInRight 0.6s ease-out;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(0px);
+    }
+    
+    /* Login Header */
+    .login-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    
+    .login-header h3 {
+        font-size: 1.875rem;
+        font-weight: 700;
+        color: #0f2b3d;
+        margin: 0;
+    }
+    
+    .login-header h3 span {
+        background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        display: inline-block;
+    }
+    
+    /* Form Group with Floating Labels */
+    .form-group {
+        margin-bottom: 1.5rem;
+        position: relative;
+    }
+    
+    .form-focus {
+        position: relative;
+    }
+    
+    .form-focus .form-control {
+        height: 56px;
+        padding: 1rem 1rem 0.5rem;
+        font-size: 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 16px;
+        transition: all 0.2s ease;
+        background: #ffffff;
+        width: 100%;
+        font-family: inherit;
+    }
+    
+    .form-focus .form-control:focus {
+        border-color: #2563eb;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    
+    .form-focus .focus-label {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 1rem;
+        color: #94a3b8;
+        transition: all 0.2s ease;
+        pointer-events: none;
+        background: transparent;
+        padding: 0 0.25rem;
+        margin: 0;
+        font-weight: 400;
+    }
+    
+    .form-focus .form-control:focus ~ .focus-label,
+    .form-focus .form-control:not(:placeholder-shown) ~ .focus-label {
+        top: 0;
+        font-size: 0.75rem;
+        transform: translateY(-50%);
+        background: white;
+        color: #2563eb;
+        font-weight: 500;
+    }
+    
+    /* Forgot Password Link */
+    .text-right {
+        text-align: right;
+        margin-bottom: 1.5rem;
+    }
+    
+    .forgot-link {
+        color: #2563eb;
+        text-decoration: none;
+        font-size: 0.875rem;
+        font-weight: 500;
+        transition: color 0.2s ease;
+    }
+    
+    .forgot-link:hover {
+        color: #1e40af;
+        text-decoration: underline;
+    }
+    
+    /* Login Button */
+    .login-btn {
+        background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+        color: white;
+        border: none;
+        padding: 0.875rem 1.5rem;
+        font-size: 1rem;
+        font-weight: 600;
+        border-radius: 40px;
+        width: 100%;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-bottom: 1rem;
+    }
+    
+    .login-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.4);
+    }
+    
+    .login-btn:active {
+        transform: translateY(0);
+    }
+    
+    /* Register Links */
+    .dont-have {
+        text-align: center;
+        font-size: 0.9375rem;
+        color: #64748b;
+        margin-top: 1.5rem;
+        padding-top: 1rem;
+        border-top: 1px solid #e2e8f0;
+    }
+    
+    .dont-have a {
+        color: #2563eb;
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.2s ease;
+        margin: 0 0.25rem;
+    }
+    
+    .dont-have a:hover {
+        color: #1e40af;
+        text-decoration: underline;
+    }
+    
+    /* Error Messages Styling (if any) */
+    .error-message {
+        background: #fee2e2;
+        color: #dc2626;
+        padding: 0.75rem 1rem;
+        border-radius: 12px;
+        font-size: 0.875rem;
+        margin-bottom: 1rem;
+        border-left: 3px solid #dc2626;
+    }
+    
+    .success-message {
+        background: #dcfce7;
+        color: #16a34a;
+        padding: 0.75rem 1rem;
+        border-radius: 12px;
+        font-size: 0.875rem;
+        margin-bottom: 1rem;
+        border-left: 3px solid #16a34a;
+    }
+    
+    /* Animations */
+    @keyframes fadeInLeft {
+        from {
+            opacity: 0;
+            transform: translateX(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    
+    @keyframes fadeInRight {
+        from {
+            opacity: 0;
+            transform: translateX(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 991.98px) {
+        .login-right {
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .login-left {
+            text-align: center;
+        }
+        
+        .login-left img {
+            max-width: 80%;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .content {
+            padding: 2rem 0;
+        }
+        
+        .login-right {
+            padding: 1.75rem;
+            border-radius: 24px;
+        }
+        
+        .login-header h3 {
+            font-size: 1.5rem;
+        }
+        
+        .form-focus .form-control {
+            height: 50px;
+            font-size: 0.9375rem;
+        }
+        
+        .login-btn {
+            padding: 0.75rem 1.25rem;
+            font-size: 0.9375rem;
+        }
+        
+        .dont-have {
+            font-size: 0.875rem;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .login-right {
+            padding: 1.5rem;
+        }
+        
+        .login-header h3 {
+            font-size: 1.375rem;
+        }
+        
+        .form-focus .form-control {
+            height: 48px;
+        }
+        
+        .dont-have a {
+            display: inline-block;
+            margin: 0.25rem;
+        }
+    }
+    
+    /* Input placeholder styling */
+    .form-control::placeholder {
+        color: transparent;
+    }
+    
+    .form-control:focus::placeholder {
+        color: #cbd5e1;
+    }
+    
+    /* Remove spinner from number inputs */
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+</style>
 
 <!-- Page Content -->
-			<div class="content">
-				<div class="container-fluid">
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <!-- Login Tab Content -->
+                <div class="account-content">
+                    <div class="row align-items-center justify-content-center">
+                        <div class="col-md-7 col-lg-6 login-left">
+                            <img src="{% static 'img/login-banner.png' %}" class="img-fluid" alt="MediConnect Login">
+                        </div>
+                        <div class="col-md-12 col-lg-6 login-right">
+                            <div class="login-header">
+                                <h3>Login <span>MediConnect</span></h3>
+                            </div>
+                            
+                            <!-- Display Django messages if any -->
+                            {% if messages %}
+                                {% for message in messages %}
+                                    <div class="{% if message.tags == 'error' %}error-message{% else %}success-message{% endif %}">
+                                        {{ message }}
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                            
+                            <form action="{% url 'login' %}" method="post" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <div class="form-group form-focus">
+                                    <input type="email" name="email" id="email" class="form-control floating" placeholder=" ">
+                                    <label class="focus-label" for="email">Email</label>
+                                </div>
+                                <div class="form-group form-focus">
+                                    <input type="password" name="password" id="password" class="form-control floating" placeholder=" ">
+                                    <label class="focus-label" for="password">Password</label>
+                                </div>
+                                <div class="text-right">
+                                    <a class="forgot-link" href="{% url 'forgot_password' %}">Forgot Password ?</a>
+                                </div>
+                                <button class="btn btn-primary btn-block btn-lg login-btn" type="submit">Login</button>
+                                <div class="text-center dont-have">
+                                    Don't have an account? 
+                                    <a href="{% url 'registerUser' %}">Patient</a> | 
+                                    <a href="{% url 'registerDoctor' %}">Doctor</a> | 
+                                    <a href="{% url 'registerPharmacist' %}">Pharmacist</a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <!-- /Login Tab Content -->
+            </div>
+        </div>
+    </div>
+</div>
 
-					<div class="row">
-						<div class="col-md-8 offset-md-2">
+<script>
+    // Optional: Add floating label enhancement for better UX
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle floating labels on page load
+        const floatingInputs = document.querySelectorAll('.form-focus .form-control');
+        
+        floatingInputs.forEach(input => {
+            // Check if input has value on load
+            if (input.value.trim() !== '') {
+                input.classList.add('filled');
+            }
+            
+            // Add event listener for input
+            input.addEventListener('input', function() {
+                if (this.value.trim() !== '') {
+                    this.classList.add('filled');
+                } else {
+                    this.classList.remove('filled');
+                }
+            });
+        });
+    });
+</script>
 
-							<!-- Login Tab Content -->
-							<div class="account-content">
-								<div class="row align-items-center justify-content-center">
-									<div class="col-md-7 col-lg-6 login-left">
-										<img src={% static "img/login-banner.png" %} class="img-fluid" alt="MediConnect Login">
-									</div>
-									<div class="col-md-12 col-lg-6 login-right">
-										<div class="login-header">
-											<h3>Login <span>MediConnect</span></h3>
-										</div>
-										<form action="{% url 'login' %}" method="post" enctype="multipart/form-data">
-                                            {% csrf_token %}
-											<div class="form-group form-focus">
-												<input type="email" name="email" class="form-control floating">
-												<label class="focus-label">Email</label>
-											</div>
-											<div class="form-group form-focus">
-												<input type="password" name="password" class="form-control floating">
-												<label class="focus-label">Password</label>
-											</div>
-											<div class="text-right">
-												<a class="forgot-link" href="{% url 'forgot_password' %}">Forgot Password ?</a>
-											</div>
-											<button class="btn btn-primary btn-block btn-lg login-btn" type="submit">Login</button>
-											<!--<div class="login-or">
-												<span class="or-line"></span>
-												<span class="span-or">or</span>
-											</div>
-											<div class="row form-row social-login">
-												<div class="col-6">
-													<a href="#" class="btn btn-facebook btn-block"><i class="fab fa-facebook-f mr-1"></i> Login</a>
-												</div>
-												<div class="col-6">
-													<a href="#" class="btn btn-google btn-block"><i class="fab fa-google mr-1"></i> Login</a>
-												</div>
-											</div>
-											-->
-											<div class="text-center dont-have">Don’t have an account? <a href="{% url 'registerUser' %}">Patient</a> | <a href="{% url 'registerDoctor' %}">Doctor</a> | <a href="{% url 'registerPharmacist' %}">Pharmacist</a></div>
-										</form>
-									</div>
-								</div>
-							</div>
-							<!-- /Login Tab Content -->
-
-						</div>
-					</div>
-
-				</div>
-
-			</div>
 {% endblock %}

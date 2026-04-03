@@ -63,21 +63,21 @@
     </script>
 
     <script>
-    {% if messages %}
-        {% for message in messages %}
-            var messageText = '{{ message|escapejs }}';
-            var messageTag = '{{ message.tags|escapejs }}';
-            var toastType = messageTag;
+    // {% if messages %}
+    //     {% for message in messages %}
+    //         var messageText = '{{ message|escapejs }}';
+    //         var messageTag = '{{ message.tags|escapejs }}';
+    //         var toastType = messageTag;
 
-            if (messageTag === 'danger') {
-                toastType = 'error';
-            } else if (messageTag === 'success') {
-                toastType = 'success';
-            }
+    //         if (messageTag === 'danger') {
+    //             toastType = 'error';
+    //         } else if (messageTag === 'success') {
+    //             toastType = 'success';
+    //         }
 
-            toastr[toastType](messageText);
-        {% endfor %}
-    {% endif %}
+    //         toastr[toastType](messageText);
+    //     {% endfor %}
+    // {% endif %}
     </script>
 </body>
 </html>

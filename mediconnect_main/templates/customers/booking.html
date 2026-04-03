@@ -1,287 +1,741 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load custom_tags %}
- 
+
 {% block content %}
- 
+
 <style>
+    /* ========== BOOKING PAGE - ADVANCED MODERN STYLING ========== */
+    
+    :root {
+        --primary: #2563eb;
+        --primary-dark: #1e40af;
+        --primary-light: #3b82f6;
+        --secondary: #64748b;
+        --success: #10b981;
+        --danger: #ef4444;
+        --warning: #f59e0b;
+        --info: #0ea5e9;
+        --dark: #0f2b3d;
+        --light: #f8fafc;
+        --gray-50: #f9fafb;
+        --gray-100: #f1f5f9;
+        --gray-200: #e2e8f0;
+        --gray-300: #cbd5e1;
+        --gray-400: #94a3b8;
+        --gray-500: #64748b;
+        --gray-600: #475569;
+        --gray-700: #334155;
+        --gray-800: #1e293b;
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+        --radius-md: 0.75rem;
+        --radius-lg: 1rem;
+        --radius-xl: 1.5rem;
+    }
+    
+    /* Main Content */
+    .content {
+        padding: 3rem 0;
+        background: linear-gradient(135deg, #f0f9ff 0%, #f1f5f9 100%);
+        min-height: calc(100vh - 200px);
+    }
+    
+    .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+    
+    /* Doctor Info Card */
+    .card {
+        border: none;
+        border-radius: var(--radius-xl);
+        box-shadow: var(--shadow-md);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        overflow: hidden;
+        background: #ffffff;
+        margin-bottom: 1.5rem;
+    }
+    
+    .card:hover {
+        box-shadow: var(--shadow-lg);
+        transform: translateY(-2px);
+    }
+    
+    .card-body {
+        padding: 1.75rem;
+    }
+    
     .booking-doc-info {
         display: flex;
         align-items: center;
-        gap: 15px;
+        gap: 1.5rem;
+        flex-wrap: wrap;
     }
- 
+    
+    .booking-doc-img {
+        flex-shrink: 0;
+    }
+    
     .booking-doc-img img {
-        width: 80px;
-        height: 80px;
+        width: 90px;
+        height: 90px;
         object-fit: cover;
         border-radius: 50%;
+        border: 3px solid var(--gray-200);
+        box-shadow: var(--shadow-md);
+        transition: all 0.3s ease;
     }
- 
+    
+    .booking-doc-img img:hover {
+        transform: scale(1.02);
+        border-color: var(--primary);
+    }
+    
+    .booking-info h4 {
+        font-size: 1.35rem;
+        font-weight: 700;
+        color: var(--gray-800);
+        margin-bottom: 0.5rem;
+    }
+    
+    .booking-info p {
+        color: var(--gray-600);
+        font-size: 0.875rem;
+        margin-bottom: 0.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .booking-info p i {
+        color: var(--primary);
+        width: 20px;
+    }
+    
+    /* Payment Summary Card */
     .payment-summary-card {
-        border: 1px solid #e5e5e5;
-        border-radius: 8px;
-        padding: 20px;
-        margin-bottom: 25px;
-        background: #fff;
+        background: linear-gradient(135deg, #ffffff 0%, var(--gray-50) 100%);
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-xl);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: var(--shadow-md);
+        transition: all 0.3s ease;
     }
- 
+    
+    .payment-summary-card:hover {
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .payment-summary-card h4 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--gray-800);
+        margin-bottom: 1.25rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid var(--gray-100);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .payment-summary-card h4::before {
+        content: "💰";
+        font-size: 1.25rem;
+    }
+    
     .payment-summary-row {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 10px;
-        font-size: 15px;
+        margin-bottom: 0.75rem;
+        font-size: 0.9375rem;
+        color: var(--gray-600);
     }
- 
+    
     .payment-summary-row.total {
-        font-weight: 700;
-        font-size: 17px;
-        border-top: 1px solid #eee;
-        padding-top: 12px;
-        margin-top: 12px;
+        font-weight: 800;
+        font-size: 1.125rem;
+        color: var(--gray-800);
+        border-top: 2px solid var(--gray-200);
+        padding-top: 0.75rem;
+        margin-top: 0.75rem;
     }
- 
+    
     .payment-note {
-        font-size: 13px;
-        color: #666;
-        margin-top: 10px;
+        font-size: 0.75rem;
+        color: var(--gray-500);
+        margin-top: 0.75rem;
+        padding: 0.5rem;
+        background: var(--gray-50);
+        border-radius: var(--radius-md);
+        text-align: center;
     }
- 
-    .timing.available {
-        display: block;
-        color: #28a745 !important;
+    
+    /* Schedule Widget */
+    .schedule-widget {
+        background: #ffffff;
+        border-radius: var(--radius-xl);
+        overflow: hidden;
+        box-shadow: var(--shadow-md);
+    }
+    
+    .schedule-header {
+        background: linear-gradient(135deg, var(--dark) 0%, #1e293b 100%);
+        padding: 1rem;
+    }
+    
+    .day-slot ul {
+        display: flex;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        justify-content: space-around;
+    }
+    
+    .day-slot ul li {
+        flex: 1;
+        text-align: center;
+        padding: 0.75rem;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: var(--radius-md);
+        transition: all 0.2s ease;
         cursor: pointer;
-        margin-bottom: 8px;
-        border: 1px solid #28a745;
-        padding: 8px 12px;
-        border-radius: 6px;
-        background: #fff;
-        text-align: center;
-        text-decoration: none;
-        transition: 0.2s ease;
     }
- 
+    
+    .day-slot ul li:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-2px);
+    }
+    
+    .day-slot ul li span {
+        display: block;
+        color: white;
+    }
+    
+    .day-slot ul li span:first-child {
+        font-weight: 700;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .slot-date {
+        font-size: 0.75rem;
+        opacity: 0.9;
+    }
+    
+    .slot-year {
+        font-size: 0.7rem;
+        opacity: 0.7;
+    }
+    
+    /* Schedule Content */
+    .schedule-cont {
+        padding: 1.5rem;
+        background: var(--gray-50);
+    }
+    
+    .time-slot ul {
+        display: flex;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        gap: 1.5rem;
+        overflow-x: auto;
+        padding-bottom: 0.5rem;
+    }
+    
+    .time-slot ul li {
+        min-width: 180px;
+        background: white;
+        border-radius: var(--radius-lg);
+        padding: 1rem;
+        box-shadow: var(--shadow-sm);
+        transition: all 0.3s ease;
+    }
+    
+    .time-slot ul li:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .day-column {
+        width: 100%;
+    }
+    
+    .day-column h5 {
+        font-size: 0.875rem;
+        font-weight: 700;
+        color: var(--gray-700);
+        margin-bottom: 0.75rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid var(--gray-200);
+    }
+    
+    .day-slots {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .timing {
+        display: block;
+        padding: 0.625rem 0.75rem;
+        border-radius: var(--radius-md);
+        text-align: center;
+        font-size: 0.8125rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        text-decoration: none;
+    }
+    
+    .timing.available {
+        background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+        color: white !important;
+        cursor: pointer;
+        border: none;
+        box-shadow: var(--shadow-sm);
+    }
+    
     .timing.available:hover {
-        background: #28a745;
-        color: #fff !important;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+        filter: brightness(1.05);
         text-decoration: none;
+        color: white;
     }
- 
+    
     .timing.booked {
-        display: block;
-        color: #dc3545 !important;
+        background: #fef2f2;
+        color: var(--danger) !important;
         cursor: not-allowed;
-        margin-bottom: 8px;
-        border: 1px solid #dc3545;
-        padding: 8px 12px;
-        border-radius: 6px;
-        background: #fff5f5;
-        text-align: center;
+        border: 1px solid #fecaca;
+        opacity: 0.7;
     }
- 
+    
+    .timing.booked small {
+        font-size: 0.7rem;
+        opacity: 0.8;
+    }
+    
     .slot-empty {
-        color: #999;
-        font-size: 14px;
-        display: block;
+        color: var(--gray-400);
+        font-size: 0.75rem;
         text-align: center;
-        padding: 8px 12px;
+        padding: 0.5rem;
+        font-style: italic;
     }
- 
-    .amount-box {
-        border: 1px solid #eee;
-        border-radius: 6px;
-        background: #fafafa;
-        padding: 15px;
-    }
- 
+    
     .past .timing.available {
+        background: var(--gray-300);
+        cursor: not-allowed;
+        opacity: 0.5;
         pointer-events: none;
-        cursor: default;
-        color: #bbb !important;
-        border-color: #ddd;
-        background: #f7f7f7;
+    }
+    
+    .past {
+        opacity: 0.6;
+    }
+    
+    /* Modal Styling */
+    .custom-modal .modal-content {
+        border: none;
+        border-radius: var(--radius-xl);
+        overflow: hidden;
+        box-shadow: var(--shadow-xl);
+    }
+    
+    .custom-modal .modal-header {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        color: white;
+        padding: 1.25rem 1.5rem;
+        border-bottom: none;
+    }
+    
+    .custom-modal .modal-header .modal-title {
+        font-weight: 700;
+        font-size: 1.125rem;
+    }
+    
+    .custom-modal .modal-header .close {
+        color: white;
+        opacity: 0.8;
+        text-shadow: none;
+        font-size: 1.5rem;
+    }
+    
+    .custom-modal .modal-header .close:hover {
+        opacity: 1;
+    }
+    
+    .custom-modal .modal-body {
+        padding: 1.5rem;
+    }
+    
+    .custom-modal .modal-footer {
+        padding: 1rem 1.5rem;
+        border-top: 1px solid var(--gray-200);
+    }
+    
+    .amount-box {
+        background: linear-gradient(135deg, var(--gray-50) 0%, #ffffff 100%);
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-lg);
+        padding: 1rem;
+    }
+    
+    /* Form Controls */
+    .form-group {
+        margin-bottom: 1.25rem;
+    }
+    
+    .form-group label {
+        font-weight: 600;
+        color: var(--gray-700);
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+        display: block;
+    }
+    
+    .form-control, select.form-control {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        font-size: 0.9375rem;
+        border: 1.5px solid var(--gray-200);
+        border-radius: var(--radius-md);
+        transition: all 0.2s ease;
+        background: #ffffff;
+    }
+    
+    .form-control:focus, select.form-control:focus {
+        border-color: var(--primary);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    
+    textarea.form-control {
+        resize: vertical;
+        min-height: 80px;
+    }
+    
+    input[type="file"].form-control {
+        padding: 0.5rem;
+    }
+    
+    /* Buttons */
+    .btn {
+        padding: 0.625rem 1.5rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+        border-radius: 40px;
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        color: white;
+        border: none;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3);
+    }
+    
+    .btn-secondary {
+        background: var(--gray-200);
+        color: var(--gray-700);
+        border: none;
+    }
+    
+    .btn-secondary:hover {
+        background: var(--gray-300);
+        transform: translateY(-2px);
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 1199.98px) {
+        .container {
+            padding: 0 1.5rem;
+        }
+    }
+    
+    @media (max-width: 991.98px) {
+        .content {
+            padding: 2rem 0;
+        }
+        
+        .card-body {
+            padding: 1.5rem;
+        }
+        
+        .time-slot ul {
+            gap: 1rem;
+        }
+        
+        .time-slot ul li {
+            min-width: 160px;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .container {
+            padding: 0 1rem;
+        }
+        
+        .booking-doc-info {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .booking-info p {
+            justify-content: center;
+        }
+        
+        .day-slot ul {
+            flex-direction: column;
+        }
+        
+        .time-slot ul {
+            flex-direction: column;
+        }
+        
+        .time-slot ul li {
+            min-width: 100%;
+        }
+        
+        .custom-modal .modal-dialog {
+            margin: 1rem;
+        }
+    }
+    
+    /* Animations */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateX(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    
+    .card, .payment-summary-card, .schedule-widget {
+        animation: fadeInUp 0.4s ease-out;
+    }
+    
+    .time-slot ul li {
+        animation: slideIn 0.3s ease-out;
+        animation-fill-mode: both;
+    }
+    
+    .time-slot ul li:nth-child(1) { animation-delay: 0.05s; }
+    .time-slot ul li:nth-child(2) { animation-delay: 0.1s; }
+    .time-slot ul li:nth-child(3) { animation-delay: 0.15s; }
+    .time-slot ul li:nth-child(4) { animation-delay: 0.2s; }
+    .time-slot ul li:nth-child(5) { animation-delay: 0.25s; }
+    .time-slot ul li:nth-child(6) { animation-delay: 0.3s; }
+    .time-slot ul li:nth-child(7) { animation-delay: 0.35s; }
+    
+    /* Scrollbar Styling */
+    .time-slot ul::-webkit-scrollbar {
+        height: 6px;
+    }
+    
+    .time-slot ul::-webkit-scrollbar-track {
+        background: var(--gray-200);
+        border-radius: 10px;
+    }
+    
+    .time-slot ul::-webkit-scrollbar-thumb {
+        background: var(--gray-400);
+        border-radius: 10px;
+    }
+    
+    .time-slot ul::-webkit-scrollbar-thumb:hover {
+        background: var(--primary);
+    }
+    
+    /* Modal Backdrop */
+    .modal-backdrop {
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+    
+    .modal-backdrop.fade.show {
+        opacity: 0.5;
     }
 </style>
- 
-<div class="main-wrapper">
- 
-    <div class="breadcrumb-bar">
-        <div class="container-fluid">
-            <div class="row align-items-center">
-                <div class="col-md-12 col-12">
-                    <nav aria-label="breadcrumb" class="page-breadcrumb">
-                        <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="#">Home</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">Booking</li>
-                        </ol>
-                    </nav>
-                    <h2 class="breadcrumb-title">Book Appointment</h2>
+
+<div class="content">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <!-- Doctor Info Card -->
+                <div class="card">
+                    <div class="card-body">
+                        <div class="booking-doc-info">
+                            <a href="#" class="booking-doc-img">
+                                <img src="{% if doctor.user.userprofile.profile_picture %}{{ doctor.user.userprofile.profile_picture.url }}{% else %}{% static 'img/doctors/doctor-thumb-02.jpg' %}{% endif %}" alt="Doctor Image">
+                            </a>
+                            <div class="booking-info">
+                                <h4 class="mb-1">
+                                    Dr. {{ doctor.user.first_name }} {{ doctor.user.last_name }}
+                                </h4>
+                                {% if doctor.department %}
+                                    <p class="text-muted mb-1">
+                                        <i class="fas fa-stethoscope"></i> {{ doctor.department.name }}
+                                    </p>
+                                {% endif %}
+                                {% if doctor.clinic_address %}
+                                    <p class="text-muted mb-0">
+                                        <i class="fas fa-map-marker-alt"></i> {{ doctor.clinic_address }}
+                                    </p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-    </div>
- 
-    <div class="content">
-        <div class="container">
- 
-            <div class="row">
-                <div class="col-12">
- 
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="booking-doc-info">
-                                <a href="#" class="booking-doc-img">
-                                    <img src="{% if doctor.user.userprofile.profile_picture %}{{ doctor.user.userprofile.profile_picture.url }}{% else %}{% static 'img/doctors/doctor-thumb-02.jpg' %}{% endif %}" alt="Doctor Image">
-                                </a>
- 
-                                <div class="booking-info">
-                                    <h4 class="mb-1">
-                                        Dr. {{ doctor.user.first_name }} {{ doctor.user.last_name }}
-                                    </h4>
- 
-                                    {% if doctor.department %}
-                                        <p class="text-muted mb-1">{{ doctor.department.name }}</p>
-                                    {% endif %}
- 
-                                    {% if doctor.clinic_address %}
-                                        <p class="text-muted mb-0">
-                                            <i class="fas fa-map-marker-alt"></i>
-                                            {{ doctor.clinic_address }}
-                                        </p>
-                                    {% endif %}
+
+                <!-- Payment Summary Card -->
+                <div class="payment-summary-card">
+                    <h4 class="mb-3">Payment Summary</h4>
+                    <div class="payment-summary-row">
+                        <span>Consultation Fee</span>
+                        <span>Rs. {{ consultation_fee }}</span>
+                    </div>
+                    <div class="payment-summary-row">
+                        <span>MediConnect Fee ({{ mediconnect_percentage }}%)</span>
+                        <span>Rs. {{ mediconnect_fee }}</span>
+                    </div>
+                    <div class="payment-summary-row total">
+                        <span>Total Amount</span>
+                        <span>Rs. {{ total_amount }}</span>
+                    </div>
+                    {% if esewa_enabled and esewa_number %}
+                        <div class="payment-note">
+                            <i class="fas fa-check-circle" style="color: var(--success);"></i> eSewa payment is available for this doctor.
+                        </div>
+                    {% else %}
+                        <div class="payment-note">
+                            <i class="fas fa-info-circle"></i> Only cash booking is available right now.
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Schedule Widget -->
+                <div class="card booking-schedule schedule-widget">
+                    <div class="schedule-header">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="day-slot">
+                                    <ul>
+                                        {% for date in week_dates %}
+                                            <li>
+                                                <span>{{ date|date:"D" }}</span>
+                                                <span class="slot-date">
+                                                    {{ date|date:"d M" }}
+                                                    <small class="slot-year">{{ date|date:"Y" }}</small>
+                                                </span>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
                                 </div>
                             </div>
                         </div>
                     </div>
- 
-                    <div class="payment-summary-card">
-                        <h4 class="mb-3">Payment Summary</h4>
- 
-                        <div class="payment-summary-row">
-                            <span>Consultation Fee</span>
-                            <span>Rs. {{ consultation_fee }}</span>
-                        </div>
- 
-                        <div class="payment-summary-row">
-                            <span>MediConnect Fee ({{ mediconnect_percentage }}%)</span>
-                            <span>Rs. {{ mediconnect_fee }}</span>
-                        </div>
- 
-                        <div class="payment-summary-row total">
-                            <span>Total Amount</span>
-                            <span>Rs. {{ total_amount }}</span>
-                        </div>
- 
-                        {% if esewa_enabled and esewa_number %}
-                            <div class="payment-note">
-                                eSewa payment is available for this doctor.
-                            </div>
-                        {% else %}
-                            <div class="payment-note">
-                                Only cash booking is available right now.
-                            </div>
-                        {% endif %}
-                    </div>
- 
-                    <div class="card booking-schedule schedule-widget">
-                        <div class="schedule-header">
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="day-slot">
-                                        <ul>
-                                            {% for date in week_dates %}
-                                                <li>
-                                                    <span>{{ date|date:"D" }}</span>
-                                                    <span class="slot-date">
-                                                        {{ date|date:"d M" }}
-                                                        <small class="slot-year">{{ date|date:"Y" }}</small>
-                                                    </span>
-                                                </li>
-                                            {% endfor %}
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
- 
-                        <div class="schedule-cont">
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="time-slot">
-                                        <ul class="clearfix">
-                                            {% for date in week_dates %}
-                                                <li class="{% if date|date:'Y-m-d' < current_date %}past{% else %}current{% endif %}">
-                                                    <div class="day-column">
-                                                        <div class="day-slots">
-                                                            {% with day_name=date|date:"l"|lower %}
-                                                            {% with day_slots=time_slots|get_item:day_name %}
-                                                                {% for entry in day_slots %}
-                                                                    {% if entry.is_booked %}
-                                                                        <div class="timing booked">
-                                                                            {{ entry.slot.start_time|time:"g:i A" }} - {{ entry.slot.end_time|time:"g:i A" }}
-                                                                            <br>
-                                                                            <small>Unavailable</small>
-                                                                        </div>
-                                                                    {% else %}
-                                                                        <a href="javascript:void(0)"
-                                                                           class="timing available open-appointment-modal"
-                                                                           data-doctor-id="{{ doctor.id }}"
-                                                                           data-time-slot-id="{{ entry.slot.id }}"
-                                                                           data-appointment-date="{{ date|date:'Y-m-d' }}"
-                                                                           data-time-range="{{ entry.slot.start_time|time:'g:i A' }} - {{ entry.slot.end_time|time:'g:i A' }}">
-                                                                            {{ entry.slot.start_time|time:"g:i A" }} - {{ entry.slot.end_time|time:"g:i A" }}
-                                                                        </a>
-                                                                    {% endif %}
-                                                                {% empty %}
-                                                                    <span class="slot-empty">No slots available</span>
-                                                                {% endfor %}
-                                                            {% endwith %}
-                                                            {% endwith %}
-                                                        </div>
+
+                    <div class="schedule-cont">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="time-slot">
+                                    <ul class="clearfix">
+                                        {% for date in week_dates %}
+                                            <li class="{% if date|date:'Y-m-d' < current_date %}past{% else %}current{% endif %}">
+                                                <div class="day-column">
+                                                    <h5>{{ date|date:"l, d M" }}</h5>
+                                                    <div class="day-slots">
+                                                        {% with day_name=date|date:"l"|lower %}
+                                                        {% with day_slots=time_slots|get_item:day_name %}
+                                                            {% for entry in day_slots %}
+                                                                {% if entry.is_booked %}
+                                                                    <div class="timing booked">
+                                                                        {{ entry.slot.start_time|time:"g:i A" }} - {{ entry.slot.end_time|time:"g:i A" }}
+                                                                        <br>
+                                                                        <small>Unavailable</small>
+                                                                    </div>
+                                                                {% else %}
+                                                                    <a href="javascript:void(0)"
+                                                                       class="timing available open-appointment-modal"
+                                                                       data-doctor-id="{{ doctor.id }}"
+                                                                       data-time-slot-id="{{ entry.slot.id }}"
+                                                                       data-appointment-date="{{ date|date:'Y-m-d' }}"
+                                                                       data-time-range="{{ entry.slot.start_time|time:'g:i A' }} - {{ entry.slot.end_time|time:'g:i A' }}">
+                                                                        {{ entry.slot.start_time|time:"g:i A" }} - {{ entry.slot.end_time|time:"g:i A" }}
+                                                                    </a>
+                                                                {% endif %}
+                                                            {% empty %}
+                                                                <span class="slot-empty">No slots available</span>
+                                                            {% endfor %}
+                                                        {% endwith %}
+                                                        {% endwith %}
                                                     </div>
-                                                </li>
-                                            {% endfor %}
-                                        </ul>
-                                    </div>
+                                                </div>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <!-- /Schedule Widget -->
- 
                 </div>
             </div>
- 
         </div>
     </div>
 </div>
- 
+
 <!-- Appointment Modal -->
 <div class="modal fade custom-modal" id="appointmentModal" tabindex="-1" role="dialog" aria-labelledby="appointmentModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <form action="{% url 'book_appointment' %}" method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
- 
                 <div class="modal-header">
                     <h5 class="modal-title" id="appointmentModalLabel">Confirm Appointment</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span>&times;</span>
                     </button>
                 </div>
- 
                 <div class="modal-body">
                     <input type="hidden" name="doctor_id" id="modal-doctor-id">
                     <input type="hidden" name="time_slot_id" id="modal-time-slot-id">
                     <input type="hidden" name="appointment_date" id="modal-appointment-date">
- 
-                    <div class="mb-3">
-                        <p class="mb-1"><strong>Doctor:</strong> Dr. {{ doctor.user.first_name }} {{ doctor.user.last_name }}</p>
-                        <p class="mb-1"><strong>Date:</strong> <span id="selected-appointment-date-text">-</span></p>
-                        <p class="mb-0"><strong>Time:</strong> <span id="selected-time-slot-text">-</span></p>
+
+                    <div class="mb-3 p-3" style="background: var(--gray-50); border-radius: var(--radius-lg);">
+                        <p class="mb-2"><strong><i class="fas fa-user-md"></i> Doctor:</strong> Dr. {{ doctor.user.first_name }} {{ doctor.user.last_name }}</p>
+                        <p class="mb-2"><strong><i class="fas fa-calendar-alt"></i> Date:</strong> <span id="selected-appointment-date-text">-</span></p>
+                        <p class="mb-0"><strong><i class="fas fa-clock"></i> Time:</strong> <span id="selected-time-slot-text">-</span></p>
                     </div>
- 
+
                     <div class="form-group">
                         <label for="appointment_type">Appointment Type</label>
                         <select name="appointment_type" id="appointment_type" class="form-control">
@@ -289,7 +743,7 @@
                             <option value="checkup">Check Up</option>
                         </select>
                     </div>
- 
+
                     <div class="form-group">
                         <label for="payment_method">Payment Method</label>
                         <select name="payment_method" id="payment_method" class="form-control">
@@ -298,39 +752,34 @@
                                 <option value="esewa">eSewa</option>
                             {% endif %}
                         </select>
-                        <small class="form-text text-muted">
-                            For now, this only saves payment details in the database.
-                        </small>
+                        <small class="form-text text-muted">For now, this only saves payment details in the database.</small>
                     </div>
- 
+
                     <div class="amount-box mb-3">
                         <div class="payment-summary-row">
                             <span>Consultation Fee</span>
                             <span>Rs. {{ consultation_fee }}</span>
                         </div>
- 
                         <div class="payment-summary-row">
                             <span>MediConnect Fee ({{ mediconnect_percentage }}%)</span>
                             <span>Rs. {{ mediconnect_fee }}</span>
                         </div>
- 
                         <div class="payment-summary-row total">
                             <span>Total Payable</span>
                             <span>Rs. {{ total_amount }}</span>
                         </div>
                     </div>
- 
+
                     <div class="form-group">
                         <label for="message">Message (optional)</label>
-                        <textarea name="message" id="message" rows="4" class="form-control"></textarea>
+                        <textarea name="message" id="message" rows="3" class="form-control" placeholder="Any additional information for the doctor..."></textarea>
                     </div>
- 
+
                     <div class="form-group">
                         <label for="image_upload">Upload Image (optional)</label>
                         <input type="file" name="image_upload" id="image_upload" class="form-control">
                     </div>
                 </div>
- 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-primary">Book Now</button>
@@ -339,36 +788,29 @@
         </div>
     </div>
 </div>
- 
+
 <script>
     function openAppointmentModal(doctorId, timeSlotId, appointmentDate, timeRange) {
-        // Populate hidden inputs
-        document.getElementById('modal-doctor-id').value        = doctorId;
-        document.getElementById('modal-time-slot-id').value     = timeSlotId;
+        document.getElementById('modal-doctor-id').value = doctorId;
+        document.getElementById('modal-time-slot-id').value = timeSlotId;
         document.getElementById('modal-appointment-date').value = appointmentDate;
- 
-        // Update visible display text
         document.getElementById('selected-appointment-date-text').textContent = appointmentDate;
-        document.getElementById('selected-time-slot-text').textContent        = timeRange;
- 
+        document.getElementById('selected-time-slot-text').textContent = timeRange;
+
         var modalEl = document.getElementById('appointmentModal');
- 
+
         if (typeof $ !== 'undefined' && typeof $.fn !== 'undefined' && typeof $.fn.modal !== 'undefined') {
-            // Bootstrap 3 or 4 with jQuery plugin loaded
             $('#appointmentModal').modal('show');
         } else if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-            // Bootstrap 5
             var bsModal = bootstrap.Modal.getOrCreateInstance(modalEl);
             bsModal.show();
         } else {
-            // Fallback: manually show the modal with CSS
             modalEl.style.display = 'block';
             modalEl.removeAttribute('aria-hidden');
             modalEl.setAttribute('aria-modal', 'true');
             modalEl.classList.add('show');
             document.body.classList.add('modal-open');
- 
-            // Inject backdrop
+
             if (!document.getElementById('manual-backdrop')) {
                 var backdrop = document.createElement('div');
                 backdrop.className = 'modal-backdrop fade show';
@@ -377,9 +819,9 @@
             }
         }
     }
- 
+
     function closeModalFallback() {
-        var modalEl  = document.getElementById('appointmentModal');
+        var modalEl = document.getElementById('appointmentModal');
         var backdrop = document.getElementById('manual-backdrop');
         modalEl.style.display = '';
         modalEl.classList.remove('show');
@@ -388,9 +830,8 @@
         document.body.classList.remove('modal-open');
         if (backdrop) backdrop.remove();
     }
- 
+
     document.addEventListener('DOMContentLoaded', function () {
-        // Attach click handler to slot links
         document.querySelectorAll('.open-appointment-modal').forEach(function (el) {
             el.addEventListener('click', function (e) {
                 e.preventDefault();
@@ -402,11 +843,9 @@
                 );
             });
         });
- 
-        // Fallback close: [data-dismiss="modal"] buttons inside the modal
+
         document.querySelectorAll('#appointmentModal [data-dismiss="modal"]').forEach(function (btn) {
             btn.addEventListener('click', function () {
-                // Only needed if the CSS fallback was used; Bootstrap handles its own close
                 if (!document.getElementById('manual-backdrop') === false) {
                     closeModalFallback();
                 }
@@ -414,5 +853,5 @@
         });
     });
 </script>
- 
+
 {% endblock %}

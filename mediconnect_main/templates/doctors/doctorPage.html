@@ -3,7 +3,7 @@
     {% load static %}
 
     <!-- Breadcrumb -->
-			<div class="breadcrumb-bar">
+			<!-- <div class="breadcrumb-bar">
 				<div class="container-fluid">
 					<div class="row align-items-center">
 						<div class="col-md-12 col-12">
@@ -17,7 +17,7 @@
 						</div>
 					</div>
 				</div>
-			</div>
+			</div> -->
 			<!-- /Breadcrumb -->
 
 			<!-- Page Content -->
@@ -44,8 +44,9 @@
 											<span class="d-inline-block average-rating">(35)</span>
 										</div> -->
 										<div class="clinic-details">
-											<p class="doc-location"><i class="fas fa-map-marker-alt"></i> {{ doctor.user.userprofile.address }} - <a href="javascript:void(0);" onclick="openMap({{doctor.clinic_latitude}}, {{doctor.clinic_longitude}});">Get Directions</a>
-</p>
+											<p class="doc-location">
+                                                <i class="fas fa-map-marker-alt"></i> {{ doctor.user.userprofile.address }}
+                                            </p>
 										</div>
 										<div class="clinic-services">
                                             {% for disease in doctor.department.disease.all %}
@@ -140,9 +141,9 @@
 													<p class="doc-speciality">{{ doctor.department.name }}</p>
 
 													<div class="clinic-details mb-0">
-                                                        <h5 class="clinic-direction"> <i class="fas fa-map-marker-alt"></i>
-                                                            {{ doctor.clinic_address }} <br>
-                                                            <a href="javascript:void(0);" onclick="openMap({{doctor.clinic_latitude}}, {{doctor.clinic_longitude}});">Get Directions</a>
+                                                        <h5 class="clinic-direction">
+                                                            <i class="fas fa-map-marker-alt"></i>
+                                                            {{ doctor.clinic_address }}
                                                         </h5>
                                                     </div>
 
@@ -260,27 +261,5 @@
 				</div>
 			</div>
 			<!-- /Page Content -->
-
-    <div id="mapModal" style="display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; overflow:auto; background-color:rgba(0,0,0,0.4)">
-    <div style="background-color:#fefefe; margin:15% auto; padding:20px; border:1px solid #888; width:80%; max-width:600px;">
-        <span onclick="closeModal()" style="float:right; font-size:28px; font-weight:bold; cursor:pointer">&times;</span>
-        <iframe id="mapFrame" width="100%" height="450" frameborder="0" style="border:0" allowfullscreen></iframe>
-    </div>
-</div>
-
-<script>
-    function openMap(lat, lng) {
-    var iframeUrl = `https://maps.google.com/?q=${lat},${lng}&output=embed`;
-    document.getElementById('mapFrame').src = iframeUrl;
-    document.getElementById('mapModal').style.display = 'block';
-}
-
-function closeModal() {
-    document.getElementById('mapModal').style.display = 'none';
-    document.getElementById('mapFrame').src = ''; // Clear the iframe src
-}
-
-</script>
-
 
 {% endblock %}

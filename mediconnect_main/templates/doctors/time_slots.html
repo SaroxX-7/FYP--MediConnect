@@ -1,154 +1,637 @@
 {% extends 'base.html' %}
 {% block content %}
-    {% load static %}
+{% load static %}
+
 <style>
-.modal-backdrop {
-    display: none;
-}
+    /* ========== SCHEDULE TIMINGS PAGE - MODERN STYLING ========== */
+    
+    :root {
+        --primary: #2563eb;
+        --primary-dark: #1e40af;
+        --primary-light: #3b82f6;
+        --secondary: #64748b;
+        --success: #10b981;
+        --danger: #ef4444;
+        --danger-dark: #dc2626;
+        --warning: #f59e0b;
+        --info: #0ea5e9;
+        --dark: #0f2b3d;
+        --light: #f8fafc;
+        --gray-50: #f9fafb;
+        --gray-100: #f1f5f9;
+        --gray-200: #e2e8f0;
+        --gray-300: #cbd5e1;
+        --gray-400: #94a3b8;
+        --gray-500: #64748b;
+        --gray-600: #475569;
+        --gray-700: #334155;
+        --gray-800: #1e293b;
+        --gray-900: #0f172a;
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+        --radius-md: 0.75rem;
+        --radius-lg: 1rem;
+        --radius-xl: 1.5rem;
+    }
+    
+    /* Modal Backdrop Fix */
+    .modal-backdrop {
+        display: none;
+    }
+    
+    .custom-modal .modal-content {
+        filter: none;
+    }
+    
+    .modal-open .main-content {
+        filter: none !important;
+    }
+    
+    .modal {
+        filter: none !important;
+        background: rgba(0, 0, 0, 0.5);
+    }
+    
+    /* Main Content */
+    .content {
+        padding: 2.5rem 0;
+        background: linear-gradient(135deg, #f0f9ff 0%, #f8fafc 100%);
+        min-height: calc(100vh - 200px);
+    }
+    
+    .container-fluid {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+    
+    /* Card Styles */
+    .card {
+        border: none;
+        border-radius: var(--radius-xl);
+        box-shadow: var(--shadow-md);
+        transition: all 0.3s ease;
+        overflow: hidden;
+        background: #ffffff;
+    }
+    
+    .card:hover {
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .card-body {
+        padding: 1.75rem;
+    }
+    
+    .card-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--gray-800);
+        margin-bottom: 1.25rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        letter-spacing: -0.3px;
+    }
+    
+    /* Profile Box */
+    .profile-box {
+        margin-top: 0.5rem;
+    }
+    
+    /* Form Group */
+    .form-group {
+        margin-bottom: 1.25rem;
+    }
+    
+    .form-group label {
+        font-weight: 600;
+        color: var(--gray-700);
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+        display: block;
+    }
+    
+    .form-control, .select.form-control {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        font-size: 0.9375rem;
+        border: 1.5px solid var(--gray-200);
+        border-radius: var(--radius-md);
+        transition: all 0.2s ease;
+        background: #ffffff;
+    }
+    
+    .form-control:focus, .select.form-control:focus {
+        border-color: var(--primary);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    
+    select.form-control {
+        cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%2364748b' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+        background-position: right 1rem center;
+        background-repeat: no-repeat;
+        background-size: 1.25rem;
+    }
+    
+    /* Schedule Widget */
+    .schedule-widget {
+        background: var(--gray-50);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+    }
+    
+    /* Schedule Header */
+    .schedule-header {
+        background: #ffffff;
+        border-bottom: 1px solid var(--gray-200);
+    }
+    
+    /* Schedule Nav */
+    .schedule-nav ul {
+        display: flex;
+        flex-wrap: wrap;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        background: #ffffff;
+    }
+    
+    .schedule-nav .nav-item {
+        flex: 1;
+        text-align: center;
+    }
+    
+    .schedule-nav .nav-link {
+        display: block;
+        padding: 1rem 0.75rem;
+        color: var(--gray-600);
+        font-weight: 600;
+        font-size: 0.875rem;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        border-bottom: 3px solid transparent;
+        cursor: pointer;
+    }
+    
+    .schedule-nav .nav-link:hover {
+        color: var(--primary);
+        background: var(--gray-50);
+    }
+    
+    .schedule-nav .nav-link.active {
+        color: var(--primary);
+        border-bottom-color: var(--primary);
+        background: var(--gray-50);
+    }
+    
+    /* Schedule Content */
+    .schedule-cont {
+        padding: 1.5rem;
+    }
+    
+    .tab-pane {
+        display: none;
+        animation: fadeIn 0.3s ease-out;
+    }
+    
+    .tab-pane.show.active {
+        display: block;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Edit Link */
+    .edit-link {
+        color: var(--primary);
+        text-decoration: none;
+        font-size: 0.875rem;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        transition: all 0.2s ease;
+    }
+    
+    .edit-link:hover {
+        color: var(--primary-dark);
+        transform: translateX(2px);
+    }
+    
+    .edit-link i {
+        font-size: 0.875rem;
+    }
+    
+    /* Doc Times / Time Slots */
+    .doc-times {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin-top: 1rem;
+    }
+    
+    .doc-slot-list {
+        background: linear-gradient(135deg, #ffffff 0%, var(--gray-50) 100%);
+        border: 1px solid var(--gray-200);
+        border-radius: 40px;
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--gray-700);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        transition: all 0.2s ease;
+        box-shadow: var(--shadow-sm);
+    }
+    
+    .doc-slot-list:hover {
+        border-color: var(--primary);
+        box-shadow: var(--shadow-md);
+        transform: translateY(-1px);
+    }
+    
+    .delete_schedule {
+        color: var(--danger);
+        text-decoration: none;
+        font-size: 0.875rem;
+        transition: all 0.2s ease;
+        width: 24px;
+        height: 24px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+    }
+    
+    .delete_schedule:hover {
+        color: var(--danger-dark);
+        background: rgba(239, 68, 68, 0.1);
+        transform: scale(1.1);
+    }
+    
+    /* Empty State */
+    .text-muted {
+        color: var(--gray-500) !important;
+        font-style: italic;
+        padding: 1rem 0;
+    }
+    
+    /* ========== MODAL STYLES ========== */
+    .custom-modal .modal-dialog {
+        max-width: 550px;
+    }
+    
+    .custom-modal .modal-content {
+        border-radius: var(--radius-xl);
+        border: none;
+        box-shadow: var(--shadow-xl);
+        overflow: hidden;
+    }
+    
+    .custom-modal .modal-header {
+        background: linear-gradient(135deg, var(--dark) 0%, var(--gray-800) 100%);
+        color: white;
+        padding: 1.25rem 1.5rem;
+        border-bottom: none;
+    }
+    
+    .custom-modal .modal-header .modal-title {
+        font-weight: 700;
+        font-size: 1.125rem;
+    }
+    
+    .custom-modal .modal-header .close {
+        color: white;
+        opacity: 0.8;
+        text-shadow: none;
+        font-size: 1.5rem;
+    }
+    
+    .custom-modal .modal-header .close:hover {
+        opacity: 1;
+    }
+    
+    .custom-modal .modal-body {
+        padding: 1.75rem;
+    }
+    
+    /* Hours Info */
+    .hours-info {
+        margin-bottom: 1rem;
+    }
+    
+    .hours-cont {
+        margin-bottom: 1rem;
+    }
+    
+    /* Submit Button */
+    .submit-section {
+        margin-top: 1.5rem;
+    }
+    
+    .submit-btn {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        color: white;
+        border: none;
+        padding: 0.75rem 2rem;
+        font-size: 0.9375rem;
+        font-weight: 600;
+        border-radius: 40px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .submit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3);
+    }
+    
+    .submit-btn:active {
+        transform: translateY(0);
+    }
+    
+    /* Toast Notification */
+    .toast {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 1060;
+        min-width: 280px;
+        background: white;
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-lg);
+        border: none;
+        border-left: 4px solid var(--success);
+    }
+    
+    .toast-header {
+        background: white;
+        border-bottom: 1px solid var(--gray-200);
+        padding: 0.75rem 1rem;
+        font-weight: 600;
+        color: var(--success);
+    }
+    
+    .toast-body {
+        padding: 0.75rem 1rem;
+        color: var(--gray-600);
+    }
+    
+    /* ========== RESPONSIVE DESIGN ========== */
+    @media (max-width: 1199.98px) {
+        .container-fluid {
+            padding: 0 1.5rem;
+        }
+    }
+    
+    @media (max-width: 991.98px) {
+        .content {
+            padding: 1.5rem 0;
+        }
+        
+        .card-body {
+            padding: 1.25rem;
+        }
+        
+        .schedule-nav .nav-link {
+            padding: 0.75rem 0.5rem;
+            font-size: 0.75rem;
+        }
+        
+        .schedule-cont {
+            padding: 1rem;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .container-fluid {
+            padding: 0 1rem;
+        }
+        
+        .card-title {
+            flex-direction: column;
+            gap: 0.75rem;
+            align-items: flex-start;
+        }
+        
+        .schedule-nav ul {
+            flex-wrap: wrap;
+        }
+        
+        .schedule-nav .nav-item {
+            flex: 0 0 33.333%;
+        }
+        
+        .doc-slot-list {
+            width: calc(50% - 0.375rem);
+            justify-content: space-between;
+        }
+        
+        .custom-modal .modal-dialog {
+            margin: 1rem;
+        }
+        
+        .modal-body .row > [class*="col-"] {
+            margin-bottom: 0.75rem;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .doc-slot-list {
+            width: 100%;
+        }
+        
+        .schedule-nav .nav-item {
+            flex: 0 0 50%;
+        }
+        
+        .submit-btn {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .custom-modal .modal-body {
+            padding: 1.25rem;
+        }
+    }
+    
+    /* Animation for time slots */
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateX(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    
+    .doc-slot-list {
+        animation: slideIn 0.2s ease-out;
+    }
+    
+    /* Scrollbar Styling */
+    .schedule-cont::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    .schedule-cont::-webkit-scrollbar-track {
+        background: var(--gray-100);
+        border-radius: 10px;
+    }
+    
+    .schedule-cont::-webkit-scrollbar-thumb {
+        background: var(--gray-300);
+        border-radius: 10px;
+    }
+    
+    /* Readonly input styling */
+    input[readonly] {
+        background-color: var(--gray-50);
+        cursor: not-allowed;
+    }
+    
+    /* Trash button in modal */
+    .trash {
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--danger);
+        border-radius: 40px;
+        padding: 0.5rem 1rem;
+        transition: all 0.2s ease;
+    }
+    
+    .trash:hover {
+        background: var(--danger);
+        color: white;
+        transform: scale(1.05);
+    }
+    
+    /* Add more button */
+    .add-more {
+        margin: 1rem 0;
+    }
+    
+    .add-hours {
+        color: var(--primary);
+        text-decoration: none;
+        font-size: 0.875rem;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        transition: all 0.2s ease;
+    }
+    
+    .add-hours:hover {
+        color: var(--primary-dark);
+        transform: translateX(2px);
+    }
+</style>
 
-.custom-modal .modal-content {
-    filter: none; /* Remove blur if it's applied */
-}
-.modal-open .main-content {
-    filter: none !important;
-}
+<!-- Main Wrapper -->
+<div class="main-wrapper">
 
-.modal {
-    filter: none !important;
-}
-</style>     <!-- Main Wrapper -->
-		<div class="main-wrapper">
+    <!-- Page Content -->
+    <div class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-5 col-lg-4 col-xl-3 theiaStickySidebar">
+                    {% include 'includes/d_sidebar.html' %}
+                </div>
 
-<!-- Breadcrumb -->
-			<div class="breadcrumb-bar">
-				<div class="container-fluid">
-					<div class="row align-items-center">
-						<div class="col-md-12 col-12">
-							<nav aria-label="breadcrumb" class="page-breadcrumb">
-								<ol class="breadcrumb">
-									<li class="breadcrumb-item"><a href="index-2.html">Home</a></li>
-									<li class="breadcrumb-item active" aria-current="page">Schedule Timings</li>
-								</ol>
-							</nav>
-							<h2 class="breadcrumb-title">Schedule Timings</h2>
-						</div>
-					</div>
-				</div>
-			</div>
-			<!-- /Breadcrumb -->
+                <div class="col-md-7 col-lg-8 col-xl-9">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="card-title">Schedule Timings</h4>
+                                    <div class="profile-box">
+                                        <div class="row">
+                                            <div class="col-lg-4">
+                                                <div class="form-group">
+                                                    <label>Timing Slot Duration</label>
+                                                    <select class="select form-control" id="duration">
+                                                        <option>-</option>
+                                                        <option>15 mins</option>
+                                                        <option selected="selected">30 mins</option>
+                                                        <option>45 mins</option>
+                                                        <option>1 Hour</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="card schedule-widget mb-0">
+                                                    <div class="schedule-header">
+                                                        <div class="schedule-nav">
+                                                            <ul class="nav nav-tabs nav-justified">
+                                                                {% for day in days %}
+                                                                    <li class="nav-item">
+                                                                        <a class="nav-link{% if day == current_day %} active{% endif %}" data-toggle="tab" href="#slot_{{ day|lower }}">
+                                                                            {{ day }}
+                                                                        </a>
+                                                                    </li>
+                                                                {% endfor %}
+                                                            </ul>
+                                                        </div>
+                                                    </div>
 
-			<!-- Page Content -->
-			<div class="content">
-				<div class="container-fluid">
+                                                    <div class="tab-content schedule-cont">
+                                                        {% for day, slots in slots_by_day.items %}
+                                                            <div id="slot_{{ day|lower }}" class="tab-pane fade {% if forloop.first %}show active{% endif %}">
+                                                                <h4 class="card-title d-flex justify-content-between">
+                                                                    <span>{{ day }} Time Slots</span>
+                                                                    <a class="edit-link" href="javascript:void(0);" onclick="openAddTimeSlotModal('{{ day }}')">
+                                                                        <i class="fa fa-plus-circle"></i> Add Slot
+                                                                    </a>
+                                                                </h4>
 
-					<div class="row">
-						<div class="col-md-5 col-lg-4 col-xl-3 theiaStickySidebar">
-
-							<!-- Profile Sidebar -->
-							{% include 'includes/d_sidebar.html' %}
-							<!-- /Profile Sidebar -->
-
-						</div>
-
-						<div class="col-md-7 col-lg-8 col-xl-9">
-
-							<div class="row">
-								<div class="col-sm-12">
-									<div class="card">
-										<div class="card-body">
-											<h4 class="card-title">Schedule Timings</h4>
-											<div class="profile-box">
-												<div class="row">
-
-													<div class="col-lg-4">
-														<div class="form-group">
-															<label>Timing Slot Duration</label>
-															<select class="select form-control" id="duration">
-																<option>-</option>
-																<option>15 mins</option>
-																<option selected="selected">30 mins</option>
-																<option>45 mins</option>
-																<option>1 Hour</option>
-															</select>
-														</div>
-													</div>
-
-												</div>
-												<div class="row">
-													<div class="col-md-12">
-														<div class="card schedule-widget mb-0">
-
-															<!-- Schedule Header -->
-															<div class="schedule-header">
-
-																<!-- Schedule Nav -->
-																<div class="schedule-nav">
-    <ul class="nav nav-tabs nav-justified">
-        {% for day in days %}
-            <li class="nav-item">
-                <a class="nav-link{% if day == current_day %} {% endif %}" data-toggle="tab" href="#slot_{{ day|lower }}">
-                    {{ day }}
-                </a>
-            </li>
-        {% endfor %}
-    </ul>
+                                                                {% if slots.exists %}
+                                                                    <div class="doc-times">
+                                                                        {% for slot in slots %}
+                                                                            <div class="doc-slot-list">
+                                                                                {{ slot.start_time|date:"h:i A" }} - {{ slot.end_time|date:"h:i A" }}
+                                                                                <a href="#" onclick="confirmDelete('{{ slot.id }}')" class="delete_schedule" data-slot-id="{{ slot.id }}">
+                                                                                    <i class="fa fa-times"></i>
+                                                                                </a>
+                                                                            </div>
+                                                                        {% endfor %}
+                                                                    </div>
+                                                                {% else %}
+                                                                    <p class="text-muted mb-0">Not Available</p>
+                                                                {% endif %}
+                                                            </div>
+                                                        {% endfor %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
-																<!-- /Schedule Nav -->
-
-															</div>
-															<!-- /Schedule Header -->
-
-															<!-- Schedule Content -->
-															<div class="tab-content schedule-cont">
-
-																{% for day, slots in slots_by_day.items %}
-                                                                    <div id="slot_{{ day|lower }}" class="tab-pane fade {% if forloop.first %}show active{% endif %}">
-                                                                        <h4 class="card-title d-flex justify-content-between">
-                                                                            <span>{{ day }} Time Slots</span>
-{#                                                                            <a class="edit-link" data-toggle="modal" href="#add_time_slot" data-day="{{ day }}"><i class="fa fa-plus-circle"></i> Add Slot</a>#}
-                                                                            <a class="edit-link" href="javascript:void(0);" onclick="openAddTimeSlotModal('{{ day }}')"><i class="fa fa-plus-circle"></i> Add Slot</a>
-
-                                                                        </h4>
-
-                                                                        {% if slots.exists %}
-                                                                            <div class="doc-times">
-                                                                                {% for slot in slots %}
-                                                                                    <div class="doc-slot-list">
-                                                                                        {{ slot.start_time|date:"h:i A" }} - {{ slot.end_time|date:"h:i A" }}
-                                                                                        <a href="#" onclick="confirmDelete('{{ slot.id }}')" class="delete_schedule" data-slot-id="{{ slot.id }}">
-                                                                                            <i class="fa fa-times"></i>
-                                                                                        </a>
-                                                                                    </div>
-                                                                                {% endfor %}
-                                                                            </div>
-                                                                        {% else %}
-                                                                            <p class="text-muted mb-0">Not Available</p>
-                                                                        {% endif %}
-                                                                    </div>
-                                                                {% endfor %}
-
-															</div>
-															<!-- /Schedule Content -->
-
-														</div>
-													</div>
-												</div>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-
-						</div>
-					</div>
-
-				</div>
-
-			</div>
-			<!-- /Page Content -->
-        </div>
-    <!-- Add Time Slot Modal -->
+<!-- Add Time Slot Modal -->
 <div class="modal fade custom-modal" id="add_time_slot">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -171,54 +654,54 @@
                                             <label>Start Time</label>
                                             <select class="form-control" name="start_time" id="start_time">
                                                 <option>-</option>
-                                                <option value = "00:00">12:00 am</option>
-                                                <option value = "00:30">12:30 am</option>
-                                                <option value = "01:00">1:00 am</option>
-                                                <option value = "01:30">1:30 am</option>
-                                                <option value = "02:00">2:00 am</option>
-                                                <option value = "02:30">2:30 am</option>
-                                                <option value = "03:00">3:00 am</option>
-                                                <option value = "03:30">3:30 am</option>
-                                                <option value = "04:00">4:00 am</option>
-                                                <option value = "04:30">4:30 am</option>
-                                                <option value = "05:00">5:00 am</option>
-                                                <option value = "05:30">5:30 am</option>
-                                                <option value = "06:00">6:00 am</option>
-                                                <option value = "06:30">6:30 am</option>
-                                                <option value = "07:00">7:00 am</option>
-                                                <option value = "07:30">7:30 am</option>
-                                                <option value = "08:00">8:00 am</option>
-                                                <option value = "08:30">8:30 am</option>
-                                                <option value = "09:00">9:00 am</option>
-                                                <option value = "09:30">9:30 am</option>
-                                                <option value = "10:00">10:00 am</option>
-                                                <option value = "10:30">10:30 am</option>
-                                                <option value = "11:00">11:00 am</option>
-                                                <option value = "11:30">11:30 am</option>
-                                                <option value = "12:00">12:00 pm</option>
-                                                <option value = "12:30">12:30 pm</option>
-                                                <option value = "13:00">1:00 pm</option>
-                                                <option value = "13:30">1:30 pm</option>
-                                                <option value = "14:00">2:00 pm</option>
-                                                <option value = "14:30">2:30 pm</option>
-                                                <option value = "15:00">3:00 pm</option>
-                                                <option value = "15:30">3:30 pm</option>
-                                                <option value = "16:00">4:00 pm</option>
-                                                <option value = "16:30">4:30 pm</option>
-                                                <option value = "17:00">5:00 pm</option>
-                                                <option value = "17:30">5:30 pm</option>
-                                                <option value = "18:00">6:00 pm</option>
-                                                <option value = "18:30">6:30 pm</option>
-                                                <option value = "19:00">7:00 pm</option>
-                                                <option value = "19:30">7:30 pm</option>
-                                                <option value = "20:00">8:00 pm</option>
-                                                <option value = "20:30">8:30 pm</option>
-                                                <option value = "21:00">9:00 pm</option>
-                                                <option value = "21:30">9:30 pm</option>
-                                                <option value = "22:00">10:00 pm</option>
-                                                <option value = "22:30">10:30 pm</option>
-                                                <option value = "23:00">11:00 pm</option>
-                                                <option value = "23:30">11:30 pm</option>
+                                                <option value="00:00">12:00 am</option>
+                                                <option value="00:30">12:30 am</option>
+                                                <option value="01:00">1:00 am</option>
+                                                <option value="01:30">1:30 am</option>
+                                                <option value="02:00">2:00 am</option>
+                                                <option value="02:30">2:30 am</option>
+                                                <option value="03:00">3:00 am</option>
+                                                <option value="03:30">3:30 am</option>
+                                                <option value="04:00">4:00 am</option>
+                                                <option value="04:30">4:30 am</option>
+                                                <option value="05:00">5:00 am</option>
+                                                <option value="05:30">5:30 am</option>
+                                                <option value="06:00">6:00 am</option>
+                                                <option value="06:30">6:30 am</option>
+                                                <option value="07:00">7:00 am</option>
+                                                <option value="07:30">7:30 am</option>
+                                                <option value="08:00">8:00 am</option>
+                                                <option value="08:30">8:30 am</option>
+                                                <option value="09:00">9:00 am</option>
+                                                <option value="09:30">9:30 am</option>
+                                                <option value="10:00">10:00 am</option>
+                                                <option value="10:30">10:30 am</option>
+                                                <option value="11:00">11:00 am</option>
+                                                <option value="11:30">11:30 am</option>
+                                                <option value="12:00">12:00 pm</option>
+                                                <option value="12:30">12:30 pm</option>
+                                                <option value="13:00">1:00 pm</option>
+                                                <option value="13:30">1:30 pm</option>
+                                                <option value="14:00">2:00 pm</option>
+                                                <option value="14:30">2:30 pm</option>
+                                                <option value="15:00">3:00 pm</option>
+                                                <option value="15:30">3:30 pm</option>
+                                                <option value="16:00">4:00 pm</option>
+                                                <option value="16:30">4:30 pm</option>
+                                                <option value="17:00">5:00 pm</option>
+                                                <option value="17:30">5:30 pm</option>
+                                                <option value="18:00">6:00 pm</option>
+                                                <option value="18:30">6:30 pm</option>
+                                                <option value="19:00">7:00 pm</option>
+                                                <option value="19:30">7:30 pm</option>
+                                                <option value="20:00">8:00 pm</option>
+                                                <option value="20:30">8:30 pm</option>
+                                                <option value="21:00">9:00 pm</option>
+                                                <option value="21:30">9:30 pm</option>
+                                                <option value="22:00">10:00 pm</option>
+                                                <option value="22:30">10:30 pm</option>
+                                                <option value="23:00">11:00 pm</option>
+                                                <option value="23:30">11:30 pm</option>
                                             </select>
                                         </div>
                                     </div>
@@ -240,253 +723,123 @@
         </div>
     </div>
 </div>
-<!-- /Add Time Slot Modal -->
 
+<!-- Toast Notification -->
+<div class="toast" id="successToast" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast-header">
+        <strong class="mr-auto">Success</strong>
+        <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="toast-body">
+        Your changes have been saved successfully.
+    </div>
+</div>
 
-
-		<!-- Edit Time Slot Modal -->
-		<div class="modal fade custom-modal" id="edit_time_slot">
-			<div class="modal-dialog modal-dialog-centered">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h5 class="modal-title">Edit Time Slots</h5>
-						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-							<span aria-hidden="true">&times;</span>
-						</button>
-					</div>
-					<div class="modal-body">
-						<form>
-							<div class="hours-info">
-								<div class="row form-row hours-cont">
-									<div class="col-12 col-md-10">
-										<div class="row form-row">
-											<div class="col-12 col-md-6">
-												<div class="form-group">
-													<label>Start Time</label>
-													<select class="form-control">
-														<option>-</option>
-														<option selected>12.00 am</option>
-														<option>12.30 am</option>
-														<option>1.00 am</option>
-														<option>1.30 am</option>
-													</select>
-												</div>
-											</div>
-											<div class="col-12 col-md-6">
-												<div class="form-group">
-													<label>End Time</label>
-													<select class="form-control">
-														<option>-</option>
-														<option>12.00 am</option>
-														<option selected>12.30 am</option>
-														<option>1.00 am</option>
-														<option>1.30 am</option>
-													</select>
-												</div>
-											</div>
-										</div>
-									</div>
-								</div>
-
-								<div class="row form-row hours-cont">
-									<div class="col-12 col-md-10">
-										<div class="row form-row">
-											<div class="col-12 col-md-6">
-												<div class="form-group">
-													<label>Start Time</label>
-													<select class="form-control">
-														<option>-</option>
-														<option>12.00 am</option>
-														<option selected>12.30 am</option>
-														<option>1.00 am</option>
-														<option>1.30 am</option>
-													</select>
-												</div>
-											</div>
-											<div class="col-12 col-md-6">
-												<div class="form-group">
-													<label>End Time</label>
-													<select class="form-control">
-														<option>-</option>
-														<option>12.00 am</option>
-														<option>12.30 am</option>
-														<option selected>1.00 am</option>
-														<option>1.30 am</option>
-													</select>
-												</div>
-											</div>
-										</div>
-									</div>
-									<div class="col-12 col-md-2"><label class="d-md-block d-sm-none d-none">&nbsp;</label><a href="#" class="btn btn-danger trash"><i class="far fa-trash-alt"></i></a></div>
-								</div>
-
-								<div class="row form-row hours-cont">
-									<div class="col-12 col-md-10">
-										<div class="row form-row">
-											<div class="col-12 col-md-6">
-												<div class="form-group">
-													<label>Start Time</label>
-													<select class="form-control">
-														<option>-</option>
-														<option>12.00 am</option>
-														<option>12.30 am</option>
-														<option selected>1.00 am</option>
-														<option>1.30 am</option>
-													</select>
-												</div>
-											</div>
-											<div class="col-12 col-md-6">
-												<div class="form-group">
-													<label>End Time</label>
-													<select class="form-control">
-														<option>-</option>
-														<option>12.00 am</option>
-														<option>12.30 am</option>
-														<option>1.00 am</option>
-														<option selected>1.30 am</option>
-													</select>
-												</div>
-											</div>
-										</div>
-									</div>
-									<div class="col-12 col-md-2"><label class="d-md-block d-sm-none d-none">&nbsp;</label><a href="#" class="btn btn-danger trash"><i class="far fa-trash-alt"></i></a></div>
-								</div>
-
-							</div>
-
-							<div class="add-more mb-3">
-								<a href="javascript:void(0);" class="add-hours"><i class="fa fa-plus-circle"></i> Add More</a>
-							</div>
-							<div class="submit-section text-center">
-								<button type="submit" class="btn btn-primary submit-btn">Save Changes</button>
-							</div>
-						</form>
-					</div>
-				</div>
-			</div>
-		</div>
-            <div class="toast" id="successToast" role="alert" aria-live="assertive" aria-atomic="true">
-            <div class="toast-header">
-                <strong class="mr-auto">Success</strong>
-                <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="toast-body">
-                Your changes have been saved successfully.
-            </div>
-        </div>
-
-    <script>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+<script>
     document.querySelectorAll('.nav-link').forEach(link => {
-    link.addEventListener('click', function() {
-        localStorage.setItem('activeTab', this.getAttribute('href'));
+        link.addEventListener('click', function() {
+            localStorage.setItem('activeTab', this.getAttribute('href'));
+        });
     });
-});
 
-window.onload = function() {
-    let activeTab = localStorage.getItem('activeTab');
-    if (activeTab) {
-        document.querySelector('a[href="' + activeTab + '"]').classList.add('active');
-    }
-};
-
-        function openAddTimeSlotModal(day) {
-    // Set the value of the hidden input
-    document.getElementById('modal_day').value = day;
-    // Trigger the modal to open
-    (function($) {
-    $('#add_time_slot').modal('show');
-})(jQuery);
-
-}
- $(document).ready(function() {
-    $('form').on('submit', function(e) {
-        e.preventDefault();
-        const formData = new FormData(this);
-        const jsonData = {};
-        for (const [key, value] of formData.entries()) {
-            jsonData[key] = value;
+    window.onload = function() {
+        let activeTab = localStorage.getItem('activeTab');
+        if (activeTab) {
+            let tab = document.querySelector('a[href="' + activeTab + '"]');
+            if (tab) tab.classList.add('active');
         }
-        fetch(this.action, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': formData.get('csrfmiddlewaretoken')
-            },
-            body: JSON.stringify(jsonData)
-        })
-        .then(response => {
-            if (response.ok) {
-                // Close the modal
-                $('#add_time_slot').modal('hide');
+    };
 
-                // Show the toast message
-                var toastEl = new bootstrap.Toast(document.getElementById('successToast'));
-                toastEl.show();
+    function openAddTimeSlotModal(day) {
+        document.getElementById('modal_day').value = day;
+        (function($) {
+            $('#add_time_slot').modal('show');
+        })(jQuery);
+    }
+
+    $(document).ready(function() {
+        $('form').on('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const jsonData = {};
+            for (const [key, value] of formData.entries()) {
+                jsonData[key] = value;
             }
-            window.location.reload();  // Reload the page to see the changes
-            return response.json();
-        })
-        .then(data => console.log(data))
-        .catch(error => console.error('Error:', error));
-    });
-    function calculateEndTime() {
-        console.log('Calculating end time');
-        var startTime = $('#start_time').val();
-        var duration = parseInt($('#duration').val(), 10);
+            fetch(this.action, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                },
+                body: JSON.stringify(jsonData)
+            })
+            .then(response => {
+                if (response.ok) {
+                    $('#add_time_slot').modal('hide');
+                    var toastEl = new bootstrap.Toast(document.getElementById('successToast'));
+                    toastEl.show();
+                }
+                window.location.reload();
+                return response.json();
+            })
+            .then(data => console.log(data))
+            .catch(error => console.error('Error:', error));
+        });
 
-        if (startTime && duration) {
-            var startTimeMoment = moment(startTime, "HH:mm");
-            var endTimeMoment = startTimeMoment.clone().add(duration, 'minutes');
-            $('#end_time').val(endTimeMoment.format("HH:mm"));
+        function calculateEndTime() {
+            var startTime = $('#start_time').val();
+            var duration = parseInt($('#duration').val(), 10);
+
+            if (startTime && duration) {
+                var startTimeMoment = moment(startTime, "HH:mm");
+                var endTimeMoment = startTimeMoment.clone().add(duration, 'minutes');
+                $('#end_time').val(endTimeMoment.format("HH:mm"));
+            }
         }
-    }
 
-    // Listen for changes in the start time or duration
-    $('#start_time, #duration').on('change', function() {
-        calculateEndTime();
+        $('#start_time, #duration').on('change', function() {
+            calculateEndTime();
+        });
     });
-});
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    // Does this cookie string begin with the name we want?
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
                 }
             }
-            return cookieValue;
         }
-
-         function confirmDelete(slotId) {
-    const csrftoken = getCookie('csrftoken');  // Get CSRF token from cookies
-
-    if (confirm('Are you sure you want to delete this time slot?')) {
-        fetch(`/doctor/time_slot/delete/${slotId}/`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': csrftoken  // Include the CSRF token in the request header
-            },
-            body: JSON.stringify({})  // In case you need to send data in the request body
-        })
-        .then(response => response.json())
-        .then(data => {
-            alert(data.message);
-            window.location.reload();  // Reload the page to see the changes
-        })
-        .catch(error => console.error('Error:', error));
+        return cookieValue;
     }
-}
 
-    </script>
+    function confirmDelete(slotId) {
+        const csrftoken = getCookie('csrftoken');
 
+        if (confirm('Are you sure you want to delete this time slot?')) {
+            fetch(`/doctor/time_slot/delete/${slotId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken
+                },
+                body: JSON.stringify({})
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                window.location.reload();
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    }
+</script>
 
 {% endblock %}

@@ -384,6 +384,7 @@ def reset_password(request):
     return render(request, 'accounts/reset_password.html')
 
 def change_password(request):
+    profile = UserProfile.objects.get(user=request.user)
     if request.method == 'POST':
         current_password = request.POST['current_password']
         password = request.POST['password']
@@ -405,7 +406,10 @@ def change_password(request):
         else:
             messages.error(request, 'Passwords do not match!')
         return redirect('change_password')
-    return render(request, 'accounts/change_password.html')
+    context = {
+        "profile":profile
+    }
+    return render(request, 'accounts/change_password.html',context)
 
 
 def change_password_view(request):
