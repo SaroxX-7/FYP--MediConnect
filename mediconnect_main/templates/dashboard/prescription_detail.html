@@ -1,0 +1,719 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Prescription Detail{% endblock %}
+{% block page_title %}Prescription Detail{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ============================================
+       MEDICONNECT PRESCRIPTION DETAIL - PREMIUM CSS
+       Modern medical prescription styling
+    ============================================ */
+    
+    :root {
+        --primary: #2563eb;
+        --primary-dark: #1d4ed8;
+        --primary-light: #3b82f6;
+        --primary-soft: #eff6ff;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --info: #06b6d4;
+        --purple: #8b5cf6;
+        --teal: #14b8a6;
+        --gray-50: #f9fafb;
+        --gray-100: #f3f4f6;
+        --gray-200: #e5e7eb;
+        --gray-300: #d1d5db;
+        --gray-400: #9ca3af;
+        --gray-500: #6b7280;
+        --gray-600: #4b5563;
+        --gray-700: #374151;
+        --gray-800: #1f2937;
+        --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
+        --card-shadow-hover: 0 8px 20px rgba(0, 0, 0, 0.08);
+        --transition-fast: 0.15s ease;
+        --transition-normal: 0.25s ease;
+    }
+    
+    /* Page Card Styling */
+    .page-card {
+        background: white;
+        border-radius: 1.25rem;
+        padding: 1.5rem;
+        box-shadow: var(--card-shadow);
+        transition: all var(--transition-normal);
+        border: 1px solid rgba(0, 0, 0, 0.03);
+        margin-bottom: 1.5rem;
+    }
+    
+    .page-card:hover {
+        box-shadow: var(--card-shadow-hover);
+    }
+    
+    .page-card:last-child {
+        margin-bottom: 0;
+    }
+    
+    .page-card h5 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 1.25rem;
+        color: var(--gray-800);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        border-left: 3px solid var(--primary);
+        padding-left: 0.75rem;
+    }
+    
+    hr {
+        margin: 1.25rem 0;
+        border: 0;
+        height: 1px;
+        background: linear-gradient(90deg, var(--gray-200), transparent);
+    }
+    
+    /* Prescription Info Grid */
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+    }
+    
+    .info-item {
+        padding: 0.5rem 0;
+    }
+    
+    .info-label {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        font-weight: 700;
+        color: var(--gray-500);
+        margin-bottom: 0.35rem;
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+    }
+    
+    .info-value {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--gray-800);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+    
+    /* Status Badge */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.25rem 0.85rem;
+        font-size: 0.7rem;
+        font-weight: 600;
+        border-radius: 2rem;
+    }
+    
+    .status-badge.active {
+        background: #d1fae5;
+        color: #065f46;
+    }
+    
+    .status-badge.completed {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+    
+    .status-badge.cancelled {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+    
+    .status-badge.pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+    
+    /* Notes Section */
+    .notes-section {
+        background: linear-gradient(135deg, #fefce8 0%, #fef9c3 100%);
+        border-radius: 1rem;
+        padding: 1rem 1.25rem;
+        margin-top: 0.5rem;
+    }
+    
+    .notes-section p {
+        margin: 0;
+        color: #854d0e;
+        line-height: 1.5;
+        font-size: 0.875rem;
+    }
+    
+    /* Table Styling */
+    .table-responsive {
+        border-radius: 1rem;
+        overflow-x: auto;
+        background: white;
+    }
+    
+    .table {
+        margin-bottom: 0;
+        border-collapse: separate;
+        border-spacing: 0;
+        width: 100%;
+    }
+    
+    .table thead th {
+        background: linear-gradient(135deg, var(--gray-50) 0%, #f8fafc 100%);
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        padding: 0.875rem 1rem;
+        border-bottom: 1.5px solid var(--gray-200);
+        color: var(--gray-600);
+    }
+    
+    .table thead th i {
+        margin-right: 0.35rem;
+        font-size: 0.65rem;
+        opacity: 0.7;
+    }
+    
+    .table tbody tr {
+        transition: all var(--transition-fast);
+    }
+    
+    .table tbody tr:hover {
+        background: var(--gray-50);
+    }
+    
+    .table td {
+        padding: 0.875rem 1rem;
+        vertical-align: middle;
+        font-size: 0.8125rem;
+        color: var(--gray-700);
+        border-bottom: 1px solid var(--gray-100);
+    }
+    
+    /* Medicine name styling */
+    .medicine-name {
+        font-weight: 600;
+        color: var(--gray-800);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .medicine-icon {
+        width: 28px;
+        height: 28px;
+        background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 0.7rem;
+    }
+    
+    /* Dosage & Frequency styling */
+    .dosage-value, .frequency-value {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        background: var(--gray-100);
+        padding: 0.2rem 0.6rem;
+        border-radius: 1rem;
+        font-size: 0.7rem;
+        font-weight: 500;
+    }
+    
+    .duration-value, .quantity-value {
+        font-weight: 600;
+        color: var(--gray-700);
+    }
+    
+    /* Dispense Record Styling */
+    .dispense-record {
+        background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+        border-radius: 1rem;
+        padding: 1.25rem;
+    }
+    
+    .dispense-record p {
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: baseline;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    
+    .dispense-record p:last-child {
+        margin-bottom: 0;
+    }
+    
+    .dispense-label {
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--gray-500);
+        min-width: 100px;
+    }
+    
+    .dispense-value {
+        font-weight: 500;
+        color: var(--gray-700);
+    }
+    
+    .pharmacist-info {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: white;
+        padding: 0.2rem 0.75rem;
+        border-radius: 2rem;
+        font-size: 0.8rem;
+    }
+    
+    .pharmacist-avatar {
+        width: 24px;
+        height: 24px;
+        background: linear-gradient(135deg, var(--teal) 0%, #0d9488 100%);
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 0.6rem;
+        font-weight: 700;
+    }
+    
+    /* Empty state for dispense */
+    .empty-dispense {
+        text-align: center;
+        padding: 2rem;
+        background: var(--gray-50);
+        border-radius: 1rem;
+        color: var(--gray-500);
+    }
+    
+    .empty-dispense i {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+        opacity: 0.5;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .page-card {
+            padding: 1rem;
+        }
+        
+        .info-grid {
+            grid-template-columns: 1fr;
+            gap: 0.5rem;
+        }
+        
+        .table thead th,
+        .table td {
+            padding: 0.625rem 0.75rem;
+            font-size: 0.75rem;
+        }
+        
+        .info-value {
+            font-size: 0.875rem;
+        }
+        
+        .dispense-record p {
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        
+        .dispense-label {
+            min-width: auto;
+        }
+    }
+    
+    /* Animation */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .page-card {
+        animation: fadeInUp 0.3s ease backwards;
+    }
+    
+    .page-card:nth-child(1) { animation-delay: 0.02s; }
+    .page-card:nth-child(2) { animation-delay: 0.06s; }
+    .page-card:nth-child(3) { animation-delay: 0.1s; }
+    
+    /* Prescription ID badge */
+    .prescription-id {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: var(--primary-soft);
+        padding: 0.3rem 1rem;
+        border-radius: 2rem;
+        font-family: monospace;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--primary-dark);
+    }
+    
+    /* Avatar styling for patient/doctor */
+    .avatar-circle {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: white;
+    }
+    
+    .avatar-patient {
+        background: linear-gradient(135deg, var(--teal) 0%, #0d9488 100%);
+    }
+    
+    .avatar-doctor {
+        background: linear-gradient(135deg, var(--purple) 0%, #7c3aed 100%);
+    }
+    
+    /* Print-friendly styles */
+    @media print {
+        body {
+            background: white;
+            padding: 1cm;
+        }
+        
+        .dashboard-sidebar,
+        .topbar,
+        .btn,
+        .action-buttons {
+            display: none !important;
+        }
+        
+        .dashboard-content {
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        
+        .page-card {
+            box-shadow: none;
+            border: 1px solid #ddd;
+            break-inside: avoid;
+        }
+        
+        .table {
+            break-inside: avoid;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-card">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="info-item">
+                <div class="info-label">
+                    <i class="fas fa-hashtag"></i> Prescription ID
+                </div>
+                <div class="info-value">
+                    <span class="prescription-id">
+                        <i class="fas fa-prescription-bottle"></i> #{{ prescription.id }}
+                    </span>
+                </div>
+            </div>
+            
+            <div class="info-item">
+                <div class="info-label">
+                    <i class="fas fa-user-injured"></i> Patient
+                </div>
+                <div class="info-value">
+                    <span class="avatar-circle avatar-patient me-2">
+                        {{ prescription.patient.first_name|slice:":1" }}{{ prescription.patient.last_name|slice:":1" }}
+                    </span>
+                    {{ prescription.patient.first_name }} {{ prescription.patient.last_name }}
+                </div>
+            </div>
+            
+            <div class="info-item">
+                <div class="info-label">
+                    <i class="fas fa-user-md"></i> Doctor
+                </div>
+                <div class="info-value">
+                    <span class="avatar-circle avatar-doctor me-2">
+                        {{ prescription.doctor.user.first_name|slice:":1" }}{{ prescription.doctor.user.last_name|slice:":1" }}
+                    </span>
+                    {{ prescription.doctor.user.first_name }} {{ prescription.doctor.user.last_name }}
+                </div>
+            </div>
+            
+            <div class="info-item">
+                <div class="info-label">
+                    <i class="fas fa-chart-line"></i> Status
+                </div>
+                <div class="info-value">
+                    {% if prescription.status == "active" or prescription.status == "Active" %}
+                        <span class="status-badge active">
+                            <i class="fas fa-check-circle"></i> Active
+                        </span>
+                    {% elif prescription.status == "completed" or prescription.status == "Completed" %}
+                        <span class="status-badge completed">
+                            <i class="fas fa-clipboard-check"></i> Completed
+                        </span>
+                    {% elif prescription.status == "cancelled" or prescription.status == "Cancelled" %}
+                        <span class="status-badge cancelled">
+                            <i class="fas fa-ban"></i> Cancelled
+                        </span>
+                    {% else %}
+                        <span class="status-badge pending">
+                            <i class="fas fa-clock"></i> {{ prescription.status }}
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="info-item">
+                <div class="info-label">
+                    <i class="fas fa-calendar-check"></i> Appointment
+                </div>
+                <div class="info-value">
+                    {% if prescription.appointment %}
+                        <i class="fas fa-hashtag text-muted"></i> #{{ prescription.appointment.id }}
+                    {% else %}
+                        <span class="text-muted">—</span>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="info-item">
+                <div class="info-label">
+                    <i class="fas fa-calendar-plus"></i> Created
+                </div>
+                <div class="info-value">
+                    <i class="far fa-calendar-alt text-muted"></i>
+                    {{ prescription.created_at|date:"Y-m-d H:i" }}
+                </div>
+            </div>
+            
+            <div class="info-item">
+                <div class="info-label">
+                    <i class="fas fa-edit"></i> Last Modified
+                </div>
+                <div class="info-value">
+                    <i class="far fa-clock text-muted"></i>
+                    {{ prescription.modified_at|date:"Y-m-d H:i" }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr>
+
+    <h5>
+        <i class="fas fa-sticky-note text-primary"></i>
+        Clinical Notes
+    </h5>
+    <div class="notes-section">
+        <p>
+            <i class="fas fa-quote-left me-2 opacity-50"></i>
+            {{ prescription.notes|default:"No additional notes provided." }}
+        </p>
+    </div>
+</div>
+
+<div class="page-card">
+    <h5>
+        <i class="fas fa-capsules text-success"></i>
+        Prescribed Medications
+    </h5>
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th><i class="fas fa-hashtag"></i> #</th>
+                    <th><i class="fas fa-pills"></i> Medicine</th>
+                    <th><i class="fas fa-chart-simple"></i> Dosage</th>
+                    <th><i class="fas fa-clock"></i> Frequency</th>
+                    <th><i class="fas fa-calendar-week"></i> Duration</th>
+                    <th><i class="fas fa-boxes"></i> Quantity</th>
+                    <th><i class="fas fa-info-circle"></i> Instructions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>
+                        <div class="medicine-name">
+                            <div class="medicine-icon">
+                                <i class="fas fa-capsules fa-xs"></i>
+                            </div>
+                            {{ item.medicine.name }}
+                        </div>
+                    </td>
+                    <td>
+                        {% if item.dosage %}
+                            <span class="dosage-value">
+                                <i class="fas fa-weight-hanging"></i> {{ item.dosage }}
+                            </span>
+                        {% else %}
+                            <span class="text-muted">—</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if item.frequency %}
+                            <span class="frequency-value">
+                                <i class="fas fa-repeat"></i> {{ item.frequency }}
+                            </span>
+                        {% else %}
+                            <span class="text-muted">—</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="duration-value">
+                            <i class="fas fa-sun"></i> {{ item.duration_days }} days
+                        </span>
+                    </td>
+                    <td>
+                        <span class="quantity-value">
+                            <i class="fas fa-cubes"></i> {{ item.quantity }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if item.instructions %}
+                            <span title="{{ item.instructions }}">
+                                <i class="fas fa-comment-dots text-muted"></i>
+                                {{ item.instructions|truncatechars:30 }}
+                            </span>
+                        {% else %}
+                            <span class="text-muted">—</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center py-4">
+                        <i class="fas fa-capsules fa-2x text-muted mb-2 d-block"></i>
+                        No prescription items found.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="page-card">
+    <h5>
+        <i class="fas fa-truck-medical text-info"></i>
+        Dispense Information
+    </h5>
+    {% if dispense_record %}
+        <div class="dispense-record">
+            <p>
+                <span class="dispense-label">
+                    <i class="fas fa-user-graduate"></i> Pharmacist:
+                </span>
+                <span class="dispense-value">
+                    {% if dispense_record.pharmacist %}
+                        <span class="pharmacist-info">
+                            <span class="pharmacist-avatar">
+                                {{ dispense_record.pharmacist.first_name|slice:":1" }}{{ dispense_record.pharmacist.last_name|slice:":1" }}
+                            </span>
+                            {{ dispense_record.pharmacist.first_name }} {{ dispense_record.pharmacist.last_name }}
+                        </span>
+                    {% else %}
+                        <span class="text-muted">N/A</span>
+                    {% endif %}
+                </span>
+            </p>
+            <p>
+                <span class="dispense-label">
+                    <i class="fas fa-calendar-check"></i> Dispensed At:
+                </span>
+                <span class="dispense-value">
+                    <i class="far fa-calendar-alt"></i> {{ dispense_record.dispensed_at|date:"Y-m-d H:i" }}
+                </span>
+            </p>
+            <p>
+                <span class="dispense-label">
+                    <i class="fas fa-sticky-note"></i> Dispensing Note:
+                </span>
+                <span class="dispense-value">
+                    {% if dispense_record.note %}
+                        <i class="fas fa-quote-left text-muted"></i> {{ dispense_record.note }}
+                    {% else %}
+                        <span class="text-muted">—</span>
+                    {% endif %}
+                </span>
+            </p>
+        </div>
+    {% else %}
+        <div class="empty-dispense">
+            <i class="fas fa-prescription-bottle"></i>
+            <div class="mt-2">No dispense record available for this prescription.</div>
+            <small class="text-muted">The prescription will appear here once dispensed by pharmacy.</small>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add tooltip for truncated instructions
+        const instructionsCells = document.querySelectorAll('.table td:last-child span[title]');
+        instructionsCells.forEach(cell => {
+            const fullText = cell.getAttribute('title');
+            if (fullText && fullText.length > 30) {
+                cell.style.cursor = 'help';
+            }
+        });
+        
+        // Optional: Add print button functionality (uncomment if needed)
+        // const printBtn = document.createElement('button');
+        // printBtn.innerHTML = '<i class="fas fa-print"></i> Print';
+        // printBtn.className = 'btn btn-outline-secondary btn-sm ms-2';
+        // printBtn.onclick = () => window.print();
+        // document.querySelector('.topbar div:first-child').appendChild(printBtn);
+        
+        // Highlight status badge based on value
+        const statusBadge = document.querySelector('.status-badge');
+        if (statusBadge && statusBadge.innerText.includes('Active')) {
+            statusBadge.style.animation = 'pulse 2s infinite';
+        }
+        
+        // Add pulse animation for active prescriptions
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes pulse {
+                0%, 100% { opacity: 1; transform: scale(1); }
+                50% { opacity: 0.85; transform: scale(1.02); }
+            }
+        `;
+        document.head.appendChild(style);
+    });
+</script>
+{% endblock %}

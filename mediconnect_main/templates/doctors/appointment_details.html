@@ -2,64 +2,296 @@
 {% block content %}
 {% load static %}
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.10.5/viewer.min.css" crossorigin="anonymous">
+
 <style>
-    body {
-        font-family: Arial, sans-serif;
+    @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap');
+
+    :root {
+        --primary: #2563eb;
+        --primary-dark: #1d4ed8;
+        --secondary: #64748b;
+        --accent: #8b5cf6;
+        --danger: #ef4444;
+        --danger-dark: #dc2626;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --dark: #0f172a;
+        --gray-50: #f8fafc;
+        --gray-100: #f1f5f9;
+        --gray-200: #e2e8f0;
+        --gray-300: #cbd5e1;
+        --gray-500: #64748b;
+        --gray-600: #475569;
+        --gray-700: #334155;
+        --gray-800: #1e293b;
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        --radius-md: 0.75rem;
+        --radius-lg: 1rem;
+        --radius-xl: 1.5rem;
     }
 
-    .invoice-box {
-        max-width: 1000px;
-        margin: auto;
-        padding: 30px;
-        border: 1px solid #eee;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
-        font-size: 16px;
-        line-height: 24px;
-        color: #555;
-        background: #fff;
+    .appointment-page,
+    .appointment-page * {
+        box-sizing: border-box;
     }
 
-    .header {
-        color: #333;
-        font-size: 24px;
-        font-weight: bold;
-        margin-bottom: 20px;
+    .appointment-page {
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        background: linear-gradient(135deg, #eef2ff 0%, #f8fafc 100%);
+        min-height: 100vh;
+        padding: 2rem 1rem;
+    }
+
+    .appointment-box {
+        max-width: 1280px;
+        margin: 0 auto;
+        background: #ffffff;
+        border-radius: var(--radius-xl);
+        box-shadow: var(--shadow-xl);
+        overflow: hidden;
+        animation: fadeInUp 0.4s ease-out;
+    }
+
+    .appointment-box:hover {
+        box-shadow: 0 25px 35px -12px rgba(0, 0, 0, 0.15);
+    }
+
+    .appointment-header {
+        background: linear-gradient(135deg, var(--dark) 0%, #1e293b 100%);
+        padding: 1.75rem 2rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .appointment-topbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .appointment-title {
+        margin: 0;
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #ffffff;
+        letter-spacing: -0.01em;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        line-height: 1.2;
+        background: transparent !important;
+        border: 0 !important;
+        width: auto !important;
+        max-width: 100%;
+        flex: 0 1 auto;
+    }
+
+    .appointment-title::before {
+        content: "👨‍⚕️";
+        font-size: 1.75rem;
+        font-weight: normal;
+    }
+
+    .appointment-content {
+        padding: 2rem;
+    }
+
+    .section-card {
+        background: var(--gray-50);
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        border: 1px solid var(--gray-200);
+        transition: all 0.2s ease;
+    }
+
+    .section-card:hover {
+        border-color: var(--gray-300);
+        box-shadow: var(--shadow-sm);
     }
 
     .section-title {
-        margin-top: 30px;
-        margin-bottom: 10px;
-        font-size: 20px;
-        font-weight: bold;
-        color: #222;
-        border-bottom: 2px solid #eee;
-        padding-bottom: 8px;
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--dark);
+        margin-bottom: 1.25rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid var(--gray-200);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
     }
 
-    .details {
-        width: 100%;
-        border-collapse: collapse;
+    .details-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 1rem;
     }
 
-    .details th {
-        text-align: left;
-        padding: 10px 8px;
-        width: 220px;
-        vertical-align: top;
-        color: #333;
+    .detail-item {
+        display: flex;
+        align-items: flex-start;
+        padding: 0.75rem 0;
+        border-bottom: 1px dashed var(--gray-200);
     }
 
-    .details td {
-        padding: 10px 8px;
-        vertical-align: top;
+    .detail-label {
+        width: 140px;
+        flex-shrink: 0;
+        font-weight: 600;
+        color: var(--gray-600);
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+    }
+
+    .detail-value {
+        color: var(--gray-800);
+        font-weight: 500;
+        font-size: 0.95rem;
+        word-break: break-word;
+    }
+
+    .badge-status {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        background: var(--gray-200);
+        color: var(--gray-700);
+    }
+
+    .badge-status.confirmed  { background: #dcfce7; color: #166534; }
+    .badge-status.pending    { background: #fef3c7; color: #92400e; }
+    .badge-status.completed  { background: #dbeafe; color: #1e40af; }
+    .badge-status.cancelled  { background: #fee2e2; color: #991b1b; }
+
+    .preview-image {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: var(--radius-md);
+        border: 2px solid #ffffff;
+        box-shadow: var(--shadow-sm);
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .preview-image:hover {
+        transform: scale(1.05);
+        box-shadow: var(--shadow-md);
+    }
+
+    .action-box {
+        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+        border: 1px solid #fbbf24;
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        transition: all 0.2s ease;
+    }
+
+    .action-box:hover {
+        box-shadow: var(--shadow-md);
+        transform: translateY(-2px);
+    }
+
+    .action-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--dark);
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 999px;
+        cursor: pointer;
+        font-size: 0.875rem;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s ease;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .btn-primary {
+        background: var(--primary);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: var(--primary-dark);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .btn-success {
+        background: var(--success);
+        color: white;
+    }
+
+    .btn-success:hover {
+        background: #0ea5e9;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .btn-danger {
+        background: var(--danger);
+        color: white;
+    }
+
+    .btn-danger:hover {
+        background: var(--danger-dark);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .form-group {
+        margin-bottom: 1.25rem;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: var(--gray-700);
+        font-size: 0.875rem;
     }
 
     .form-control {
         width: 100%;
-        padding: 10px;
-        border: 1px solid #ccc;
-        border-radius: 6px;
-        font-size: 14px;
+        padding: 0.625rem 0.875rem;
+        border: 1px solid var(--gray-300);
+        border-radius: var(--radius-md);
+        font-size: 0.875rem;
+        transition: all 0.2s ease;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
     }
 
     textarea.form-control {
@@ -67,306 +299,492 @@
         resize: vertical;
     }
 
-    .medicine-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 15px;
-    }
-
-    .medicine-table th,
-    .medicine-table td {
-        border: 1px solid #ddd;
-        padding: 8px;
-        text-align: left;
-        vertical-align: top;
-    }
-
-    .medicine-table th {
-        background: #f5f5f5;
-    }
-
-    .btn {
-        padding: 10px 18px;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        font-size: 14px;
-    }
-
-    .btn-primary {
-        background: #0d6efd;
-        color: white;
-    }
-
-    .btn-success {
-        background: #198754;
-        color: white;
-    }
-
-    .btn-danger {
-        background: #dc3545;
-        color: white;
-    }
-
-    .mt-3 {
-        margin-top: 15px;
-    }
-
-    .preview-image {
-        width: 100px;
-        height: 100px;
-        cursor: pointer;
-        object-fit: cover;
-        border-radius: 6px;
-        border: 1px solid #ddd;
-    }
-
     .remark-card {
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        padding: 18px;
-        margin-bottom: 20px;
-        background: #fafafa;
+        background: #ffffff;
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        transition: all 0.2s ease;
+        box-shadow: var(--shadow-sm);
+        animation: fadeInUp 0.3s ease-out;
+        animation-fill-mode: both;
+    }
+
+    .remark-card:hover {
+        border-color: var(--gray-300);
+        box-shadow: var(--shadow-md);
     }
 
     .remark-meta {
-        margin-bottom: 12px;
-        font-size: 14px;
-        color: #666;
+        margin-bottom: 1rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid var(--gray-200);
+        font-size: 0.875rem;
+        color: var(--gray-600);
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .medicine-table-wrapper {
+        overflow-x: auto;
+        margin-top: 1rem;
+        border-radius: var(--radius-md);
+        border: 1px solid var(--gray-200);
+    }
+
+    .medicine-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.875rem;
+    }
+
+    .medicine-table th {
+        background: var(--gray-100);
+        padding: 0.875rem 1rem;
+        text-align: left;
+        font-weight: 600;
+        color: var(--gray-700);
+        border-bottom: 1px solid var(--gray-200);
+    }
+
+    .medicine-table td {
+        padding: 0.875rem 1rem;
+        border-bottom: 1px solid var(--gray-200);
+        color: var(--gray-600);
+    }
+
+    .medicine-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .medicine-table tr:hover td {
+        background: var(--gray-50);
     }
 
     .empty-text {
-        color: #888;
+        text-align: center;
+        color: var(--gray-500);
+        padding: 2rem;
         font-style: italic;
+    }
+
+    .mt-3 {
+        margin-top: 1rem;
+    }
+
+    .mb-3 {
+        margin-bottom: 1rem;
+    }
+
+    @media (max-width: 768px) {
+        .appointment-page {
+            padding: 1rem;
+        }
+
+        .appointment-header {
+            padding: 1.25rem;
+        }
+
+        .appointment-content {
+            padding: 1.25rem;
+        }
+
+        .appointment-topbar {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .appointment-title {
+            font-size: 1.4rem;
+        }
+
+        .details-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .detail-item {
+            flex-direction: column;
+            padding: 0.5rem 0;
+        }
+
+        .detail-label {
+            width: auto;
+            margin-bottom: 0.25rem;
+        }
+
+        .medicine-table th,
+        .medicine-table td {
+            padding: 0.625rem 0.75rem;
+            font-size: 0.8rem;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+
+        .action-buttons .btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 </style>
 
-<div class="invoice-box">
-    <div class="header">Doctor Appointment Management</div>
+<div class="appointment-page">
+    <div class="appointment-box">
 
-    <div class="section-title">Appointment Information</div>
-    <table class="details">
-        <tr>
-            <th>Appointment ID:</th>
-            <td>{{ appointment.id }}</td>
-        </tr>
-        <tr>
-            <th>Doctor:</th>
-            <td>Dr. {{ appointment.doctor.user.first_name }} {{ appointment.doctor.user.last_name }}</td>
-        </tr>
-        <tr>
-            <th>Patient:</th>
-            <td>{{ appointment.patient.username }}</td>
-        </tr>
-        <tr>
-            <th>Appointment Type:</th>
-            <td>{{ appointment.appointment_type }}</td>
-        </tr>
-        <tr>
-            <th>Status:</th>
-            <td>{{ appointment.appointment_status }}</td>
-        </tr>
-        <tr>
-            <th>Appointment Time:</th>
-            <td>{{ appointment.appointment_date }} at {{ appointment.time_slot.start_time|time:"H:i" }}</td>
-        </tr>
-        <tr>
-            <th>Patient Message:</th>
-            <td>{{ appointment.message|default:"-" }}</td>
-        </tr>
-        {% if appointment.image_upload %}
-        <tr>
-            <th>Uploaded Image:</th>
-            <td>
-                <img src="{{ appointment.image_upload.url }}" id="image-preview" class="preview-image" alt="View Image">
-            </td>
-        </tr>
-        {% endif %}
-    </table>
+        <!-- Header -->
+        <div class="appointment-header">
+            <div class="appointment-topbar">
+                <h1 class="appointment-title">Doctor Appointment Management</h1>
+            </div>
+        </div>
 
-    <div class="section-title">Current Remark</div>
+        <!-- Body -->
+        <div class="appointment-content">
 
-    {% if latest_remark %}
-        <div class="remark-card">
-            <div class="remark-meta">
-                {% if latest_remark.doctor %}
-                    <strong>By Dr. {{ latest_remark.doctor.user.first_name }} {{ latest_remark.doctor.user.last_name }}</strong>
-                {% endif %}
-                {% if latest_remark.created_at %}
-                    | Created: {{ latest_remark.created_at }}
-                {% endif %}
-                {% if latest_remark.updated_at %}
-                    | Updated: {{ latest_remark.updated_at }}
+            <!-- Appointment Information -->
+            <div class="section-card">
+                <div class="section-title">
+                    <span>📌</span> Appointment Information
+                </div>
+
+                <div class="details-grid">
+                    <div class="detail-item">
+                        <div class="detail-label">Appointment ID</div>
+                        <div class="detail-value">#{{ appointment.id }}</div>
+                    </div>
+
+                    <div class="detail-item">
+                        <div class="detail-label">Doctor</div>
+                        <div class="detail-value">
+                            Dr. {{ appointment.doctor.user.first_name }} {{ appointment.doctor.user.last_name }}
+                        </div>
+                    </div>
+
+                    <div class="detail-item">
+                        <div class="detail-label">Patient</div>
+                        <div class="detail-value">{{ appointment.patient.username }}</div>
+                    </div>
+
+                    <div class="detail-item">
+                        <div class="detail-label">Appointment Type</div>
+                        <div class="detail-value">{{ appointment.appointment_type|default:"-" }}</div>
+                    </div>
+
+                    <div class="detail-item">
+                        <div class="detail-label">Status</div>
+                        <div class="detail-value">
+                            <span class="badge-status
+                                {% if appointment.appointment_status == 'confirmed' %}confirmed
+                                {% elif appointment.appointment_status == 'pending' %}pending
+                                {% elif appointment.appointment_status == 'completed' %}completed
+                                {% elif appointment.appointment_status == 'cancelled' %}cancelled
+                                {% endif %}">
+                                {{ appointment.appointment_status|default:"-" }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="detail-item">
+                        <div class="detail-label">Appointment Time</div>
+                        <div class="detail-value">
+                            {{ appointment.appointment_date }} at {{ appointment.time_slot.start_time|time:"H:i" }}
+                        </div>
+                    </div>
+
+                    <div class="detail-item">
+                        <div class="detail-label">Patient Message</div>
+                        <div class="detail-value">{{ appointment.message|default:"-" }}</div>
+                    </div>
+
+                    {% if appointment.image_upload %}
+                    <div class="detail-item">
+                        <div class="detail-label">Uploaded Image</div>
+                        <div class="detail-value">
+                            <img src="{{ appointment.image_upload.url }}"
+                                 id="image-preview"
+                                 class="preview-image"
+                                 alt="View Image">
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Action Box for Doctor -->
+            {% if request.user == appointment.doctor.user and appointment.appointment_status != 'completed' and appointment.appointment_status != 'cancelled' %}
+            <div class="action-box">
+                <div class="action-title">
+                    <span>⚡</span> Quick Actions
+                </div>
+                <div class="action-buttons">
+                    <a href="{% url 'complete_appointment' appointment.id %}" class="btn btn-success" onclick="return confirm('Mark this appointment as completed?')">
+                        ✓ Mark as Completed
+                    </a>
+                    {% if appointment.appointment_status == 'pending' %}
+                        <a href="{% url 'accept_appointment' appointment.id %}" class="btn btn-primary" onclick="return confirm('Accept this appointment?')">
+                            ✓ Accept Appointment
+                        </a>
+                        <a href="{% url 'reject_appointment' appointment.id %}" class="btn btn-danger" onclick="return confirm('Reject this appointment?')">
+                            ✗ Reject Appointment
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Create Follow Up Appointment -->
+            {% if request.user == appointment.doctor.user and appointment.appointment_status == 'completed' %}
+            <div class="section-card">
+                <div class="section-title">
+                    <span>🔄</span> Create Follow Up Appointment
+                </div>
+                
+                <form method="POST" action="{% url 'create_followup_appointment' appointment.id %}">
+                    {% csrf_token %}
+
+                    <div class="form-group">
+                        <label for="appointment_date">Follow-up Date</label>
+                        <input type="date" name="appointment_date" id="appointment_date" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="time_slot_id">Time Slot</label>
+                        <select name="time_slot_id" id="time_slot_id" class="form-control" required>
+                            <option value="">Select Time Slot</option>
+                            {% for slot in doctor_time_slots %}
+                                <option value="{{ slot.id }}">
+                                    {{ slot.day }} | {{ slot.start_time|time:"H:i" }} - {{ slot.end_time|time:"H:i" }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="message">Message (Optional)</label>
+                        <textarea name="message" id="message" class="form-control" rows="3" 
+                                  placeholder="Write follow-up note if needed"></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Create Follow Up</button>
+                </form>
+            </div>
+            {% endif %}
+
+            <!-- Current Remark -->
+            <div class="section-card">
+                <div class="section-title">
+                    <span>📋</span> Current Remark
+                </div>
+
+                {% if latest_remark %}
+                    <div class="remark-card">
+                        <div class="remark-meta">
+                            <div>
+                                <strong>Dr. {{ latest_remark.doctor.user.first_name }} {{ latest_remark.doctor.user.last_name }}</strong>
+                            </div>
+                            <div>
+                                Created: {{ latest_remark.created_at|date:"M d, Y H:i" }}
+                            </div>
+                        </div>
+
+                        <div class="details-grid" style="margin-bottom: 1rem;">
+                            <div class="detail-item">
+                                <div class="detail-label">Diagnosis</div>
+                                <div class="detail-value">{{ latest_remark.diagnosis|default:"-" }}</div>
+                            </div>
+
+                            <div class="detail-item">
+                                <div class="detail-label">Symptoms</div>
+                                <div class="detail-value">{{ latest_remark.symptoms|default:"-" }}</div>
+                            </div>
+
+                            <div class="detail-item">
+                                <div class="detail-label">Doctor Note</div>
+                                <div class="detail-value">{{ latest_remark.note|default:"-" }}</div>
+                            </div>
+
+                            <div class="detail-item">
+                                <div class="detail-label">Advice</div>
+                                <div class="detail-value">{{ latest_remark.advice|default:"-" }}</div>
+                            </div>
+
+                            <div class="detail-item">
+                                <div class="detail-label">Follow Up Date</div>
+                                <div class="detail-value">{{ latest_remark.follow_up_date|default:"-" }}</div>
+                            </div>
+                        </div>
+
+                        <h4 style="margin-top: 1rem; margin-bottom: 0.75rem; font-weight: 600;">💊 Medicines</h4>
+                        <div class="medicine-table-wrapper">
+                            <table class="medicine-table">
+                                <thead>
+                                    <tr>
+                                        <th>Medicine</th>
+                                        <th>Dosage</th>
+                                        <th>Quantity</th>
+                                        <th>Frequency</th>
+                                        <th>Duration</th>
+                                        <th>Instruction</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for rm in remark_medicines %}
+                                    <tr>
+                                        <td>{{ rm.medicine.name }}</td>
+                                        <td>{{ rm.dosage|default:"-" }}</td>
+                                        <td>{{ rm.quantity|default:"-" }}</td>
+                                        <td>{{ rm.frequency|default:"-" }}</td>
+                                        <td>{{ rm.duration|default:"-" }}</td>
+                                        <td>{{ rm.instruction|default:"-" }}</td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="6" class="empty-text">No medicines added yet.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                {% else %}
+                    <p class="empty-text">No remark added for this appointment yet.</p>
                 {% endif %}
             </div>
 
-            <table class="details">
-                <tr>
-                    <th>Diagnosis:</th>
-                    <td>{{ latest_remark.diagnosis|default:"-" }}</td>
-                </tr>
-                <tr>
-                    <th>Symptoms:</th>
-                    <td>{{ latest_remark.symptoms|default:"-" }}</td>
-                </tr>
-                <tr>
-                    <th>Doctor Note:</th>
-                    <td>{{ latest_remark.note|default:"-" }}</td>
-                </tr>
-                <tr>
-                    <th>Advice:</th>
-                    <td>{{ latest_remark.advice|default:"-" }}</td>
-                </tr>
-                <tr>
-                    <th>Follow Up Date:</th>
-                    <td>{{ latest_remark.follow_up_date|default:"-" }}</td>
-                </tr>
-            </table>
+            <!-- Write/Update Remark Form -->
+            <div class="section-card">
+                <div class="section-title">
+                    <span>✏️</span>
+                    {% if latest_remark %}Update Remark{% else %}Write Remark{% endif %}
+                </div>
 
-            <h4 style="margin-top: 15px;">Medicines</h4>
-            <table class="medicine-table">
-                <thead>
-                    <tr>
-                        <th>Medicine</th>
-                        <th>Dosage</th>
-                        <th>Quantity</th>
-                        <th>Frequency</th>
-                        <th>Duration</th>
-                        <th>Instruction</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for rm in remark_medicines %}
-                        <tr>
-                            <td>{{ rm.medicine.name }}</td>
-                            <td>{{ rm.dosage|default:"-" }}</td>
-                            <td>{{ rm.quantity|default:"-" }}</td>
-                            <td>{{ rm.frequency|default:"-" }}</td>
-                            <td>{{ rm.duration|default:"-" }}</td>
-                            <td>{{ rm.instruction|default:"-" }}</td>
-                        </tr>
-                    {% empty %}
-                        <tr>
-                            <td colspan="6" class="empty-text">No medicines added yet.</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                <form method="POST">
+                    {% csrf_token %}
+
+                    <div class="form-group">
+                        <label>Diagnosis</label>
+                        <textarea name="diagnosis" class="form-control" placeholder="Enter diagnosis">{{ latest_remark.diagnosis|default:'' }}</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Symptoms</label>
+                        <textarea name="symptoms" class="form-control" placeholder="Enter symptoms">{{ latest_remark.symptoms|default:'' }}</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Doctor Note</label>
+                        <textarea name="note" class="form-control" placeholder="Enter note">{{ latest_remark.note|default:'' }}</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Advice</label>
+                        <textarea name="advice" class="form-control" placeholder="Enter advice">{{ latest_remark.advice|default:'' }}</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Follow Up Date</label>
+                        <input type="date" name="follow_up_date" class="form-control"
+                               value="{% if latest_remark and latest_remark.follow_up_date %}{{ latest_remark.follow_up_date|date:'Y-m-d' }}{% endif %}">
+                    </div>
+
+                    <div class="section-title" style="margin-top: 1.5rem;">
+                        <span>💊</span> Add Medicines
+                    </div>
+
+                    <div class="medicine-table-wrapper">
+                        <table class="medicine-table" id="medicine-table">
+                            <thead>
+                                <tr>
+                                    <th>Medicine</th>
+                                    <th>Dosage</th>
+                                    <th>Quantity</th>
+                                    <th>Frequency</th>
+                                    <th>Duration</th>
+                                    <th>Instruction</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="medicine-body">
+                                {% if remark_medicines %}
+                                    {% for rm in remark_medicines %}
+                                    <tr>
+                                        <td>
+                                            <select name="medicine_id[]" class="form-control">
+                                                <option value="">Select Medicine</option>
+                                                {% for medicine in medicines %}
+                                                    <option value="{{ medicine.id }}" {% if medicine.id == rm.medicine.id %}selected{% endif %}>
+                                                        {{ medicine }}
+                                                    </option>
+                                                {% endfor %}
+                                            </select>
+                                        </td>
+                                        <td><input type="text" name="dosage[]" class="form-control" value="{{ rm.dosage|default:'' }}" placeholder="e.g. 500mg"></td>
+                                        <td><input type="number" name="quantity[]" class="form-control" value="{{ rm.quantity|default:1 }}" min="1"></td>
+                                        <td><input type="text" name="frequency[]" class="form-control" value="{{ rm.frequency|default:'' }}" placeholder="e.g. 2 times a day"></td>
+                                        <td><input type="text" name="duration[]" class="form-control" value="{{ rm.duration|default:'' }}" placeholder="e.g. 5 days"></td>
+                                        <td><input type="text" name="instruction[]" class="form-control" value="{{ rm.instruction|default:'' }}" placeholder="e.g. After meal"></td>
+                                        <td><button type="button" class="btn btn-danger remove-row">Remove</button></td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td>
+                                            <select name="medicine_id[]" class="form-control">
+                                                <option value="">Select Medicine</option>
+                                                {% for medicine in medicines %}
+                                                    <option value="{{ medicine.id }}">{{ medicine }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </td>
+                                        <td><input type="text" name="dosage[]" class="form-control" placeholder="e.g. 500mg"></td>
+                                        <td><input type="number" name="quantity[]" class="form-control" value="1" min="1"></td>
+                                        <td><input type="text" name="frequency[]" class="form-control" placeholder="e.g. 2 times a day"></td>
+                                        <td><input type="text" name="duration[]" class="form-control" placeholder="e.g. 5 days"></td>
+                                        <td><input type="text" name="instruction[]" class="form-control" placeholder="e.g. After meal"></td>
+                                        <td><button type="button" class="btn btn-danger remove-row">Remove</button></td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div style="display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap;">
+                        <button type="button" class="btn btn-success" id="add-medicine">+ Add More Medicine</button>
+                        <button type="submit" class="btn btn-primary">
+                            {% if latest_remark %}Update Remark{% else %}Save Remark{% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+
         </div>
-    {% else %}
-        <p class="empty-text">No remark added for this appointment yet.</p>
-    {% endif %}
-
-    <form method="POST">
-        {% csrf_token %}
-
-        <div class="section-title">
-            {% if latest_remark %}Update Remark{% else %}Write Remark{% endif %}
-        </div>
-
-        <table class="details">
-            <tr>
-                <th>Diagnosis:</th>
-                <td>
-                    <textarea name="diagnosis" class="form-control" placeholder="Enter diagnosis">{{ latest_remark.diagnosis|default:'' }}</textarea>
-                </td>
-            </tr>
-            <tr>
-                <th>Symptoms:</th>
-                <td>
-                    <textarea name="symptoms" class="form-control" placeholder="Enter symptoms">{{ latest_remark.symptoms|default:'' }}</textarea>
-                </td>
-            </tr>
-            <tr>
-                <th>Doctor Note:</th>
-                <td>
-                    <textarea name="note" class="form-control" placeholder="Enter note">{{ latest_remark.note|default:'' }}</textarea>
-                </td>
-            </tr>
-            <tr>
-                <th>Advice:</th>
-                <td>
-                    <textarea name="advice" class="form-control" placeholder="Enter advice">{{ latest_remark.advice|default:'' }}</textarea>
-                </td>
-            </tr>
-            <tr>
-                <th>Follow Up Date:</th>
-                <td>
-                    <input type="date" name="follow_up_date" class="form-control"
-                           value="{% if latest_remark and latest_remark.follow_up_date %}{{ latest_remark.follow_up_date|date:'Y-m-d' }}{% endif %}">
-                </td>
-            </tr>
-        </table>
-
-        <div class="section-title">Add Medicines</div>
-        <table class="medicine-table" id="medicine-table">
-            <thead>
-                <tr>
-                    <th>Medicine</th>
-                    <th>Dosage</th>
-                    <th>Quantity</th>
-                    <th>Frequency</th>
-                    <th>Duration</th>
-                    <th>Instruction</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody id="medicine-body">
-                {% if remark_medicines %}
-                    {% for rm in remark_medicines %}
-                    <tr>
-                        <td>
-                            <select name="medicine_id[]" class="form-control">
-                                <option value="">Select Medicine</option>
-                                {% for medicine in medicines %}
-                                    <option value="{{ medicine.id }}" {% if medicine.id == rm.medicine.id %}selected{% endif %}>
-                                        {{ medicine }}
-                                    </option>
-                                {% endfor %}
-                            </select>
-                        </td>
-                        <td><input type="text" name="dosage[]" class="form-control" value="{{ rm.dosage|default:'' }}" placeholder="e.g. 500mg"></td>
-                        <td><input type="number" name="quantity[]" class="form-control" value="{{ rm.quantity|default:1 }}" min="1"></td>
-                        <td><input type="text" name="frequency[]" class="form-control" value="{{ rm.frequency|default:'' }}" placeholder="e.g. 2 times a day"></td>
-                        <td><input type="text" name="duration[]" class="form-control" value="{{ rm.duration|default:'' }}" placeholder="e.g. 5 days"></td>
-                        <td><input type="text" name="instruction[]" class="form-control" value="{{ rm.instruction|default:'' }}" placeholder="e.g. After meal"></td>
-                        <td><button type="button" class="btn btn-danger remove-row">Remove</button></td>
-                    </tr>
-                    {% endfor %}
-                {% else %}
-                    <tr>
-                        <td>
-                            <select name="medicine_id[]" class="form-control">
-                                <option value="">Select Medicine</option>
-                                {% for medicine in medicines %}
-                                    <option value="{{ medicine.id }}">{{ medicine }}</option>
-                                {% endfor %}
-                            </select>
-                        </td>
-                        <td><input type="text" name="dosage[]" class="form-control" placeholder="e.g. 500mg"></td>
-                        <td><input type="number" name="quantity[]" class="form-control" value="1" min="1"></td>
-                        <td><input type="text" name="frequency[]" class="form-control" placeholder="e.g. 2 times a day"></td>
-                        <td><input type="text" name="duration[]" class="form-control" placeholder="e.g. 5 days"></td>
-                        <td><input type="text" name="instruction[]" class="form-control" placeholder="e.g. After meal"></td>
-                        <td><button type="button" class="btn btn-danger remove-row">Remove</button></td>
-                    </tr>
-                {% endif %}
-            </tbody>
-        </table>
-
-        <button type="button" class="btn btn-success mt-3" id="add-medicine">+ Add More Medicine</button>
-        <button type="submit" class="btn btn-primary mt-3">
-            {% if latest_remark %}Update Remark{% else %}Save Remark{% endif %}
-        </button>
-    </form>
+    </div>
 </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.10.5/viewer.min.js" crossorigin="anonymous"></script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Image viewer
     var viewer;
     var image = document.getElementById('image-preview');
 
-    if (image) {
+    if (image && typeof Viewer !== 'undefined') {
         image.addEventListener('click', function () {
             if (viewer) {
                 viewer.destroy();
@@ -376,13 +794,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 toolbar: true,
                 title: true,
                 hidden: function () {
-                    viewer.destroy();
-                },
+                    if (viewer) {
+                        viewer.destroy();
+                        viewer = null;
+                    }
+                }
             });
             viewer.show();
         });
     }
 
+    // Add medicine row
     document.getElementById('add-medicine').addEventListener('click', function() {
         let tableBody = document.getElementById('medicine-body');
         let newRow = document.createElement('tr');
@@ -405,16 +827,56 @@ document.addEventListener('DOMContentLoaded', function() {
         `;
 
         tableBody.appendChild(newRow);
+        
+        // Add animation
+        newRow.style.opacity = '0';
+        setTimeout(() => {
+            newRow.style.transition = 'opacity 0.3s';
+            newRow.style.opacity = '1';
+        }, 10);
     });
 
+    // Remove medicine row
     document.addEventListener('click', function(e) {
         if (e.target.classList.contains('remove-row')) {
             let rows = document.querySelectorAll('#medicine-body tr');
             if (rows.length > 1) {
                 e.target.closest('tr').remove();
+            } else {
+                alert('At least one medicine row is required. Leave medicine field empty if no medicine needed.');
             }
         }
     });
+
+    // Set minimum date for follow-up
+    var dateInput = document.getElementById('appointment_date');
+    if (dateInput) {
+        var today = new Date();
+        var tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        dateInput.min = tomorrow.toISOString().split('T')[0];
+    }
+
+    // Form validation for follow-up
+    var followupForm = document.querySelector('.section-card form');
+    if (followupForm && followupForm.action.includes('create_followup_appointment')) {
+        followupForm.addEventListener('submit', function(e) {
+            var dateInput = document.getElementById('appointment_date');
+            var slotSelect = document.getElementById('time_slot_id');
+            
+            if (!dateInput.value) {
+                e.preventDefault();
+                alert('Please select a follow-up date');
+                return false;
+            }
+            
+            if (!slotSelect.value) {
+                e.preventDefault();
+                alert('Please select a time slot');
+                return false;
+            }
+        });
+    }
 });
 </script>
 

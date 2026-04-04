@@ -1,58 +1,351 @@
 {% load static %}
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}MediConnect Dashboard{% endblock %}</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="bg-light">
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="{% url 'dashboard:home' %}">MediConnect Panel</a>
-    <div class="d-flex">
-      {% if request.user.is_authenticated %}
-        <span class="navbar-text text-white me-3">{{ request.user.email }}</span>
-        <a class="btn btn-outline-light btn-sm" href="{% url 'dashboard:logout' %}">Logout</a>
-      {% endif %}
-    </div>
-  </div>
-</nav>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}MediConnect Admin Dashboard{% endblock %}</title>
 
-<div class="container-fluid">
-  <div class="row">
-    <aside class="col-12 col-lg-2 bg-white border-end min-vh-100 p-3">
-      <div class="list-group">
-        <a class="list-group-item list-group-item-action" href="{% url 'dashboard:home' %}">Dashboard</a>
-        <a class="list-group-item list-group-item-action" href="{% url 'dashboard:user_list' %}">Users</a>
-        <a class="list-group-item list-group-item-action" href="{% url 'dashboard:profile_list' %}">User Profiles</a>
-        <a class="list-group-item list-group-item-action" href="{% url 'dashboard:doctor_list' %}">Doctors</a>
-        <a class="list-group-item list-group-item-action" href="{% url 'dashboard:department_list' %}">Departments</a>
-        <a class="list-group-item list-group-item-action" href="{% url 'dashboard:disease_list' %}">Diseases</a>
-        <a class="list-group-item list-group-item-action" href="{% url 'dashboard:timeslot_list' %}">Time Slots</a>
-        <a class="list-group-item list-group-item-action" href="{% url 'dashboard:booking_list' %}">Bookings</a>
-      </div>
-      <div class="mt-4 small text-muted">
-        Custom admin (no Django /admin/)
-      </div>
+    <!-- Bootstrap 5 + Font Awesome -->
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'plugins/fontawesome/css/all.min.css' %}">
+
+    <!-- Google Fonts (Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+
+    <style>
+        /* ============================================
+           MEDICONNECT DASHBOARD BASE - PREMIUM CSS
+           Modern layout, sidebar, topbar, and global styles
+        ============================================ */
+        
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #3b82f6;
+            --primary-soft: #eff6ff;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #06b6d4;
+            --purple: #8b5cf6;
+            --teal: #14b8a6;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            --sidebar-bg: #0f172a;
+            --sidebar-hover: #1e293b;
+            --sidebar-active: #2563eb;
+            --transition-fast: 0.15s ease;
+            --transition-normal: 0.25s ease;
+            --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f1f5f9;
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            color: var(--gray-800);
+            line-height: 1.5;
+        }
+
+        /* Dashboard Wrapper */
+        .dashboard-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ========== SIDEBAR STYLES ========== */
+        .dashboard-sidebar {
+            width: 280px;
+            background: var(--sidebar-bg);
+            color: #e2e8f0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            overflow-y: auto;
+            transition: all var(--transition-normal);
+            z-index: 1000;
+            box-shadow: 2px 0 12px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Custom scrollbar for sidebar */
+        .dashboard-sidebar::-webkit-scrollbar {
+            width: 5px;
+        }
+        .dashboard-sidebar::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        .dashboard-sidebar::-webkit-scrollbar-thumb {
+            background: var(--gray-600);
+            border-radius: 10px;
+        }
+
+        .dashboard-sidebar h3 {
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 1.5rem 0 2rem 0;
+            color: white;
+            letter-spacing: -0.3px;
+            background: linear-gradient(135deg, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .dashboard-sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .dashboard-sidebar ul li {
+            margin: 0.25rem 0.75rem;
+        }
+
+        .dashboard-sidebar ul li a {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: #cbd5e1;
+            text-decoration: none;
+            padding: 0.7rem 1rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-radius: 0.75rem;
+            transition: all var(--transition-fast);
+        }
+
+        .dashboard-sidebar ul li a i {
+            width: 1.25rem;
+            font-size: 1rem;
+            text-align: center;
+        }
+
+        .dashboard-sidebar ul li a:hover {
+            background: var(--sidebar-hover);
+            color: white;
+            transform: translateX(4px);
+        }
+
+        .dashboard-sidebar ul li a.active {
+            background: rgba(37, 99, 235, 0.15);
+            color: var(--primary-light);
+            font-weight: 600;
+            border-right: 2px solid var(--primary);
+        }
+
+        /* ========== MAIN CONTENT ========== */
+        .dashboard-content {
+            margin-left: 280px;
+            width: calc(100% - 280px);
+            padding: 1.5rem;
+            transition: all var(--transition-normal);
+        }
+
+        /* ========== TOPBAR ========== */
+        .topbar {
+            background: white;
+            border-radius: 1.25rem;
+            padding: 0.875rem 1.5rem;
+            margin-bottom: 1.75rem;
+            box-shadow: var(--card-shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(0, 0, 0, 0.03);
+        }
+
+        .topbar h4 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 0;
+            color: var(--gray-800);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .topbar h4 i {
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+
+        .topbar .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: var(--gray-50);
+            padding: 0.4rem 1rem;
+            border-radius: 2rem;
+        }
+
+        .topbar .user-info span {
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: var(--gray-700);
+        }
+
+        .topbar .user-info i {
+            color: var(--primary);
+            font-size: 1rem;
+        }
+
+        /* ========== ALERTS ========== */
+        .alert {
+            border-radius: 1rem;
+            border: none;
+            padding: 0.875rem 1.25rem;
+            font-size: 0.8125rem;
+            font-weight: 500;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .alert-danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        .alert-warning {
+            background: #fed7aa;
+            color: #9a3412;
+        }
+        .alert-info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 991px) {
+            .dashboard-sidebar {
+                width: 260px;
+            }
+            .dashboard-content {
+                margin-left: 260px;
+                width: calc(100% - 260px);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-sidebar {
+                position: relative;
+                width: 100%;
+                height: auto;
+                transform: translateX(0);
+            }
+            .dashboard-content {
+                margin-left: 0;
+                width: 100%;
+                padding: 1rem;
+            }
+            .dashboard-wrapper {
+                flex-direction: column;
+            }
+            .topbar {
+                flex-direction: column;
+                gap: 0.75rem;
+                align-items: flex-start;
+            }
+            .topbar .user-info {
+                align-self: flex-start;
+            }
+        }
+
+        /* Page Card (reused across child templates) */
+        .page-card {
+            background: white;
+            border-radius: 1.25rem;
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+            transition: all var(--transition-normal);
+            border: 1px solid rgba(0, 0, 0, 0.03);
+        }
+        .page-card:hover {
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Utility classes */
+        .text-primary-custom {
+            color: var(--primary);
+        }
+        .bg-primary-soft {
+            background: var(--primary-soft);
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+<div class="dashboard-wrapper">
+    <aside class="dashboard-sidebar">
+        <h3>MediConnect</h3>
+        <ul class="dashboard-menu">
+            <li><a href="{% url 'dashboard:home' %}"><i class="fas fa-home"></i> Dashboard</a></li>
+            <li><a href="{% url 'dashboard:user_list' %}"><i class="fas fa-users"></i> Users</a></li>
+            <li><a href="{% url 'dashboard:doctor_list' %}"><i class="fas fa-user-md"></i> Doctors</a></li>
+            <li><a href="{% url 'dashboard:appointment_list' %}"><i class="fas fa-calendar-check"></i> Appointments</a></li>
+            <li><a href="{% url 'dashboard:remark_list' %}"><i class="fas fa-notes-medical"></i> Remarks</a></li>
+            <li><a href="{% url 'dashboard:prescription_list' %}"><i class="fas fa-prescription-bottle"></i> Prescriptions</a></li>
+            <li><a href="{% url 'dashboard:medicine_list' %}"><i class="fas fa-capsules"></i> Medicines</a></li>
+            <li><a href="{% url 'dashboard:department_list' %}"><i class="fas fa-building"></i> Departments</a></li>
+            <li><a href="{% url 'dashboard:payment_list' %}"><i class="fas fa-money-bill-wave"></i> Payments</a></li>
+            <li><a href="{% url 'dashboard:logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+        </ul>
     </aside>
 
-    <main class="col-12 col-lg-10 p-4">
-      {% if messages %}
-        {% for message in messages %}
-          <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
-        {% endfor %}
-      {% endif %}
+    <main class="dashboard-content">
+        <div class="topbar">
+            <div>
+                <h4>
+                    <i class="fas fa-stethoscope"></i> 
+                    {% block page_title %}Dashboard{% endblock %}
+                </h4>
+            </div>
+            <div class="user-info">
+                <i class="fas fa-user-circle"></i>
+                {% if request.user.is_authenticated %}
+                    <span>{{ request.user.first_name }} {{ request.user.last_name }}</span>
+                {% endif %}
+            </div>
+        </div>
 
-      {% block content %}{% endblock %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{% if message.tags %}{{ message.tags }}{% else %}info{% endif %} alert-dismissible fade show" role="alert">
+                    <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'danger' %}exclamation-triangle{% else %}info-circle{% endif %}"></i>
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% block content %}{% endblock %}
     </main>
-  </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Scripts -->
+<script src="{% static 'js/jquery-3.6.0.min.js' %}"></script>
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+{% block extra_js %}{% endblock %}
 </body>
 </html>

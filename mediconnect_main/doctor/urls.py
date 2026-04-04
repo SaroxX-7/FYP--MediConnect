@@ -25,4 +25,7 @@ urlpatterns = [
     path('appointment/reject/<int:appointment_id>/', views.reject_appointment, name='reject_appointment'),
     path('appointment/<int:appointment_id>/', views.appointment_details, name='appointment_details'),
 
+path('appointment/<int:appointment_id>/complete/', views.complete_appointment, name='complete_appointment'),
+path('appointment/<int:appointment_id>/create-followup/', views.create_followup_appointment, name='create_followup_appointment'),
+path('download-prescription/<int:appointment_id>/', views.download_prescription_pdf, name='download_prescription_pdf'),
 ]

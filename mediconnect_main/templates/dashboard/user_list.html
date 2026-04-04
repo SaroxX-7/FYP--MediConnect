@@ -1,51 +1,497 @@
-{% extends "dashboard/base.html" %}
-{% block content %}
-<div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
-  <h2 class="mb-0">Users</h2>
-  <div class="d-flex gap-2">
-    <form method="get" class="d-flex gap-2">
-      <input class="form-control" style="min-width:220px" name="q" value="{{ q }}" placeholder="Search by name/email">
-      <button class="btn btn-outline-dark" type="submit">Search</button>
-    </form>
-    <a class="btn btn-dark" href="{% url 'dashboard:user_create' %}">Create</a>
-  </div>
+{% extends 'dashboard/list_base.html' %}
+{% load static %}
+
+{% block title %}Users{% endblock %}
+{% block page_title %}Users{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ============================================
+       MEDICONNECT USER MANAGEMENT - PREMIUM CSS
+       Modern, clean, and professional list styling
+    ============================================ */
+    
+    :root {
+        --primary: #2563eb;
+        --primary-dark: #1d4ed8;
+        --primary-light: #3b82f6;
+        --primary-soft: #eff6ff;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --info: #06b6d4;
+        --gray-50: #f9fafb;
+        --gray-100: #f3f4f6;
+        --gray-200: #e5e7eb;
+        --gray-300: #d1d5db;
+        --gray-400: #9ca3af;
+        --gray-500: #6b7280;
+        --gray-600: #4b5563;
+        --gray-700: #374151;
+        --gray-800: #1f2937;
+        --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
+        --transition-fast: 0.15s ease;
+        --transition-normal: 0.25s ease;
+    }
+    
+    /* Add User Button - Premium Styling */
+    .d-flex.justify-content-end {
+        margin-bottom: 1.75rem !important;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        border: none;
+        padding: 0.6rem 1.25rem;
+        font-size: 0.8125rem;
+        font-weight: 600;
+        border-radius: 0.75rem;
+        transition: all var(--transition-normal);
+        box-shadow: 0 2px 6px rgba(37, 99, 235, 0.2);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 14px rgba(37, 99, 235, 0.3);
+        background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
+    }
+    
+    .btn-primary:active {
+        transform: translateY(0);
+    }
+    
+    /* Table Container Enhancement */
+    .table-responsive {
+        border-radius: 1rem;
+        overflow-x: auto;
+        background: white;
+        box-shadow: var(--card-shadow);
+        border: 1px solid rgba(0, 0, 0, 0.03);
+    }
+    
+    /* Modern Table Design */
+    .table {
+        margin-bottom: 0;
+        border-collapse: separate;
+        border-spacing: 0;
+        width: 100%;
+    }
+    
+    .table thead th {
+        background: linear-gradient(135deg, var(--gray-50) 0%, #f8fafc 100%);
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        padding: 1rem 1rem;
+        border-bottom: 1.5px solid var(--gray-200);
+        color: var(--gray-600);
+        font-family: 'Inter', sans-serif;
+    }
+    
+    .table tbody tr {
+        transition: all var(--transition-fast);
+        border-bottom: 1px solid var(--gray-100);
+    }
+    
+    .table tbody tr:hover {
+        background: linear-gradient(90deg, rgba(37, 99, 235, 0.02) 0%, rgba(37, 99, 235, 0.04) 100%);
+        transform: scale(1.001);
+    }
+    
+    .table td {
+        padding: 0.875rem 1rem;
+        vertical-align: middle;
+        font-size: 0.8125rem;
+        color: var(--gray-700);
+        border-bottom: 1px solid var(--gray-100);
+    }
+    
+    /* First column styling (serial number) */
+    .table td:first-child,
+    .table th:first-child {
+        font-weight: 600;
+        color: var(--gray-500);
+        width: 60px;
+    }
+    
+    /* Role Badge Styling */
+    .role-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.25rem 0.75rem;
+        font-size: 0.7rem;
+        font-weight: 600;
+        border-radius: 2rem;
+        background: var(--gray-100);
+        color: var(--gray-700);
+    }
+    
+    .role-badge.admin {
+        background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+        color: white;
+        box-shadow: 0 1px 3px rgba(139, 92, 246, 0.3);
+    }
+    
+    .role-badge.doctor {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        color: white;
+    }
+    
+    .role-badge.patient {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+    }
+    
+    .role-badge.staff {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        color: white;
+    }
+    
+    /* Active Status Badge */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.25rem 0.75rem;
+        font-size: 0.7rem;
+        font-weight: 600;
+        border-radius: 2rem;
+    }
+    
+    .status-badge.active {
+        background: #d1fae5;
+        color: #065f46;
+    }
+    
+    .status-badge.inactive {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+    
+    /* Action Buttons Container */
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+    
+    /* Edit Button */
+    .btn-warning {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        border: none;
+        padding: 0.35rem 0.9rem;
+        font-size: 0.7rem;
+        font-weight: 600;
+        border-radius: 0.5rem;
+        color: white;
+        transition: all var(--transition-fast);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+    }
+    
+    .btn-warning:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3);
+        background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+        color: white;
+    }
+    
+    /* Delete Button */
+    .btn-danger {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        border: none;
+        padding: 0.35rem 0.9rem;
+        font-size: 0.7rem;
+        font-weight: 600;
+        border-radius: 0.5rem;
+        color: white;
+        transition: all var(--transition-fast);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+    }
+    
+    .btn-danger:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
+        background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
+    }
+    
+    /* Empty State Styling */
+    .text-center[colspan] {
+        padding: 3rem !important;
+        color: var(--gray-500);
+        font-style: normal;
+    }
+    
+    .empty-state-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+    
+    /* Table row animation */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .table tbody tr {
+        animation: fadeInUp 0.3s ease backwards;
+    }
+    
+    .table tbody tr:nth-child(1) { animation-delay: 0.02s; }
+    .table tbody tr:nth-child(2) { animation-delay: 0.04s; }
+    .table tbody tr:nth-child(3) { animation-delay: 0.06s; }
+    .table tbody tr:nth-child(4) { animation-delay: 0.08s; }
+    .table tbody tr:nth-child(5) { animation-delay: 0.1s; }
+    .table tbody tr:nth-child(6) { animation-delay: 0.12s; }
+    .table tbody tr:nth-child(7) { animation-delay: 0.14s; }
+    .table tbody tr:nth-child(8) { animation-delay: 0.16s; }
+    .table tbody tr:nth-child(9) { animation-delay: 0.18s; }
+    .table tbody tr:nth-child(10) { animation-delay: 0.2s; }
+    
+    /* Email and username styling */
+    .table td:nth-child(3),
+    .table td:nth-child(4) {
+        font-family: 'Monaco', 'Menlo', monospace;
+        font-size: 0.75rem;
+        color: var(--gray-600);
+    }
+    
+    /* Phone number styling */
+    .table td:nth-child(5) {
+        font-family: monospace;
+        letter-spacing: 0.3px;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 992px) {
+        .table thead th,
+        .table td {
+            padding: 0.75rem;
+            font-size: 0.75rem;
+        }
+        
+        .btn-warning, .btn-danger {
+            padding: 0.3rem 0.7rem;
+            font-size: 0.65rem;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .action-buttons {
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+        
+        .btn-warning, .btn-danger {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .table td:nth-child(8) {
+            min-width: 100px;
+        }
+    }
+    
+    /* Custom scrollbar for table */
+    .table-responsive::-webkit-scrollbar {
+        height: 6px;
+    }
+    
+    .table-responsive::-webkit-scrollbar-track {
+        background: var(--gray-100);
+        border-radius: 10px;
+    }
+    
+    .table-responsive::-webkit-scrollbar-thumb {
+        background: var(--gray-400);
+        border-radius: 10px;
+    }
+    
+    .table-responsive::-webkit-scrollbar-thumb:hover {
+        background: var(--gray-500);
+    }
+    
+    /* Hover effect for action buttons container */
+    .action-buttons {
+        transition: all var(--transition-fast);
+    }
+    
+    /* Additional polish for the Add User button icon */
+    .btn-primary i {
+        font-size: 0.8125rem;
+    }
+    
+    /* Serial number column highlight on hover */
+    .table tbody tr:hover td:first-child {
+        color: var(--primary);
+        font-weight: 700;
+    }
+    
+    /* Name column styling */
+    .table td:nth-child(2) {
+        font-weight: 600;
+        color: var(--gray-800);
+    }
+    
+    /* Table header icon alignment */
+    .table thead th i {
+        margin-right: 0.35rem;
+        font-size: 0.65rem;
+        opacity: 0.7;
+    }
+</style>
+{% endblock %}
+
+{% block list_content %}
+<div class="d-flex justify-content-end mb-3">
+    <a href="{% url 'dashboard:user_create' %}" class="btn btn-primary">
+        <i class="fas fa-plus-circle"></i> Add New User
+    </a>
 </div>
 
-<div class="card">
-  <div class="table-responsive">
-    <table class="table table-striped table-hover align-middle mb-0">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Email</th>
-          <th>Name</th>
-          <th>Role</th>
-          <th>Active</th>
-          <th>Staff</th>
-          <th class="text-end">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for u in page.object_list %}
-          <tr>
-            <td>{{ u.id }}</td>
-            <td>{{ u.email }}</td>
-            <td>{{ u.first_name }} {{ u.last_name }}</td>
-            <td>{{ u.get_role_display }}</td>
-            <td>{{ u.is_active }}</td>
-            <td>{{ u.is_staff }}</td>
-            <td class="text-end">
-              <a class="btn btn-sm btn-outline-dark" href="{% url 'dashboard:user_edit' u.id %}">Edit</a>
-              <a class="btn btn-sm btn-outline-danger" href="{% url 'dashboard:user_delete' u.id %}">Delete</a>
-            </td>
-          </tr>
-        {% empty %}
-          <tr><td colspan="7" class="text-center text-muted p-4">No users.</td></tr>
-        {% endfor %}
-      </tbody>
+<div class="table-responsive">
+    <table class="table align-middle">
+        <thead>
+            <tr>
+                <th><i class="fas fa-hashtag"></i> #</th>
+                <th><i class="fas fa-user"></i> Name</th>
+                <th><i class="fas fa-envelope"></i> Email</th>
+                <th><i class="fas fa-user-tag"></i> Username</th>
+                <th><i class="fas fa-phone"></i> Phone</th>
+                <th><i class="fas fa-id-badge"></i> Role</th>
+                <th><i class="fas fa-toggle-on"></i> Active</th>
+                <th><i class="fas fa-cog"></i> Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in page %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>
+                    <i class="fas fa-user-circle me-2 text-primary"></i>
+                    {{ item.first_name }} {{ item.last_name }}
+                </td>
+                <td>{{ item.email }}</td>
+                <td>@{{ item.username }}</td>
+                <td>
+                    {% if item.phone_number %}
+                        <i class="fas fa-mobile-alt me-1 text-muted"></i> {{ item.phone_number }}
+                    {% else %}
+                        <span class="text-muted">—</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% with role=item.get_role|default:"-" %}
+                        {% if role == "Admin" or role == "admin" %}
+                            <span class="role-badge admin">
+                                <i class="fas fa-crown"></i> Admin
+                            </span>
+                        {% elif role == "Doctor" or role == "doctor" %}
+                            <span class="role-badge doctor">
+                                <i class="fas fa-stethoscope"></i> Doctor
+                            </span>
+                        {% elif role == "Patient" or role == "patient" %}
+                            <span class="role-badge patient">
+                                <i class="fas fa-procedures"></i> Patient
+                            </span>
+                        {% elif role == "Staff" or role == "staff" %}
+                            <span class="role-badge staff">
+                                <i class="fas fa-user-tie"></i> Staff
+                            </span>
+                        {% else %}
+                            <span class="role-badge">{{ role }}</span>
+                        {% endif %}
+                    {% endwith %}
+                </td>
+                <td>
+                    {% if item.is_active %}
+                        <span class="status-badge active">
+                            <i class="fas fa-check-circle"></i> Yes
+                        </span>
+                    {% else %}
+                        <span class="status-badge inactive">
+                            <i class="fas fa-ban"></i> No
+                        </span>
+                    {% endif %}
+                </td>
+                <td>
+                    <div class="action-buttons">
+                        <a href="{% url 'dashboard:user_edit' item.pk %}" class="btn btn-warning">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>
+                        <a href="{% url 'dashboard:user_delete' item.pk %}" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this user?');">
+                            <i class="fas fa-trash-alt"></i> Delete
+                        </a>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8" class="text-center py-5">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-users-slash"></i>
+                    </div>
+                    <div class="text-muted mb-3">No users found in the system.</div>
+                    <a href="{% url 'dashboard:user_create' %}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-plus-circle"></i> Add your first user
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
     </table>
-  </div>
 </div>
+{% endblock %}
 
-{% include "dashboard/pagination.html" with page=page q=q %}
+{% block extra_js %}
+<script>
+    // Optional: Add confirmation dialog for delete actions (already handled with onclick)
+    // Additional smooth interactions
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add hover sound effect? No, just visual polish
+        const deleteBtns = document.querySelectorAll('.btn-danger');
+        deleteBtns.forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                // The confirmation is already in the onclick attribute
+                // This is just a backup for better UX
+                if (!confirm('⚠️ This action cannot be undone. Are you sure you want to delete this user?')) {
+                    e.preventDefault();
+                }
+            });
+        });
+        
+        // Add a subtle animation to table rows when loaded
+        const rows = document.querySelectorAll('.table tbody tr');
+        rows.forEach((row, index) => {
+            row.style.animationDelay = (index * 0.02) + 's';
+        });
+        
+        // Tooltip effect for action buttons (optional)
+        const editButtons = document.querySelectorAll('.btn-warning');
+        const deleteButtons = document.querySelectorAll('.btn-danger');
+        
+        editButtons.forEach(btn => {
+            btn.setAttribute('title', 'Edit user details');
+        });
+        
+        deleteButtons.forEach(btn => {
+            btn.setAttribute('title', 'Delete user permanently');
+        });
+    });
+</script>
 {% endblock %}

@@ -310,7 +310,7 @@ h4.mb-4::before {
     gap: 0.375rem;
 }
 
-/* Chat Launcher (will be hidden by default if no conversation) */
+/* Chat Launcher */
 .chat-launcher {
     position: fixed;
     bottom: 24px;
@@ -337,6 +337,7 @@ h4.mb-4::before {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
 }
 
 .chat-launcher:hover .chat-launcher-image-wrap {
@@ -348,6 +349,24 @@ h4.mb-4::before {
     width: 100%;
     height: 100%;
     object-fit: cover;
+}
+
+.chat-launcher-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 6px;
+    border-radius: 999px;
+    background: #ef4444;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #fff;
 }
 
 /* Chat Widget */
@@ -459,8 +478,24 @@ h4.mb-4::before {
 }
 
 .chat-message-meta {
+    display: block;
     font-size: 10px;
     opacity: 0.7;
+}
+
+.chat-message-status {
+    display: inline-block;
+    font-size: 10px;
+    margin-top: 4px;
+    font-weight: 600;
+}
+
+.chat-bubble.self .chat-message-status {
+    color: rgba(255,255,255,0.85);
+}
+
+.chat-bubble.other .chat-message-status {
+    color: #64748b;
 }
 
 .chat-widget-footer {
@@ -503,11 +538,11 @@ h4.mb-4::before {
         text-align: center;
         gap: 1rem;
     }
-    
+
     .dash-widget-info {
         text-align: center;
     }
-    
+
     .dct-border-rht {
         border-right: none;
         border-bottom: 1px solid var(--gray-200);
@@ -518,33 +553,33 @@ h4.mb-4::before {
     .content {
         padding: 1.5rem 0;
     }
-    
+
     .table-action {
         flex-direction: column;
     }
-    
+
     .table thead {
         display: none;
     }
-    
+
     .table tbody tr {
         display: block;
         margin-bottom: 1rem;
         border: 1px solid var(--gray-200);
         border-radius: var(--radius-lg);
     }
-    
+
     .table tbody td {
         display: flex;
         justify-content: space-between;
         align-items: center;
         border-bottom: 1px solid var(--gray-200);
     }
-    
+
     .table tbody td:last-child {
         border-bottom: none;
     }
-    
+
     .table tbody td::before {
         content: attr(data-label);
         font-weight: 600;
@@ -714,13 +749,14 @@ h4.mb-4::before {
                 </div>
             </div>
         </div>
-    </div>
+     </div>
 </div>
 
 <!-- Chat Launcher -->
 <button id="chat-launcher" class="chat-launcher" type="button" aria-label="Open chat">
     <div class="chat-launcher-image-wrap">
         <img id="chat-launcher-image" src="{% static 'img/favicon.png' %}" alt="Chat User">
+        <span id="chat-launcher-badge" class="chat-launcher-badge"></span>
     </div>
 </button>
 
@@ -757,6 +793,7 @@ h4.mb-4::before {
     const startChatButtons = document.querySelectorAll('.start-chat-btn');
     const chatLauncher = document.getElementById('chat-launcher');
     const chatLauncherImage = document.getElementById('chat-launcher-image');
+    const chatLauncherBadge = document.getElementById('chat-launcher-badge');
     const chatWidget = document.getElementById('chat-widget');
     const chatHeaderImage = document.getElementById('chat-header-image');
     const chatHeaderName = document.getElementById('chat-header-name');
@@ -768,6 +805,16 @@ h4.mb-4::before {
     let currentConversationId = null;
     let chatSocket = null;
     let widgetOpen = false;
+    let unreadCount = 0;
+
+    function updateLauncherBadge() {
+        if (unreadCount > 0) {
+            chatLauncherBadge.style.display = 'flex';
+            chatLauncherBadge.textContent = unreadCount > 99 ? '99+' : unreadCount;
+        } else {
+            chatLauncherBadge.style.display = 'none';
+        }
+    }
 
     function scrollToBottom() {
         chatLog.scrollTop = chatLog.scrollHeight;
@@ -779,6 +826,10 @@ h4.mb-4::before {
 
     function renderEmpty() {
         chatLog.innerHTML = '<div class="chat-empty">No messages yet. Start the conversation.</div>';
+    }
+
+    function formatStatusText(readAt) {
+        return readAt ? `Seen • ${readAt}` : 'Seen';
     }
 
     function renderMessage(message) {
@@ -797,20 +848,47 @@ h4.mb-4::before {
 
         const meta = document.createElement('small');
         meta.className = 'chat-message-meta';
-        meta.textContent = `${message.sender_name} • ${message.created_at}`;
+        meta.textContent = `${message.created_at}`;
 
         bubble.appendChild(textDiv);
         bubble.appendChild(meta);
+
+        if (isSelf) {
+            const status = document.createElement('small');
+            status.className = 'chat-message-status';
+            status.setAttribute('data-status-for-message', message.id);
+            status.textContent = message.is_read ? formatStatusText(message.read_at) : 'Unseen';
+            bubble.appendChild(status);
+        }
+
         wrapper.appendChild(bubble);
         chatLog.appendChild(wrapper);
+    }
+
+    function markMessagesSeenInUi(messageIds, readAt) {
+        messageIds.forEach(function(messageId) {
+            const statusEl = document.querySelector(`[data-status-for-message="${messageId}"]`);
+            if (statusEl) {
+                statusEl.textContent = formatStatusText(readAt);
+            }
+        });
     }
 
     function openWidget() {
         widgetOpen = true;
         chatWidget.style.display = 'flex';
         chatLauncher.style.display = 'block';
+        unreadCount = 0;
+        updateLauncherBadge();
         scrollToBottom();
-        messageInput.focus();
+
+        if (messageInput) {
+            messageInput.focus();
+        }
+
+        if (chatSocket && chatSocket.readyState === WebSocket.OPEN) {
+            chatSocket.send(JSON.stringify({ action: 'mark_seen' }));
+        }
     }
 
     function closeWidget() {
@@ -835,17 +913,25 @@ h4.mb-4::before {
     }
 
     function connectSocket(conversationId) {
-        if (chatSocket) chatSocket.close();
+        if (chatSocket) {
+            chatSocket.close();
+        }
 
         const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
         chatSocket = new WebSocket(protocol + window.location.host + '/ws/chat/' + conversationId + '/');
+
+        chatSocket.onopen = function() {
+            chatSocket.send(JSON.stringify({ action: 'mark_seen' }));
+        };
 
         chatSocket.onmessage = function(e) {
             const data = JSON.parse(e.data);
 
             if (data.event_type === 'message') {
                 const empty = chatLog.querySelector('.chat-empty');
-                if (empty) empty.remove();
+                if (empty) {
+                    empty.remove();
+                }
 
                 renderMessage({
                     id: data.message_id,
@@ -853,9 +939,35 @@ h4.mb-4::before {
                     sender_id: data.sender_id,
                     sender_name: data.sender_email,
                     created_at: data.created_at,
+                    is_read: data.is_read,
+                    read_at: data.read_at,
                 });
+
+                const isFromOtherUser = parseInt(data.sender_id) !== parseInt(currentUserId);
+
+                if (isFromOtherUser) {
+                    if (widgetOpen) {
+                        chatSocket.send(JSON.stringify({ action: 'mark_seen' }));
+                    } else {
+                        unreadCount += 1;
+                        updateLauncherBadge();
+                    }
+                }
+
                 scrollToBottom();
             }
+
+            if (data.event_type === 'seen_update') {
+                markMessagesSeenInUi(data.message_ids, data.read_at);
+            }
+        };
+
+        chatSocket.onclose = function() {
+            console.log('Chat socket disconnected');
+        };
+
+        chatSocket.onerror = function(error) {
+            console.log('WebSocket error:', error);
         };
     }
 
@@ -876,35 +988,67 @@ h4.mb-4::before {
         openWidget();
     }
 
+    function preloadExistingConversation() {
+        const existingButton = document.querySelector('.start-chat-btn[data-has-conversation="1"]');
+        if (!existingButton) return;
+
+        currentConversationId = existingButton.dataset.conversationId;
+        chatHeaderName.textContent = existingButton.dataset.otherName;
+        chatHeaderImage.src = existingButton.dataset.otherImage;
+        chatLauncherImage.src = existingButton.dataset.otherImage;
+        chatLauncher.style.display = 'block';
+
+        loadMessages(currentConversationId);
+        connectSocket(currentConversationId);
+    }
+
     startChatButtons.forEach(function(button) {
         button.addEventListener('click', function() {
             startChat(this.dataset.appointmentId, this.dataset.otherName, this.dataset.otherImage);
         });
     });
 
-    chatLauncher.addEventListener('click', function() {
-        if (widgetOpen) {
+    if (chatLauncher) {
+        chatLauncher.addEventListener('click', function() {
+            if (widgetOpen) {
+                closeWidget();
+            } else if (currentConversationId) {
+                openWidget();
+            }
+        });
+    }
+
+    if (chatMinimizeBtn) {
+        chatMinimizeBtn.addEventListener('click', function() {
             closeWidget();
-        } else if (currentConversationId) {
-            openWidget();
-        }
-    });
+        });
+    }
 
-    chatMinimizeBtn.addEventListener('click', function() {
-        closeWidget();
-    });
+    if (messageInput) {
+        messageInput.addEventListener('keyup', function(e) {
+            if (e.key === 'Enter') {
+                submitButton.click();
+            }
+        });
+    }
 
-    messageInput.addEventListener('keyup', function(e) {
-        if (e.key === 'Enter') submitButton.click();
-    });
+    if (submitButton) {
+        submitButton.addEventListener('click', function() {
+            const message = messageInput.value.trim();
 
-    submitButton.addEventListener('click', function() {
-        const message = messageInput.value.trim();
-        if (!message || !chatSocket || chatSocket.readyState !== WebSocket.OPEN) return;
+            if (!message || !chatSocket || chatSocket.readyState !== WebSocket.OPEN) return;
 
-        chatSocket.send(JSON.stringify({ action: 'message', message: message }));
-        messageInput.value = '';
-        messageInput.focus();
-    });
+            chatSocket.send(JSON.stringify({
+                action: 'message',
+                message: message
+            }));
+
+            messageInput.value = '';
+            messageInput.focus();
+        });
+    }
+
+    preloadExistingConversation();
 </script>
+
 {% endblock %}

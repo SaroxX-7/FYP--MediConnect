@@ -2,12 +2,11 @@ from datetime import date
 from django.utils.text import slugify
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
-from django.db.models.fields.related import ForeignKey, OneToOneField
+from django.db.models.fields.related import OneToOneField
 
 from django.contrib.gis.db import models as gismodels
-from django.contrib.gis.geos import Point
 
-# Create your models here.
+
 class UserManager(BaseUserManager):
     def create_user(self, first_name, last_name, username, email, password=None):
         if not email:
@@ -17,10 +16,10 @@ class UserManager(BaseUserManager):
             raise ValueError('User must have an username')
 
         user = self.model(
-            email = self.normalize_email(email),
-            username = username,
-            first_name = first_name,
-            last_name = last_name,
+            email=self.normalize_email(email),
+            username=username,
+            first_name=first_name,
+            last_name=last_name,
         )
         user.set_password(password)
         user.save(using=self._db)
@@ -28,11 +27,11 @@ class UserManager(BaseUserManager):
 
     def create_superuser(self, first_name, last_name, username, email, password=None):
         user = self.create_user(
-            email = self.normalize_email(email),
-            username = username,
-            password = password,
-            first_name = first_name,
-            last_name = last_name,
+            email=self.normalize_email(email),
+            username=username,
+            password=password,
+            first_name=first_name,
+            last_name=last_name,
         )
         user.is_admin = True
         user.is_active = True
@@ -52,6 +51,7 @@ class User(AbstractBaseUser):
         (CUSTOMER, 'Customer'),
         (PHARMACIST, 'Pharmacist'),
     )
+
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     username = models.CharField(max_length=50, unique=True)
@@ -59,7 +59,6 @@ class User(AbstractBaseUser):
     phone_number = models.CharField(max_length=12, blank=True)
     role = models.PositiveSmallIntegerField(choices=ROLE_CHOICE, blank=True, null=True)
 
-    # required fields
     date_joined = models.DateTimeField(auto_now_add=True)
     last_login = models.DateTimeField(auto_now_add=True)
     created_date = models.DateTimeField(auto_now_add=True)
@@ -84,11 +83,13 @@ class User(AbstractBaseUser):
         return True
 
     def get_role(self):
-        if self.role == 1:
-            user_role = 'Doctor'
-        elif self.role == 2:
-            user_role = 'Customer'
-        return user_role
+        if self.role == self.DOCTOR:
+            return 'Doctor'
+        elif self.role == self.CUSTOMER:
+            return 'Customer'
+        elif self.role == self.PHARMACIST:
+            return 'Pharmacist'
+        return 'Unknown'
 
     def is_doctor(self):
         return self.role == self.DOCTOR
@@ -102,7 +103,12 @@ class User(AbstractBaseUser):
 
 class UserProfile(models.Model):
     user = OneToOneField(User, on_delete=models.CASCADE, blank=True, null=True)
-    profile_picture = models.ImageField(upload_to='users/profile_pictures', blank=True, null=True, default="users/default.png")
+    profile_picture = models.ImageField(
+        upload_to='users/profile_pictures',
+        blank=True,
+        null=True,
+        default="users/default.png"
+    )
     gender = models.CharField(max_length=10, blank=True, null=True)
     date_of_birth = models.DateField(blank=True, null=True)
     phone_number = models.CharField(max_length=12, blank=True, null=True)
@@ -117,18 +123,15 @@ class UserProfile(models.Model):
     modified_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.user.email
-
-    # def save(self, *args, **kwargs):
-    #     if self.latitude and self.longitude:
-    #         self.location = Point(float(self.longitude), float(self.latitude))
-    #         return super(UserProfile, self).save(*args, **kwargs)
-    #     return super(UserProfile, self).save(*args, **kwargs)
+        return self.user.email if self.user else "No User"
 
     def calculate_age(self):
+        if not self.date_of_birth:
+            return None
         today = date.today()
         return today.year - self.date_of_birth.year - (
-                    (today.month, today.day) < (self.date_of_birth.month, self.date_of_birth.day))
+            (today.month, today.day) < (self.date_of_birth.month, self.date_of_birth.day)
+        )
 
 
 class Disease(models.Model):
@@ -140,9 +143,10 @@ class Disease(models.Model):
     def __str__(self):
         return self.name
 
+
 class Department(models.Model):
     name = models.CharField(max_length=100)
-    disease = models.ManyToManyField(Disease, related_name='departments', blank=True, null=True)
+    disease = models.ManyToManyField(Disease, related_name='departments', blank=True)
     description = models.TextField(blank=True, null=True)
     image = models.ImageField(upload_to='departments', blank=True, null=True, default="users/default.png")
     slug = models.SlugField(max_length=100, unique=False, blank=True)

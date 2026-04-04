@@ -615,6 +615,12 @@
                         </div>
                     </div>
                 </div>
+                {% if existing_active_appointment %}
+    <div class="alert alert-warning">
+        You already have an active appointment with Dr. {{ doctor.user.first_name }} {{ doctor.user.last_name }}.
+        Please wait until it is completed or cancelled before booking again.
+    </div>
+{% endif %}
 
                 <!-- Payment Summary Card -->
                 <div class="payment-summary-card">
@@ -739,9 +745,9 @@
                     <div class="form-group">
                         <label for="appointment_type">Appointment Type</label>
                         <select name="appointment_type" id="appointment_type" class="form-control">
-                            <option value="followup">Follow Up</option>
-                            <option value="checkup">Check Up</option>
-                        </select>
+    <option value="checkup" selected>Check Up</option>
+</select>
+<small class="text-muted">Follow-up appointments can only be created by the doctor after your previous appointment is completed.</small>
                     </div>
 
                     <div class="form-group">

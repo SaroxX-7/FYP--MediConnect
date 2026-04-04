@@ -27,8 +27,6 @@ urlpatterns = [
     path('doctor/', include('doctor.urls')),
     path('customer/', include('customers.urls')),
     path('pharmacy/', include('pharmacy.urls')),
-    path('search/location/', CustomerViews.searchByLocation, name='search'),
-    # path('appointment/', include('appointment.urls')),
     path('chat/', include('chat.urls')),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

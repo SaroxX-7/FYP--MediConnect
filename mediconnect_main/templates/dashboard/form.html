@@ -1,36 +1,376 @@
 {% extends "dashboard/base.html" %}
+{% load static %}
+
+{% block title %}{{ title }} | MediConnect{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ============================================
+       MEDICONNECT FORM MANAGEMENT - PREMIUM CSS
+       Modern form styling for create/edit pages
+    ============================================ */
+    
+    :root {
+        --primary: #2563eb;
+        --primary-dark: #1d4ed8;
+        --primary-light: #3b82f6;
+        --primary-soft: #eff6ff;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --info: #06b6d4;
+        --purple: #8b5cf6;
+        --teal: #14b8a6;
+        --gray-50: #f9fafb;
+        --gray-100: #f3f4f6;
+        --gray-200: #e5e7eb;
+        --gray-300: #d1d5db;
+        --gray-400: #9ca3af;
+        --gray-500: #6b7280;
+        --gray-600: #4b5563;
+        --gray-700: #374151;
+        --gray-800: #1f2937;
+        --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
+        --card-shadow-hover: 0 8px 20px rgba(0, 0, 0, 0.08);
+        --transition-fast: 0.15s ease;
+        --transition-normal: 0.25s ease;
+    }
+    
+    /* Header Section */
+    .d-flex.align-items-center.justify-content-between {
+        margin-bottom: 1.5rem;
+    }
+    
+    .d-flex.align-items-center.justify-content-between h2 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--gray-800);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .d-flex.align-items-center.justify-content-between h2 i {
+        color: var(--primary);
+        font-size: 1.4rem;
+    }
+    
+    .text-muted {
+        font-size: 0.8125rem;
+        color: var(--gray-500) !important;
+        margin-top: 0.25rem;
+    }
+    
+    /* Back Button */
+    .btn-outline-secondary {
+        border: 1px solid var(--gray-300);
+        background: white;
+        padding: 0.5rem 1rem;
+        font-size: 0.8125rem;
+        font-weight: 600;
+        border-radius: 0.75rem;
+        transition: all var(--transition-fast);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .btn-outline-secondary:hover {
+        background: var(--gray-100);
+        border-color: var(--gray-400);
+        transform: translateY(-1px);
+    }
+    
+    /* Form Card */
+    .card {
+        border: none;
+        border-radius: 1.25rem;
+        box-shadow: var(--card-shadow);
+        transition: all var(--transition-normal);
+        overflow: hidden;
+        background: white;
+    }
+    
+    .card:hover {
+        box-shadow: var(--card-shadow-hover);
+    }
+    
+    .card-body {
+        padding: 1.75rem;
+    }
+    
+    .card-footer {
+        background: var(--gray-50);
+        border-top: 1px solid var(--gray-200);
+        padding: 1rem 1.75rem;
+    }
+    
+    /* Form Fields */
+    .form-label {
+        font-weight: 600;
+        font-size: 0.8125rem;
+        margin-bottom: 0.5rem;
+        color: var(--gray-700);
+        display: block;
+    }
+    
+    .form-label i {
+        margin-right: 0.35rem;
+        color: var(--primary);
+        font-size: 0.75rem;
+    }
+    
+    /* Input, Select, Textarea */
+    input:not([type="checkbox"]):not([type="radio"]),
+    select,
+    textarea {
+        width: 100%;
+        padding: 0.6rem 1rem;
+        font-size: 0.875rem;
+        border: 1px solid var(--gray-200);
+        border-radius: 0.75rem;
+        transition: all var(--transition-fast);
+        background-color: white;
+        color: var(--gray-800);
+    }
+    
+    input:focus,
+    select:focus,
+    textarea:focus {
+        border-color: var(--primary-light);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    
+    /* Disabled / Readonly */
+    input:disabled,
+    select:disabled,
+    textarea:disabled {
+        background-color: var(--gray-50);
+        cursor: not-allowed;
+    }
+    
+    /* Checkbox & Radio */
+    input[type="checkbox"],
+    input[type="radio"] {
+        width: auto;
+        margin-right: 0.5rem;
+        transform: scale(1.1);
+        accent-color: var(--primary);
+    }
+    
+    /* Help Text */
+    .form-text {
+        font-size: 0.7rem;
+        color: var(--gray-500);
+        margin-top: 0.35rem;
+    }
+    
+    /* Error Styling */
+    .text-danger {
+        color: var(--danger) !important;
+        font-size: 0.7rem;
+        margin-top: 0.35rem;
+    }
+    
+    /* Non-field errors */
+    .card-body > .text-danger {
+        background: #fee2e2;
+        border-left: 3px solid var(--danger);
+        padding: 0.75rem 1rem;
+        border-radius: 0.75rem;
+        margin-bottom: 1rem;
+        font-size: 0.8125rem;
+    }
+    
+    /* Submit Button */
+    .btn-dark {
+        background: linear-gradient(135deg, var(--gray-800) 0%, var(--gray-700) 100%);
+        border: none;
+        padding: 0.6rem 1.5rem;
+        font-size: 0.8125rem;
+        font-weight: 600;
+        border-radius: 0.75rem;
+        transition: all var(--transition-fast);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .btn-dark:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        background: linear-gradient(135deg, var(--gray-700) 0%, var(--gray-800) 100%);
+    }
+    
+    .btn-dark:active {
+        transform: translateY(0);
+    }
+    
+    /* Cancel button (if we add one) */
+    .btn-outline-secondary.cancel {
+        border-color: var(--gray-300);
+    }
+    
+    /* Row/grid support for fields (optional, but kept generic) */
+    .row.g-3 {
+        margin-bottom: 0;
+    }
+    
+    /* Animation for form fields */
+    input, select, textarea {
+        animation: fadeInField 0.3s ease backwards;
+    }
+    
+    @keyframes fadeInField {
+        from {
+            opacity: 0;
+            transform: translateY(5px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .card-body {
+            padding: 1.25rem;
+        }
+        
+        .card-footer {
+            padding: 0.875rem 1.25rem;
+        }
+        
+        .d-flex.align-items-center.justify-content-between {
+            flex-direction: column;
+            align-items: flex-start !important;
+            gap: 0.75rem;
+        }
+        
+        .btn-outline-secondary {
+            align-self: flex-start;
+        }
+        
+        input, select, textarea {
+            font-size: 0.8125rem;
+            padding: 0.5rem 0.875rem;
+        }
+        
+        .btn-dark {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+    
+    /* Password field specific */
+    input[name="password"] {
+        font-family: 'Courier New', monospace;
+    }
+    
+    /* Required field indicator */
+    .form-label:after {
+        content: '';
+    }
+    
+    .form-label.required:after {
+        content: ' *';
+        color: var(--danger);
+        font-weight: 700;
+    }
+    
+    /* Custom file input styling */
+    input[type="file"] {
+        padding: 0.5rem;
+        background-color: var(--gray-50);
+    }
+    
+    input[type="file"]::file-selector-button {
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 0.4rem 1rem;
+        border-radius: 0.5rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        margin-right: 1rem;
+        cursor: pointer;
+        transition: background var(--transition-fast);
+    }
+    
+    input[type="file"]::file-selector-button:hover {
+        background: var(--primary-dark);
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="d-flex align-items-center justify-content-between mb-3">
-  <div>
-    <h2 class="mb-0">{{ title }}</h2>
-    {% if subtitle %}<div class="text-muted">{{ subtitle }}</div>{% endif %}
-  </div>
-  <a class="btn btn-outline-secondary" href="javascript:history.back()">Back</a>
+<div class="container-fluid px-0">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <div>
+            <h2>
+                <i class="fas fa-edit"></i> {{ title }}
+            </h2>
+            {% if subtitle %}
+                <div class="text-muted">
+                    <i class="fas fa-info-circle"></i> {{ subtitle }}
+                </div>
+            {% endif %}
+        </div>
+        <a class="btn btn-outline-secondary" href="javascript:history.back()">
+            <i class="fas fa-arrow-left"></i> Back
+        </a>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" class="card">
+        <div class="card-body">
+            {% csrf_token %}
+            
+            {% if form.non_field_errors %}
+                <div class="text-danger mb-3">
+                    {% for error in form.non_field_errors %}
+                        <div><i class="fas fa-exclamation-triangle"></i> {{ error }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            
+            {% for field in form %}
+                <div class="mb-3">
+                    <label class="form-label {% if field.field.required %}required{% endif %}">
+                        <i class="fas fa-tag"></i> {{ field.label }}
+                    </label>
+                    {{ field }}
+                    {% if field.help_text %}
+                        <div class="form-text">{{ field.help_text }}</div>
+                    {% endif %}
+                    {% if field.errors %}
+                        <div class="text-danger">
+                            {% for error in field.errors %}
+                                <div><i class="fas fa-exclamation-circle"></i> {{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            {% if show_password %}
+                <div class="mb-3">
+                    <label class="form-label">
+                        <i class="fas fa-lock"></i> Password (optional)
+                    </label>
+                    <input class="form-control" type="text" name="password" placeholder="Leave blank to keep unchanged">
+                    <div class="form-text">
+                        <i class="fas fa-info-circle"></i> For new users, if blank it will be set to <code>ChangeMe123!</code>.
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        <div class="card-footer d-flex justify-content-end gap-2">
+            <button class="btn btn-dark" type="submit">
+                <i class="fas fa-save"></i> Save
+            </button>
+        </div>
+    </form>
 </div>
-
-<form method="post" enctype="multipart/form-data" class="card">
-  <div class="card-body">
-    {% csrf_token %}
-    {{ form.non_field_errors }}
-    {% for field in form %}
-      <div class="mb-3">
-        <label class="form-label">{{ field.label }}</label>
-        {{ field }}
-        {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
-        <div class="text-danger small">{{ field.errors }}</div>
-      </div>
-    {% endfor %}
-
-    {% if show_password %}
-      <div class="mb-3">
-        <label class="form-label">Password (optional)</label>
-        <input class="form-control" type="text" name="password" placeholder="Leave blank to keep unchanged">
-        <div class="form-text">For new users, if blank it will be set to <code>ChangeMe123!</code>.</div>
-      </div>
-    {% endif %}
-  </div>
-  <div class="card-footer d-flex justify-content-end gap-2">
-    <button class="btn btn-dark" type="submit">Save</button>
-  </div>
-</form>
 {% endblock %}

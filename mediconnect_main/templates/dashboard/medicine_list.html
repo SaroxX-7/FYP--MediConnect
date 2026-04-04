@@ -1,14 +1,14 @@
 {% extends 'dashboard/list_base.html' %}
 {% load static %}
 
-{% block title %}Departments{% endblock %}
-{% block page_title %}Departments{% endblock %}
+{% block title %}Medicines{% endblock %}
+{% block page_title %}Medicines{% endblock %}
 
 {% block extra_css %}
 <style>
     /* ============================================
-       MEDICONNECT DEPARTMENTS MANAGEMENT - PREMIUM CSS
-       Modern department tracking styling
+       MEDICONNECT MEDICINES MANAGEMENT - PREMIUM CSS
+       Modern medicine inventory tracking styling
     ============================================ */
     
     :root {
@@ -22,7 +22,6 @@
         --info: #06b6d4;
         --purple: #8b5cf6;
         --teal: #14b8a6;
-        --indigo: #6366f1;
         --gray-50: #f9fafb;
         --gray-100: #f3f4f6;
         --gray-200: #e5e7eb;
@@ -52,7 +51,7 @@
         box-shadow: var(--card-shadow-hover);
     }
     
-    /* Add Department Button */
+    /* Add Medicine Button */
     .btn-primary {
         background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
         border: none;
@@ -135,20 +134,20 @@
     .table th:first-child {
         font-weight: 600;
         color: var(--gray-500);
-        width: 60px;
+        width: 50px;
     }
     
-    /* Department Name Styling */
-    .department-name {
+    /* Medicine Name Styling */
+    .medicine-name {
         display: flex;
         align-items: center;
         gap: 0.75rem;
     }
     
-    .department-icon {
-        width: 42px;
-        height: 42px;
-        border-radius: 14px;
+    .medicine-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 12px;
         background: linear-gradient(135deg, var(--primary-soft) 0%, #e0e7ff 100%);
         display: inline-flex;
         align-items: center;
@@ -156,53 +155,128 @@
         flex-shrink: 0;
     }
     
-    .department-icon i {
-        font-size: 1.1rem;
+    .medicine-icon i {
+        font-size: 1rem;
         color: var(--primary);
     }
     
-    .department-info {
+    .medicine-info {
         display: flex;
         flex-direction: column;
     }
     
-    .department-name-text {
+    .medicine-name-text {
         font-weight: 700;
         color: var(--gray-800);
         font-size: 0.875rem;
     }
     
-    .department-code {
+    .medicine-category {
         font-size: 0.65rem;
         color: var(--gray-500);
         margin-top: 0.125rem;
-        font-family: monospace;
     }
     
-    /* Description Styling */
-    .description-text {
+    /* Generic Name */
+    .generic-name {
         font-size: 0.75rem;
         color: var(--gray-600);
-        line-height: 1.5;
-        max-width: 400px;
-        position: relative;
+        max-width: 180px;
+        line-height: 1.4;
     }
     
-    .description-text i {
-        color: var(--gray-400);
-        margin-right: 0.35rem;
+    /* Dosage Form Badge */
+    .dosage-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        background: var(--gray-100);
+        padding: 0.25rem 0.75rem;
+        border-radius: 2rem;
         font-size: 0.7rem;
-    }
-    
-    .description-text.has-more {
-        cursor: pointer;
-    }
-    
-    .description-text .more-indicator {
-        color: var(--primary);
-        font-size: 0.65rem;
-        margin-left: 0.25rem;
         font-weight: 600;
+        color: var(--gray-700);
+    }
+    
+    .dosage-badge i {
+        color: var(--purple);
+        font-size: 0.65rem;
+    }
+    
+    /* Strength Styling */
+    .strength-value {
+        font-family: 'Monaco', 'Menlo', monospace;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--gray-700);
+        background: var(--gray-50);
+        padding: 0.2rem 0.5rem;
+        border-radius: 0.5rem;
+        display: inline-block;
+    }
+    
+    /* Price Styling */
+    .unit-price {
+        font-weight: 700;
+        color: var(--teal);
+        font-size: 0.875rem;
+    }
+    
+    .unit-price::before {
+        content: '৳';
+        margin-right: 0.125rem;
+        font-weight: 600;
+    }
+    
+    /* Stock Quantity Styling */
+    .stock-qty {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 2rem;
+        font-weight: 700;
+        font-size: 0.75rem;
+    }
+    
+    .stock-qty.high {
+        background: #d1fae5;
+        color: #065f46;
+    }
+    
+    .stock-qty.medium {
+        background: #fed7aa;
+        color: #9a3412;
+    }
+    
+    .stock-qty.low {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+    
+    .stock-qty i {
+        font-size: 0.65rem;
+    }
+    
+    /* Active Status Badge */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.25rem 0.85rem;
+        font-size: 0.7rem;
+        font-weight: 600;
+        border-radius: 2rem;
+    }
+    
+    .status-badge.active {
+        background: #d1fae5;
+        color: #065f46;
+    }
+    
+    .status-badge.inactive {
+        background: #fee2e2;
+        color: #991b1b;
     }
     
     /* Action Buttons */
@@ -309,17 +383,13 @@
             font-size: 0.65rem;
         }
         
-        .department-icon {
-            width: 36px;
-            height: 36px;
+        .medicine-icon {
+            width: 30px;
+            height: 30px;
         }
         
-        .department-icon i {
-            font-size: 0.9rem;
-        }
-        
-        .description-text {
-            max-width: 250px;
+        .medicine-icon i {
+            font-size: 0.875rem;
         }
     }
     
@@ -346,19 +416,6 @@
             width: 100%;
             justify-content: center;
         }
-        
-        .department-name {
-            flex-direction: column;
-            align-items: flex-start;
-        }
-        
-        .department-icon {
-            margin-bottom: 0.25rem;
-        }
-        
-        .description-text {
-            max-width: 200px;
-        }
     }
     
     /* Custom scrollbar */
@@ -382,49 +439,14 @@
         font-style: italic;
     }
     
-    /* Tooltip for long descriptions */
-    .description-text[data-full] {
-        position: relative;
+    /* Stock animation for low stock */
+    @keyframes pulseWarning {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.7; }
     }
     
-    .description-text[data-full]:hover::after {
-        content: attr(data-full);
-        position: absolute;
-        bottom: 100%;
-        left: 0;
-        background: var(--gray-800);
-        color: white;
-        font-size: 0.7rem;
-        padding: 0.5rem 0.75rem;
-        border-radius: 0.5rem;
-        white-space: normal;
-        max-width: 300px;
-        z-index: 1000;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        margin-bottom: 0.5rem;
-        pointer-events: none;
-    }
-    
-    /* Department header styling */
-    .page-card .d-flex h5 {
-        font-size: 1.1rem;
-        font-weight: 700;
-        color: var(--gray-800);
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        border-left: 3px solid var(--primary);
-        padding-left: 0.75rem;
-    }
-    
-    /* Stats badge for department (optional) */
-    .dept-stats {
-        font-size: 0.6rem;
-        background: var(--gray-100);
-        padding: 0.15rem 0.4rem;
-        border-radius: 1rem;
-        margin-left: 0.5rem;
-        color: var(--gray-600);
+    .stock-qty.low {
+        animation: pulseWarning 1.5s ease infinite;
     }
 </style>
 {% endblock %}
@@ -433,11 +455,11 @@
 <div class="page-card">
     <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
         <h5 class="mb-0">
-            <i class="fas fa-building text-primary"></i>
-            Hospital Departments
+            <i class="fas fa-capsules text-primary"></i>
+            Medicine Inventory
         </h5>
-        <a href="{% url 'dashboard:department_create' %}" class="btn btn-primary btn-sm">
-            <i class="fas fa-plus-circle"></i> Add Department
+        <a href="{% url 'dashboard:medicine_create' %}" class="btn btn-primary btn-sm">
+            <i class="fas fa-plus-circle"></i> Add Medicine
         </a>
     </div>
 
@@ -446,8 +468,13 @@
             <thead>
                 <tr>
                     <th><i class="fas fa-hashtag"></i> #</th>
-                    <th><i class="fas fa-building"></i> Name</th>
-                    <th><i class="fas fa-align-left"></i> Description</th>
+                    <th><i class="fas fa-capsules"></i> Medicine</th>
+                    <th><i class="fas fa-dna"></i> Generic Name</th>
+                    <th><i class="fas fa-pills"></i> Dosage Form</th>
+                    <th><i class="fas fa-weight-hanging"></i> Strength</th>
+                    <th><i class="fas fa-tag"></i> Unit Price</th>
+                    <th><i class="fas fa-boxes"></i> Stock</th>
+                    <th><i class="fas fa-toggle-on"></i> Active</th>
                     <th><i class="fas fa-cog"></i> Action</th>
                 </tr>
             </thead>
@@ -456,57 +483,96 @@
                 <tr>
                     <td>{{ forloop.counter }}</td>
                     <td>
-                        <div class="department-name">
-                            <div class="department-icon">
-                                <i class="fas fa-hospital-user"></i>
+                        <div class="medicine-name">
+                            <div class="medicine-icon">
+                                <i class="fas fa-tablets"></i>
                             </div>
-                            <div class="department-info">
-                                <span class="department-name-text">{{ item.name }}</span>
-                                {% if item.code %}
-                                <span class="department-code">
-                                    <i class="fas fa-tag"></i> {{ item.code }}
+                            <div class="medicine-info">
+                                <span class="medicine-name-text">{{ item.name }}</span>
+                                {% if item.category %}
+                                <span class="medicine-category">
+                                    <i class="fas fa-tag"></i> {{ item.category }}
                                 </span>
                                 {% endif %}
                             </div>
                         </div>
                     </td>
                     <td>
-                        {% if item.description %}
-                            <div class="description-text" 
-                                 {% if item.description|length > 70 %}data-full="{{ item.description }}"{% endif %}>
-                                <i class="fas fa-file-alt"></i>
-                                {{ item.description|truncatechars:70 }}
-                                {% if item.description|length > 70 %}
-                                    <span class="more-indicator">...</span>
-                                {% endif %}
-                            </div>
+                        {% if item.generic_name %}
+                            <span class="generic-name">{{ item.generic_name }}</span>
                         {% else %}
-                            <span class="dash-symbol">
-                                <i class="fas fa-minus-circle"></i> No description
-                            </span>
+                            <span class="dash-symbol">—</span>
                         {% endif %}
                     </td>
                     <td>
+                        {% if item.dosage_form %}
+                            <span class="dosage-badge">
+                                <i class="fas fa-prescription-bottle-alt"></i>
+                                {{ item.dosage_form }}
+                            </span>
+                        {% else %}
+                            <span class="dash-symbol">—</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if item.strength %}
+                            <span class="strength-value">{{ item.strength }}</span>
+                        {% else %}
+                            <span class="dash-symbol">—</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="unit-price">{{ item.unit_price }}</span>
+                    </td>
+                    <td>
+                        {% with stock=item.stock_qty %}
+                            {% if stock <= 0 %}
+                                <span class="stock-qty low">
+                                    <i class="fas fa-exclamation-triangle"></i> {{ stock }} (Out of Stock)
+                                </span>
+                            {% elif stock <= 10 %}
+                                <span class="stock-qty low">
+                                    <i class="fas fa-exclamation-circle"></i> {{ stock }} (Low Stock)
+                                </span>
+                            {% elif stock <= 50 %}
+                                <span class="stock-qty medium">
+                                    <i class="fas fa-chart-line"></i> {{ stock }}
+                                </span>
+                            {% else %}
+                                <span class="stock-qty high">
+                                    <i class="fas fa-check-circle"></i> {{ stock }}
+                                </span>
+                            {% endif %}
+                        {% endwith %}
+                    </td>
+                    <td>
+                        <span class="status-badge {% if item.is_active %}active{% else %}inactive{% endif %}">
+                            {% if item.is_active %}
+                                <i class="fas fa-check-circle"></i> Active
+                            {% else %}
+                                <i class="fas fa-ban"></i> Inactive
+                            {% endif %}
+                        </span>
+                    </td>
+                    <td>
                         <div class="action-buttons">
-                            <a href="{% url 'dashboard:department_edit' item.pk %}" class="btn btn-warning">
+                            <a href="{% url 'dashboard:medicine_edit' item.pk %}" class="btn btn-warning">
                                 <i class="fas fa-edit"></i> Edit
                             </a>
-                            <a href="{% url 'dashboard:department_delete' item.pk %}"
-   class="btn btn-danger"
-   onclick="return confirm('Are you sure you want to delete department: {{ item.name }}? This action cannot be undone.')">
-    <i class="fas fa-trash-alt"></i> Delete
-</a>
+                            <a href="{% url 'dashboard:medicine_delete' item.pk %}" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete {{ item.name }}? This action cannot be undone.')">
+                                <i class="fas fa-trash-alt"></i> Delete
+                            </a>
                         </div>
                     </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="4" class="text-center">
+                    <td colspan="9" class="text-center">
                         <div class="empty-state-icon">
-                            <i class="fas fa-building"></i>
+                            <i class="fas fa-capsules"></i>
                         </div>
-                        <h6>No departments found</h6>
-                        <p class="text-muted mb-0">Click "Add Department" to start building your hospital departments.</p>
+                        <h6>No medicines found</h6>
+                        <p class="text-muted mb-0">Click "Add Medicine" to start building your inventory.</p>
                     </td>
                 </tr>
                 {% endfor %}
@@ -519,12 +585,12 @@
         <ul class="pagination justify-content-center">
             {% if page.has_previous %}
                 <li class="page-item">
-                    <a class="page-link" href="?page=1{% if q %}&q={{ q }}{% endif %}" aria-label="First">
+                    <a class="page-link" href="?page=1{% if q %}&q={{ q }}{% endif %}{% if status %}&status={{ status }}{% endif %}" aria-label="First">
                         <i class="fas fa-angle-double-left"></i>
                     </a>
                 </li>
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ page.previous_page_number }}{% if q %}&q={{ q }}{% endif %}" aria-label="Previous">
+                    <a class="page-link" href="?page={{ page.previous_page_number }}{% if q %}&q={{ q }}{% endif %}{% if status %}&status={{ status }}{% endif %}" aria-label="Previous">
                         <i class="fas fa-angle-left"></i>
                     </a>
                 </li>
@@ -535,19 +601,19 @@
                     <li class="page-item active"><span class="page-link">{{ num }}</span></li>
                 {% elif num > page.number|add:'-3' and num < page.number|add:'3' %}
                     <li class="page-item">
-                        <a class="page-link" href="?page={{ num }}{% if q %}&q={{ q }}{% endif %}">{{ num }}</a>
+                        <a class="page-link" href="?page={{ num }}{% if q %}&q={{ q }}{% endif %}{% if status %}&status={{ status }}{% endif %}">{{ num }}</a>
                     </li>
                 {% endif %}
             {% endfor %}
 
             {% if page.has_next %}
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ page.next_page_number }}{% if q %}&q={{ q }}{% endif %}" aria-label="Next">
+                    <a class="page-link" href="?page={{ page.next_page_number }}{% if q %}&q={{ q }}{% endif %}{% if status %}&status={{ status }}{% endif %}" aria-label="Next">
                         <i class="fas fa-angle-right"></i>
                     </a>
                 </li>
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ page.paginator.num_pages }}{% if q %}&q={{ q }}{% endif %}" aria-label="Last">
+                    <a class="page-link" href="?page={{ page.paginator.num_pages }}{% if q %}&q={{ q }}{% endif %}{% if status %}&status={{ status }}{% endif %}" aria-label="Last">
                         <i class="fas fa-angle-double-right"></i>
                     </a>
                 </li>
@@ -556,4 +622,4 @@
     </nav>
     {% endif %}
 </div>
-{% endblock%}
+{% endblock %}

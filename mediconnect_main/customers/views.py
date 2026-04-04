@@ -1,10 +1,8 @@
 from datetime import datetime, timedelta
+from decimal import Decimal, ROUND_HALF_UP
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.gis.db.models.functions import Distance
-from django.contrib.gis.geos import GEOSGeometry, Point
-from django.contrib.gis.measure import D
 from django.db import transaction
 from django.db.models import Prefetch, Q
 from django.http import HttpResponse
@@ -26,35 +24,23 @@ from reportlab.platypus import (
 )
 
 from accounts.forms import UserInfoForm, UserProfileForm
-from accounts.models import UserProfile, User, Department, Disease
-from appointment.forms import AppointmentForm
+from accounts.models import UserProfile, Department, Disease
 from appointment.models import TimeSlot, Appointment, Booking, Remark, RemarkMedicine
-from doctor.models import Doctor
-from datetime import datetime, timedelta
-from decimal import Decimal, ROUND_HALF_UP
+from doctor.models import Doctor, Payment
+from pharmacy.models import Medicine
 
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from django.db import transaction
-from django.shortcuts import get_object_or_404, redirect, render
-
-from appointment.models import TimeSlot, Appointment, Booking
-from doctor.models import Doctor, DoctorBilling, Payment
 
 @login_required(login_url='login')
 def cprofile(request):
     profile = get_object_or_404(UserProfile, user=request.user)
+
     if request.method == 'POST':
         profile_form = UserProfileForm(request.POST, request.FILES, instance=profile)
-        image = request.FILES.get('profile_picture')
-        print("image is", image)
-
         user_form = UserInfoForm(request.POST, instance=request.user)
+
         if profile_form.is_valid() and user_form.is_valid():
-            print (profile_form)
             profile_form.save()
             user_form.save()
-            print("doneeeee")
             messages.success(request, 'Profile updated')
             return redirect('cprofile')
         else:
@@ -64,21 +50,19 @@ def cprofile(request):
         profile_form = UserProfileForm(instance=profile)
         user_form = UserInfoForm(instance=request.user)
 
-    # Assuming `profile_form.date_of_birth.value` is a date or datetime object
     formatted_date = profile_form.instance.date_of_birth
     dob = profile.date_of_birth
-    age = None  # Default age is None if no date_of_birth provided
+    age = None
     if dob:
-        age = (datetime.now().date() - dob).days // 365  # Calculate age
+        age = (datetime.now().date() - dob).days // 365
 
     context = {
         'profile_form': profile_form,
-        'user_form' : user_form,
+        'user_form': user_form,
         'profile': profile,
         'formatted_date': formatted_date,
         'age': age,
     }
-    print ("view successfully called")
     return render(request, 'customers/cprofile.html', context)
 
 
@@ -87,210 +71,58 @@ class DoctorsByDepartmentView(ListView):
     template_name = 'customers/doctors_by_department.html'
 
     def get_queryset(self):
-        """
-        Override the get_queryset method to filter doctors by the department slug.
-        """
         department_slug = self.kwargs.get('department_slug')
         diseases_prefetch = Prefetch('department__disease', queryset=Disease.objects.all())
 
         queryset = Doctor.objects.filter(
             department__slug=department_slug
         ).select_related(
-            'user__userprofile'
+            'user__userprofile',
+            'department'
         ).prefetch_related(
             diseases_prefetch
         )
 
-        print("Doctor count:", queryset.count())
-        print("Doctor IDs:", list(queryset.values_list('id', flat=True)))
-
         return queryset
 
     def get_context_data(self, **kwargs):
-        """
-        Add the department to the context.
-        """
         context = super().get_context_data(**kwargs)
         department_slug = self.kwargs.get('department_slug')
         context['department'] = Department.objects.filter(slug=department_slug).first()
-
-        print("Context object_list count:", len(context['object_list']))
-        print("Context object_list IDs:", [obj.id for obj in context['object_list']])
-
         return context
 
-# def search_doctors(request):
-#     query = request.GET.get('query', '')
-#     doctors = Doctor.objects.all()
-#
-#     if query:
-#         # Attempt to find a matching disease or department
-#         disease = Disease.objects.filter(name__iexact=query).first()
-#         department = Department.objects.filter(name__iexact=query).first()
-#
-#         if disease:
-#             doctors = doctors.filter(department__disease=disease)
-#         elif department:
-#             doctors = doctors.filter(department=department)
-#         else:
-#             # If no disease or department matches the query, return no results
-#             doctors = Doctor.objects.none()
-#
-#     # doctors_list = [{"name": doctor.user.get_full_name(), "department": doctor.department.name} for doctor in doctors]
-#
-#     return render(request, 'customers/search_doctors.html', {'query': query, 'object_list': doctors, 'query': query})
-
-# def search_doctors(request):
-#     query = request.GET.get('query', '')
-#     latitude = request.GET.get('lat', '')
-#     longitude = request.GET.get('lng', '')
-#     radius = request.GET.get('radius', '')
-#     doctors = Doctor.objects.all()
-#
-#     # Preparing a default far away point if no valid location is provided
-#     default_location = Point(0, 0, srid=4326)
-#
-#     # Check if location parameters exist
-#     if latitude and longitude:
-#         try:
-#             user_location = Point(float(longitude), float(latitude), srid=4326)
-#         except ValueError:
-#             user_location = default_location  # Invalid data leads to default location
-#     else:
-#         user_location = default_location
-#
-#     # Annotate all doctors with distance regardless of whether we'll use it
-#     doctors = doctors.annotate(
-#         distance=Distance("userprofile__location", user_location)
-#     )
-#
-#     # Search by disease or department
-#     if query:
-#         disease = Disease.objects.filter(name__iexact=query).first()
-#         department = Department.objects.filter(name__iexact=query).first()
-#
-#         if disease:
-#             doctors = doctors.filter(department__disease=disease)
-#         elif department:
-#             doctors = doctors.filter(department=department)
-#         else:
-#             # General search when no disease or department matches
-#             doctors = doctors.filter(Q(user__first_name__icontains=query) | Q(user__last_name__icontains=query))
-#
-#     # Apply distance filtering if a valid radius is given
-#     if radius:
-#         try:
-#             radius_km = float(radius)
-#             doctors = doctors.filter(distance__lte=D(km=radius_km)).order_by("distance")
-#         except ValueError:
-#             # Handle case where radius is not a valid float
-#             pass
-#
-#     doctors_list = [{
-#         "doctor": doctor,
-#         "department": doctor.department.name if doctor.department else "No department",
-#         "distance": f"{doctor.distance.km:.2f} km" if doctor.distance else "N/A"
-#     } for doctor in doctors]
-#
-#     return render(request, 'customers/search_doctors.html', {
-#         'query': query,
-#         'object_list': doctors_list,
-#     })
-#
-
-# def search_doctors(request):
-#     query = request.GET.get('query', '')
-#     latitude = request.GET.get('lat', '')
-#     longitude = request.GET.get('lng', '')
-#     radius = request.GET.get('radius', '')
-#
-#     # First, determine if there are any specific diseases or departments being queried
-#     disease = Disease.objects.filter(name__iexact=query).first()
-#     department = Department.objects.filter(name__iexact=query).first()
-#
-#     # Collect doctor IDs based on disease or department
-#     doctor_ids = []
-#     if disease:
-#         doctor_ids = Doctor.objects.filter(department__disease=disease).values_list('id', flat=True)
-#     elif department:
-#         doctor_ids = Doctor.objects.filter(department=department).values_list('id', flat=True)
-#
-#     # Construct the main query
-#     if doctor_ids:
-#         doctors = Doctor.objects.filter(id__in=doctor_ids)
-#     else:
-#         # General search based on the user's name if no specific disease or department
-#         doctors = Doctor.objects.filter(Q(user__first_name__icontains=query) | Q(user__last_name__icontains=query))
-#
-#     # Location-based filtering
-#     if latitude and longitude and radius:
-#         pnt = GEOSGeometry(f'POINT({longitude} {latitude})', srid=4326)
-#         doctors = doctors.annotate(distance=Distance("user__userprofile__location", pnt)).filter(distance__lte=D(km=float(radius))).order_by("distance")
-#
-#         # Include additional details for rendering in the template if needed
-#     doctors_list = [{
-#         "doctor": doctor,
-#         "department": doctor.department.name if doctor.department else "No department",
-#         "distance": f"{doctor.distance.km:.2f}" if hasattr(doctor, 'distance') else "N/A"
-#     } for doctor in doctors]
-#
-#
-#     context = {
-#         'doctors': doctors,
-#         'query': query,
-#         'object_list': doctors_list,
-#     }
-#
-#     return render(request, 'customers/search_doctors.html', context)
-#
-from django.shortcuts import render
-from django.contrib.gis.geos import GEOSGeometry, Point
-from django.contrib.gis.db.models.functions import Distance
-from django.db.models import Q
 
 def search_doctors(request):
-    query = request.GET.get('query', '')
-    # latitude = request.GET.get('lat', '')
-    # longitude = request.GET.get('lng', '')
-    # radius = request.GET.get('radius', '')
+    query = request.GET.get('query', '').strip()
 
-    # First, determine if there are any specific diseases or departments being queried
-    disease = Disease.objects.filter(name__iexact=query).first()
-    department = Department.objects.filter(name__iexact=query).first()
+    doctors = Doctor.objects.select_related(
+        'user',
+        'department'
+    ).prefetch_related(
+        'department__disease'
+    )
 
-    # Collect doctor IDs based on disease or department
-    doctor_ids = []
-    if disease:
-        doctor_ids = Doctor.objects.filter(department__disease=disease).values_list('id', flat=True)
-    elif department:
-        doctor_ids = Doctor.objects.filter(department=department).values_list('id', flat=True)
+    if query:
+        disease = Disease.objects.filter(name__iexact=query).first()
+        department = Department.objects.filter(name__iexact=query).first()
 
-    # Construct the main query
-    if doctor_ids:
-        doctors = Doctor.objects.filter(id__in=doctor_ids)
-    else:
-        # General search based on the user's name if no specific disease or department
-        doctors = Doctor.objects.filter(Q(user__first_name__icontains=query) | Q(user__last_name__icontains=query))
-
-        # If no doctors are found from the general search, perform a similar search for like results
-        if not doctors.exists():
-            doctors = Doctor.objects.filter(
+        if disease:
+            doctors = doctors.filter(department__disease=disease)
+        elif department:
+            doctors = doctors.filter(department=department)
+        else:
+            doctors = doctors.filter(
                 Q(user__first_name__icontains=query) |
                 Q(user__last_name__icontains=query) |
                 Q(department__name__icontains=query) |
                 Q(department__disease__name__icontains=query)
             ).distinct()
+    else:
+        doctors = Doctor.objects.none()
 
-    # Location-based filtering
-    # if latitude and longitude and radius:
-    #     pnt = GEOSGeometry(f'POINT({longitude} {latitude})', srid=4326)
-    #     doctors = doctors.annotate(distance=Distance("user__userprofile__location", pnt)).filter(distance__lte=D(km=float(radius))).order_by("distance")
-
-    # Include additional details for rendering in the template if needed
     doctors_list = [{
         "doctor": doctor,
         "department": doctor.department.name if doctor.department else "No department",
-        "distance": f"{doctor.distance.km:.2f}" if hasattr(doctor, 'distance') else "N/A"
     } for doctor in doctors]
 
     context = {
@@ -302,41 +134,9 @@ def search_doctors(request):
     return render(request, 'customers/search_doctors.html', context)
 
 
-# @require_http_methods(["POST"])
-# def book_appointment(request):
-#     time_slot_id = request.POST.get('time_slot_id')
-#     doctor_id = request.POST.get('doctor_id')
-#     patient_id = request.user.id  # Assuming the user is logged in
-#     appointment_type = request.POST.get('appointment_type')
-#     appointment_date = request.POST.get('appointment_date')
-#     message = request.POST.get('message', '')
-#
-#
-#     appointment = Appointment(
-#         time_slot_id=time_slot_id,
-#         doctor_id=doctor_id,
-#         appointment_date=appointment_date,
-#         patient_id=patient_id,
-#         appointment_type=appointment_type,
-#         appointment_status='pending',
-#         message=message
-#     )
-#
-#     appointment.save()
-#     time_slot = TimeSlot.objects.get(id=time_slot_id)
-#     time_slot.availability = False
-#     time_slot.save()
-#
-#     #get appointment id of the appointment just created
-#     appointment_id = appointment.id
-#     print("appointment_id",appointment_id)
-#     return redirect('appointment_details', appointment_id=appointment_id)
-#
 @require_http_methods(["POST"])
 @login_required
 def book_appointment(request):
-    from decimal import Decimal, ROUND_HALF_UP
-
     time_slot_id = request.POST.get('time_slot_id')
     doctor_id = request.POST.get('doctor_id')
     patient_id = request.user.id
@@ -351,9 +151,32 @@ def book_appointment(request):
         messages.error(request, "Invalid date format.")
         return HttpResponse("Invalid date format.", status=400)
 
+    if appointment_type != 'checkup':
+        messages.error(request, "You cannot create a follow-up appointment yourself.")
+        return redirect('available_appointment', doctor_id=doctor_id)
+
     with transaction.atomic():
         doctor = get_object_or_404(Doctor.objects.select_related('billing'), id=doctor_id)
-        time_slot = get_object_or_404(TimeSlot, id=time_slot_id, doctor=doctor)
+        time_slot = get_object_or_404(TimeSlot, id=time_slot_id, doctor=doctor, availability=True)
+
+        existing_active_appointment = Appointment.objects.filter(
+            patient=request.user,
+            doctor=doctor,
+            appointment_status__in=['pending', 'confirmed']
+        ).exists()
+
+        if existing_active_appointment:
+            latest_active = Appointment.objects.filter(
+                patient=request.user,
+                doctor=doctor,
+                appointment_status__in=['pending', 'confirmed']
+            ).order_by('-id').first()
+
+            messages.error(
+                request,
+                "You already have a pending or confirmed appointment with this doctor."
+            )
+            return redirect('appointment_details', appointment_id=latest_active.id)
 
         if Booking.objects.filter(time_slot=time_slot, date=appointment_date).exists():
             messages.error(request, "This time slot is already booked.")
@@ -401,7 +224,7 @@ def book_appointment(request):
             doctor=doctor,
             appointment_date=appointment_date,
             patient_id=patient_id,
-            appointment_type=appointment_type,
+            appointment_type='checkup',
             appointment_status='pending',
             message=message,
             image_upload=image_upload
@@ -419,8 +242,9 @@ def book_appointment(request):
             total_amount=total_amount
         )
 
-        time_slot.availability = False
-        time_slot.save()
+        # Do NOT set time_slot.availability = False here.
+        # A TimeSlot is a reusable weekly schedule slot.
+        # Date-wise blocking is handled by Booking(date + time_slot).
 
     messages.success(request, "Your appointment has been successfully booked!")
     return redirect('appointment_details', appointment_id=appointment.id)
@@ -432,32 +256,6 @@ def get_week_dates(start_date=None):
     start_of_week = start_date - timedelta(days=start_date.weekday())
     return [start_of_week + timedelta(days=i) for i in range(7)]
 
-# @login_required
-# def available_appointment(request, doctor_id, start_date=None):
-#     doctor = get_object_or_404(Doctor, id=doctor_id)
-#     if start_date:
-#         start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
-#     else:
-#         start_date = datetime.today().date()
-#
-#     week_dates = get_week_dates(start_date)
-#     # Format the time_slots dictionary with day names as keys
-#     time_slots = {}
-#     for date in week_dates:
-#         day_name = date.strftime("%A").lower()  # Use lowercase to match the template access
-#         slots = TimeSlot.objects.filter(doctor=doctor,
-#                                         day=day_name.capitalize())  # Capitalize to match your DAY_CHOICES in the model
-#         time_slots[day_name] = slots
-#     for date in week_dates:
-#         day_name = date.strftime("%A")
-#     today = datetime.today().strftime('%Y-%m-%d')
-#     context = {
-#         'current_date': today,
-#         'doctor': doctor,
-#         'time_slots': time_slots,
-#         'week_dates': week_dates
-#     }
-#     return render(request, 'customers/booking.html', context)
 
 @login_required
 def available_appointment(request, doctor_id, start_date=None):
@@ -496,20 +294,29 @@ def available_appointment(request, doctor_id, start_date=None):
     if esewa_enabled and esewa_number:
         available_payment_methods.append('esewa')
 
+    existing_active_appointment = Appointment.objects.filter(
+        patient=request.user,
+        doctor=doctor,
+        appointment_status__in=['pending', 'confirmed']
+    ).order_by('-id').first()
+
     week_dates = [start_date + timedelta(days=i) for i in range(7)]
 
     time_slots = {}
     for date in week_dates:
         day_name = date.strftime("%A").lower()
+
         slots = TimeSlot.objects.filter(
             doctor=doctor,
-            day=day_name.capitalize()
-        )
+            day=date.strftime("%A"),
+            availability=True
+        ).order_by('start_time')
 
         time_slots[day_name] = []
 
         for slot in slots:
             slot_time = datetime.combine(date, slot.start_time)
+
             is_booked = Booking.objects.filter(
                 time_slot=slot,
                 date=date
@@ -536,20 +343,27 @@ def available_appointment(request, doctor_id, start_date=None):
         'mediconnect_fee': mediconnect_fee,
         'total_amount': total_amount,
         'available_payment_methods': available_payment_methods,
+        'existing_active_appointment': existing_active_appointment,
     }
 
     return render(request, 'customers/booking.html', context)
 
+
+@login_required
 def appointment_details(request, appointment_id):
     appointment = get_object_or_404(
         Appointment.objects.select_related(
             'doctor',
+            'doctor__user',
             'patient',
             'time_slot'
         ).prefetch_related(
             Prefetch(
                 'remarks',
-                queryset=Remark.objects.select_related('doctor').prefetch_related(
+                queryset=Remark.objects.select_related(
+                    'doctor',
+                    'doctor__user'
+                ).prefetch_related(
                     Prefetch(
                         'medicines',
                         queryset=RemarkMedicine.objects.select_related('medicine')
@@ -557,45 +371,20 @@ def appointment_details(request, appointment_id):
                 ).order_by('-created_at')
             )
         ),
-        pk=appointment_id
+        pk=appointment_id,
+        patient=request.user
     )
 
     latest_remark = appointment.remarks.first()
+    remark_medicines = latest_remark.medicines.all() if latest_remark else []
 
     return render(request, 'customers/appointment_details.html', {
         'appointment': appointment,
         'latest_remark': latest_remark,
+        'remark_medicines': remark_medicines,
     })
 
-def searchByLocation(request):
-    if not 'address' in request.GET:
-        return redirect('marketplace')
-    else:
-        address = request.GET['address']
-        latitude = request.GET['lat']
-        longitude = request.GET['lng']
-        radius = request.GET['radius']
-        keyword = request.GET['keyword']
 
-        if latitude and longitude and radius:
-            pnt = GEOSGeometry('POINT(%s %s)' % (longitude, latitude))
-
-            doctors  = Doctor.objects.filter(Q(vendor_name__icontains=keyword, is_approved=True, user__is_active=True),
-            user_profile__location__distance_lte=(pnt, D(km=radius))
-            ).annotate(distance=Distance("user_profile__location", pnt)).order_by("distance")
-
-            for v in doctors :
-                v.kms = round(v.distance.km, 1)
-        doctor_count = doctors.count()
-        context = {
-            'vendors': doctors,
-            'vendor_count': doctor_count,
-            'source_location': address,
-        }
-
-
-        return render(request, 'marketplace/listings.html', context)
-    
 @login_required
 def download_prescription_pdf(request, appointment_id):
     import re
@@ -674,7 +463,6 @@ def download_prescription_pdf(request, appointment_id):
 
         text = str(value)
 
-        # Replace unsupported / ugly bullet-like chars that show as black boxes
         replacements = {
             "■": "- ",
             "▪": "- ",
@@ -689,13 +477,8 @@ def download_prescription_pdf(request, appointment_id):
         for old, new in replacements.items():
             text = text.replace(old, new)
 
-        # Remove repeated blank lines
         text = re.sub(r"\n{3,}", "\n\n", text)
-
-        # Escape HTML/XML special chars for Paragraph
         text = escape(text)
-
-        # Preserve line breaks in PDF
         text = text.replace("\n", "<br/>")
         return text
 

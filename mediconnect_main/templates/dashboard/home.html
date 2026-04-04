@@ -1,66 +1,593 @@
-{% extends "dashboard/base.html" %}
-{% block title %}Dashboard - MediConnect{% endblock %}
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Dashboard Home{% endblock %}
+{% block page_title %}Admin Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ============================================
+       MEDICONNECT ADMIN DASHBOARD - ENHANCED CSS
+       Modern, clean, responsive, and professional
+    ============================================ */
+    
+    :root {
+        --primary: #2563eb;
+        --primary-dark: #1d4ed8;
+        --primary-light: #3b82f6;
+        --primary-soft: #eff6ff;
+        --secondary: #8b5cf6;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --info: #06b6d4;
+        --gray-50: #f9fafb;
+        --gray-100: #f3f4f6;
+        --gray-200: #e5e7eb;
+        --gray-300: #d1d5db;
+        --gray-400: #9ca3af;
+        --gray-500: #6b7280;
+        --gray-600: #4b5563;
+        --gray-700: #374151;
+        --gray-800: #1f2937;
+        --gray-900: #111827;
+        --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
+        --card-shadow-hover: 0 12px 24px -8px rgba(0, 0, 0, 0.12);
+        --transition-fast: 0.15s ease;
+        --transition-normal: 0.25s ease;
+    }
+    
+    /* Dashboard content container styling */
+    .dashboard-content .container-fluid {
+        padding: 0 !important;
+    }
+    
+    /* Modern Stats Cards - Enhanced Design */
+    .page-card {
+        background: linear-gradient(135deg, #ffffff 0%, #fefefe 100%);
+        border-radius: 1.25rem;
+        padding: 1.5rem 1rem;
+        box-shadow: var(--card-shadow);
+        transition: all var(--transition-normal);
+        border: 1px solid rgba(0, 0, 0, 0.03);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .page-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, var(--primary), var(--secondary), var(--info));
+        opacity: 0;
+        transition: opacity var(--transition-fast);
+    }
+    
+    .page-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--card-shadow-hover);
+        border-color: rgba(37, 99, 235, 0.1);
+    }
+    
+    .page-card:hover::before {
+        opacity: 1;
+    }
+    
+    .page-card h6 {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        font-weight: 700;
+        color: var(--gray-500);
+        margin-bottom: 0.75rem;
+    }
+    
+    .page-card h2 {
+        font-size: 2rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, var(--gray-800) 0%, var(--gray-600) 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        margin-bottom: 0;
+        letter-spacing: -0.02em;
+    }
+    
+    /* Individual card icon backgrounds (optional decorative) */
+    .page-card.text-center {
+        position: relative;
+    }
+    
+    /* Table Styling - Modern & Clean */
+    .page-card .table {
+        margin-bottom: 0;
+    }
+    
+    .table {
+        border-collapse: separate;
+        border-spacing: 0;
+        width: 100%;
+    }
+    
+    .table thead th {
+        background: var(--gray-50);
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 1rem 1rem;
+        border-bottom: 1.5px solid var(--gray-200);
+        color: var(--gray-600);
+    }
+    
+    .table tbody tr {
+        transition: background var(--transition-fast);
+    }
+    
+    .table tbody tr:hover {
+        background: var(--gray-50);
+    }
+    
+    .table td {
+        padding: 0.875rem 1rem;
+        vertical-align: middle;
+        font-size: 0.8125rem;
+        color: var(--gray-700);
+        border-bottom: 1px solid var(--gray-100);
+    }
+    
+    /* Status badge styling (for appointment status etc) */
+    .badge-status {
+        display: inline-block;
+        padding: 0.25rem 0.65rem;
+        font-size: 0.7rem;
+        font-weight: 600;
+        border-radius: 2rem;
+        background: var(--gray-100);
+        color: var(--gray-700);
+    }
+    
+    .badge-status.pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+    
+    .badge-status.confirmed {
+        background: #d1fae5;
+        color: #065f46;
+    }
+    
+    .badge-status.cancelled {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+    
+    .badge-status.completed {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+    
+    /* Section headers inside cards */
+    .page-card h5 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 1.25rem;
+        color: var(--gray-800);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        border-left: 3px solid var(--primary);
+        padding-left: 0.75rem;
+    }
+    
+    /* Empty state styling */
+    .text-center.text-muted {
+        padding: 2rem;
+        font-size: 0.875rem;
+    }
+    
+    /* Responsive grid gap improvements */
+    .row.g-4 {
+        --bs-gutter-y: 1.5rem;
+    }
+    
+    /* Animation for cards loading */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .page-card {
+        animation: fadeInUp 0.4s ease backwards;
+    }
+    
+    .page-card:nth-child(1) { animation-delay: 0.02s; }
+    .page-card:nth-child(2) { animation-delay: 0.04s; }
+    .page-card:nth-child(3) { animation-delay: 0.06s; }
+    .page-card:nth-child(4) { animation-delay: 0.08s; }
+    .page-card:nth-child(5) { animation-delay: 0.1s; }
+    .page-card:nth-child(6) { animation-delay: 0.12s; }
+    .page-card:nth-child(7) { animation-delay: 0.14s; }
+    .page-card:nth-child(8) { animation-delay: 0.16s; }
+    .page-card:nth-child(9) { animation-delay: 0.18s; }
+    .page-card:nth-child(10) { animation-delay: 0.2s; }
+    .page-card:nth-child(11) { animation-delay: 0.22s; }
+    .page-card:nth-child(12) { animation-delay: 0.24s; }
+    
+    /* Table responsive wrapper improvement */
+    .table-responsive {
+        border-radius: 0.75rem;
+        overflow-x: auto;
+    }
+    
+    /* Scrollbar styling for tables */
+    .table-responsive::-webkit-scrollbar {
+        height: 6px;
+    }
+    
+    .table-responsive::-webkit-scrollbar-track {
+        background: var(--gray-100);
+        border-radius: 10px;
+    }
+    
+    .table-responsive::-webkit-scrollbar-thumb {
+        background: var(--gray-400);
+        border-radius: 10px;
+    }
+    
+    /* Hover effect for table rows */
+    .table tbody tr {
+        cursor: default;
+    }
+    
+    /* Colorful accent for different stat cards - optional subtle gradients */
+    .col-md-3:nth-child(1) .page-card h2 { background: linear-gradient(135deg, #2563eb, #3b82f6); -webkit-background-clip: text; background-clip: text; }
+    .col-md-3:nth-child(2) .page-card h2 { background: linear-gradient(135deg, #10b981, #34d399); -webkit-background-clip: text; background-clip: text; }
+    .col-md-3:nth-child(3) .page-card h2 { background: linear-gradient(135deg, #8b5cf6, #a78bfa); -webkit-background-clip: text; background-clip: text; }
+    .col-md-3:nth-child(4) .page-card h2 { background: linear-gradient(135deg, #f59e0b, #fbbf24); -webkit-background-clip: text; background-clip: text; }
+    .col-md-3:nth-child(5) .page-card h2 { background: linear-gradient(135deg, #06b6d4, #22d3ee); -webkit-background-clip: text; background-clip: text; }
+    .col-md-3:nth-child(6) .page-card h2 { background: linear-gradient(135deg, #ef4444, #f87171); -webkit-background-clip: text; background-clip: text; }
+    .col-md-3:nth-child(7) .page-card h2 { background: linear-gradient(135deg, #14b8a6, #2dd4bf); -webkit-background-clip: text; background-clip: text; }
+    .col-md-3:nth-child(8) .page-card h2 { background: linear-gradient(135deg, #6366f1, #818cf8); -webkit-background-clip: text; background-clip: text; }
+    .col-md-3:nth-child(9) .page-card h2 { background: linear-gradient(135deg, #ec4899, #f472b6); -webkit-background-clip: text; background-clip: text; }
+    .col-md-3:nth-child(10) .page-card h2 { background: linear-gradient(135deg, #84cc16, #a3e635); -webkit-background-clip: text; background-clip: text; }
+    .col-md-3:nth-child(11) .page-card h2 { background: linear-gradient(135deg, #f97316, #fb923c); -webkit-background-clip: text; background-clip: text; }
+    .col-md-3:nth-child(12) .page-card h2 { background: linear-gradient(135deg, #6b7280, #9ca3af); -webkit-background-clip: text; background-clip: text; }
+    
+    /* Additional polish for table status text */
+    .table td:contains("Pending"), 
+    .table td:contains("Confirmed"),
+    .table td:contains("Cancelled") {
+        font-weight: 600;
+    }
+    
+    /* Improve empty state message */
+    .text-center[colspan] {
+        color: var(--gray-500);
+        font-style: italic;
+    }
+    
+    /* Responsive adjustments for smaller devices */
+    @media (max-width: 768px) {
+        .page-card {
+            padding: 1rem;
+        }
+        
+        .page-card h2 {
+            font-size: 1.5rem;
+        }
+        
+        .page-card h6 {
+            font-size: 0.65rem;
+        }
+        
+        .table thead th,
+        .table td {
+            padding: 0.625rem 0.75rem;
+            font-size: 0.75rem;
+        }
+        
+        .page-card h5 {
+            font-size: 1rem;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .page-card h2 {
+            font-size: 1.25rem;
+        }
+        
+        .row.g-4 {
+            --bs-gutter-x: 1rem;
+        }
+    }
+    
+    /* Tooltip / hover extra info effect */
+    .page-card {
+        cursor: default;
+    }
+    
+    /* Optional: add subtle background pattern to cards */
+    .page-card {
+        background: linear-gradient(135deg, #ffffff 0%, #fefefe 100%);
+        position: relative;
+    }
+    
+    /* Zebra striping for tables (optional) */
+    .table tbody tr:nth-child(even) {
+        background-color: rgba(0, 0, 0, 0.01);
+    }
+    
+    /* Status column enhancement - if status contains specific text */
+    .table td:contains("Pending") {
+        color: #d97706;
+        font-weight: 600;
+    }
+    
+    .table td:contains("Confirmed") {
+        color: #059669;
+        font-weight: 600;
+    }
+    
+    /* Buttons inside tables (if any edit/view) - keep consistent */
+    .btn-sm {
+        padding: 0.25rem 0.75rem;
+        font-size: 0.7rem;
+        border-radius: 0.5rem;
+        transition: all 0.2s;
+    }
+    
+    /* Custom scrollbar for whole dashboard */
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+        background: var(--gray-100);
+    }
+    
+    ::-webkit-scrollbar-thumb {
+        background: var(--gray-400);
+        border-radius: 10px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+        background: var(--gray-500);
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<h2 class="mb-4">Dashboard</h2>
+<div class="container-fluid px-0">
 
-<div class="row g-3">
-  <div class="col-12 col-md-4">
-    <div class="card">
-      <div class="card-body">
-        <div class="text-muted">Users</div>
-        <div class="display-6">{{ user_count }}</div>
-      </div>
-    </div>
-  </div>
-  <div class="col-12 col-md-4">
-    <div class="card">
-      <div class="card-body">
-        <div class="text-muted">Doctors</div>
-        <div class="display-6">{{ doctor_count }}</div>
-      </div>
-    </div>
-  </div>
-  <div class="col-12 col-md-4">
-    <div class="card">
-      <div class="card-body">
-        <div class="text-muted">Patients</div>
-        <div class="display-6">{{ patient_count }}</div>
-      </div>
-    </div>
-  </div>
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="page-card text-center">
+                <h6><i class="fas fa-users me-1"></i> Total Users</h6>
+                <h2>{{ user_count }}</h2>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="page-card text-center">
+                <h6><i class="fas fa-user-md me-1"></i> Total Doctors</h6>
+                <h2>{{ doctor_count }}</h2>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="page-card text-center">
+                <h6><i class="fas fa-procedures me-1"></i> Total Patients</h6>
+                <h2>{{ patient_count }}</h2>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="page-card text-center">
+                <h6><i class="fas fa-calendar-check me-1"></i> Total Appointments</h6>
+                <h2>{{ appointment_count }}</h2>
+            </div>
+        </div>
 
-  <div class="col-12 col-md-4">
-    <div class="card">
-      <div class="card-body">
-        <div class="text-muted">Departments</div>
-        <div class="display-6">{{ department_count }}</div>
-      </div>
-    </div>
-  </div>
-  <div class="col-12 col-md-4">
-    <div class="card">
-      <div class="card-body">
-        <div class="text-muted">Diseases</div>
-        <div class="display-6">{{ disease_count }}</div>
-      </div>
-    </div>
-  </div>
-  <div class="col-12 col-md-4">
-    <div class="card">
-      <div class="card-body">
-        <div class="text-muted">Time Slots</div>
-        <div class="display-6">{{ timeslot_count }}</div>
-      </div>
-    </div>
-  </div>
+        <div class="col-md-3">
+            <div class="page-card text-center">
+                <h6><i class="fas fa-calendar-day me-1"></i> Today's Appointments</h6>
+                <h2>{{ today_appointment_count }}</h2>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="page-card text-center">
+                <h6><i class="fas fa-hourglass-half me-1"></i> Pending Appointments</h6>
+                <h2>{{ pending_appointment_count }}</h2>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="page-card text-center">
+                <h6><i class="fas fa-check-circle me-1"></i> Confirmed Appointments</h6>
+                <h2>{{ confirmed_appointment_count }}</h2>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="page-card text-center">
+                <h6><i class="fas fa-times-circle me-1"></i> Cancelled Appointments</h6>
+                <h2>{{ cancelled_appointment_count }}</h2>
+            </div>
+        </div>
 
-  <div class="col-12">
-    <div class="card">
-      <div class="card-body">
-        <div class="text-muted">Bookings</div>
-        <div class="display-6">{{ booking_count }}</div>
-      </div>
+        <div class="col-md-3">
+            <div class="page-card text-center">
+                <h6><i class="fas fa-prescription-bottle me-1"></i> Total Prescriptions</h6>
+                <h2>{{ prescription_count }}</h2>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="page-card text-center">
+                <h6><i class="fas fa-capsules me-1"></i> Total Medicines</h6>
+                <h2>{{ medicine_count }}</h2>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="page-card text-center">
+                <h6><i class="fas fa-money-bill-wave me-1"></i> Total Payments</h6>
+                <h2>{{ payment_count }}</h2>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="page-card text-center">
+                <h6><i class="fas fa-building me-1"></i> Total Departments</h6>
+                <h2>{{ department_count }}</h2>
+            </div>
+        </div>
     </div>
-  </div>
+
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <div class="page-card">
+                <h5><i class="fas fa-clock text-primary"></i> Recent Appointments</h5>
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead>
+                            <tr>
+                                <th>Patient</th>
+                                <th>Doctor</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in recent_appointments %}
+                            <tr>
+                                <td>
+                                    {% if item.patient %}
+                                        <i class="fas fa-user-circle me-1 text-muted"></i> {{ item.patient.first_name }} {{ item.patient.last_name }}
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+                                </td>
+                                <td><i class="fas fa-stethoscope me-1 text-primary"></i> {{ item.doctor.user.first_name }} {{ item.doctor.user.last_name }}</td>
+                                <td><i class="far fa-calendar-alt me-1"></i> {{ item.appointment_date }}</td>
+                                <td>
+                                    {% if item.appointment_status == "Pending" %}
+                                        <span class="badge-status pending">Pending</span>
+                                    {% elif item.appointment_status == "Confirmed" %}
+                                        <span class="badge-status confirmed">Confirmed</span>
+                                    {% elif item.appointment_status == "Cancelled" %}
+                                        <span class="badge-status cancelled">Cancelled</span>
+                                    {% else %}
+                                        <span class="badge-status">{{ item.appointment_status }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center text-muted py-4">
+                                    <i class="fas fa-inbox fa-2x mb-2 d-block"></i> No appointments found.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="page-card">
+                <h5><i class="fas fa-file-prescription text-success"></i> Recent Prescriptions</h5>
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead>
+                            <tr>
+                                <th>Patient</th>
+                                <th>Doctor</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in recent_prescriptions %}
+                            <tr>
+                                <td><i class="fas fa-user-injured me-1"></i> {{ item.patient.first_name }} {{ item.patient.last_name }}</td>
+                                <td><i class="fas fa-user-md me-1"></i> {{ item.doctor.user.first_name }} {{ item.doctor.user.last_name }}</td>
+                                <td>
+                                    {% if item.status == "Active" %}
+                                        <span class="badge-status confirmed">Active</span>
+                                    {% elif item.status == "Completed" %}
+                                        <span class="badge-status completed">Completed</span>
+                                    {% else %}
+                                        <span class="badge-status">{{ item.status }}</span>
+                                    {% endif %}
+                                </td>
+                                <td><i class="far fa-clock me-1"></i> {{ item.created_at|date:"Y-m-d H:i" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center text-muted py-4">
+                                    <i class="fas fa-notes-medical fa-2x mb-2 d-block"></i> No prescriptions found.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-12">
+            <div class="page-card">
+                <h5><i class="fas fa-chalkboard-user text-info"></i> Recent Doctors</h5>
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Department</th>
+                                <th>Approved</th>
+                                <th>Created</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for doctor in recent_doctors %}
+                            <tr>
+                                <td><i class="fas fa-user-graduate me-1"></i> {{ doctor.user.first_name }} {{ doctor.user.last_name }}</td>
+                                <td><i class="fas fa-envelope me-1"></i> {{ doctor.user.email }}</td>
+                                <td>
+                                    {% if doctor.department %}
+                                        <i class="fas fa-building me-1"></i> {{ doctor.department.name }}
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if doctor.is_approved %}
+                                        <span class="badge-status confirmed"><i class="fas fa-check-circle"></i> Yes</span>
+                                    {% else %}
+                                        <span class="badge-status pending"><i class="fas fa-clock"></i> No</span>
+                                    {% endif %}
+                                </td>
+                                <td><i class="far fa-calendar-alt me-1"></i> {{ doctor.created_at|date:"Y-m-d H:i" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-4">
+                                    <i class="fas fa-user-slash fa-2x mb-2 d-block"></i> No doctors found.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 {% endblock %}

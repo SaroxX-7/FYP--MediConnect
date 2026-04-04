@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import models
+from django.core.exceptions import ValidationError
 from accounts.models import User
 from doctor.models import Doctor
 
@@ -9,9 +10,11 @@ class Appointment(models.Model):
         ('followup', 'followup'),
         ('checkup', 'checkup'),
     )
+
     APPOINTMENT_STATUS = (
         ('pending', 'pending'),
         ('confirmed', 'confirmed'),
+        ('completed', 'completed'),
         ('cancelled', 'cancelled'),
     )
 
@@ -24,8 +27,80 @@ class Appointment(models.Model):
     message = models.CharField(max_length=255, null=True, blank=True)
     image_upload = models.ImageField(upload_to='appointment/', null=True, blank=True)
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['doctor', 'appointment_date', 'time_slot'],
+                name='unique_doctor_date_timeslot'
+            ),
+            models.UniqueConstraint(
+                fields=['patient', 'appointment_date', 'time_slot'],
+                name='unique_patient_date_timeslot'
+            ),
+        ]
+
+    def clean(self):
+        # Skip duplicate check when updating to confirmed status
+        is_status_update = self.pk and Appointment.objects.filter(pk=self.pk).exists()
+        
+        if self.doctor and self.appointment_date and self.time_slot:
+            doctor_conflict = Appointment.objects.filter(
+                doctor=self.doctor,
+                appointment_date=self.appointment_date,
+                time_slot=self.time_slot
+            ).exclude(pk=self.pk)
+
+            if doctor_conflict.exists():
+                raise ValidationError("This doctor already has an appointment in this time slot.")
+
+        if self.patient and self.appointment_date and self.time_slot:
+            patient_conflict = Appointment.objects.filter(
+                patient=self.patient,
+                appointment_date=self.appointment_date,
+                time_slot=self.time_slot
+            ).exclude(pk=self.pk)
+
+            if patient_conflict.exists():
+                raise ValidationError("This patient already has an appointment in this time slot.")
+
+        # Only check for duplicate active appointments when creating NEW appointment
+        # Skip this check when updating existing appointment status
+        if (self.patient and self.doctor and 
+            self.appointment_status in ['pending', 'confirmed'] and 
+            not is_status_update):  # Only for new appointments, not status updates
+            active_same_doctor = Appointment.objects.filter(
+                patient=self.patient,
+                doctor=self.doctor,
+                appointment_status__in=['pending', 'confirmed']
+            ).exclude(pk=self.pk)
+
+            if active_same_doctor.exists():
+                raise ValidationError("You already have an active appointment with this doctor.")
+
+        # Only block follow-up creation if there is no completed previous appointment.
+        # Skip this check when updating an existing follow-up record.
+        if (
+            self.appointment_type == 'followup'
+            and self.patient
+            and self.doctor
+            and not self.pk
+        ):
+            previous_completed = Appointment.objects.filter(
+                patient=self.patient,
+                doctor=self.doctor,
+                appointment_status='completed'
+            ).exists()
+
+            if not previous_completed:
+                raise ValidationError("Follow-up appointment can only be created after a completed appointment.")
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
+
     def __str__(self):
-        return f"{self.patient.username} - {self.doctor} - {self.appointment_date}"
+        patient_name = self.patient.username if self.patient else "No Patient"
+        return f"{patient_name} - {self.doctor} - {self.appointment_date}"
 
 
 class TimeSlot(models.Model):
@@ -55,6 +130,18 @@ class Booking(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['time_slot', 'date'],
+                name='unique_timeslot_date_booking'
+            ),
+            models.UniqueConstraint(
+                fields=['user', 'date', 'time_slot'],
+                name='unique_user_date_timeslot_booking'
+            ),
+        ]
 
     def __str__(self):
         return f"{self.time_slot} on {self.date} by {self.user}"
@@ -93,11 +180,10 @@ class RemarkMedicine(models.Model):
         on_delete=models.CASCADE,
         related_name='remark_medicines'
     )
-
-    dosage = models.CharField(max_length=100, blank=True, null=True)  
-    quantity = models.PositiveIntegerField(default=1)                 
-    frequency = models.CharField(max_length=100, blank=True, null=True) 
-    duration = models.CharField(max_length=100, blank=True, null=True) 
+    dosage = models.CharField(max_length=100, blank=True, null=True)
+    quantity = models.PositiveIntegerField(default=1)
+    frequency = models.CharField(max_length=100, blank=True, null=True)
+    duration = models.CharField(max_length=100, blank=True, null=True)
     instruction = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):

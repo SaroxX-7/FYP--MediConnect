@@ -1,0 +1,786 @@
+{% extends 'dashboard/list_base.html' %}
+{% load static %}
+
+{% block title %}Payments{% endblock %}
+{% block page_title %}Payments{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ============================================
+       MEDICONNECT PAYMENTS MANAGEMENT - PREMIUM CSS
+       Modern financial transaction styling
+    ============================================ */
+    
+    :root {
+        --primary: #2563eb;
+        --primary-dark: #1d4ed8;
+        --primary-light: #3b82f6;
+        --primary-soft: #eff6ff;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --info: #06b6d4;
+        --purple: #8b5cf6;
+        --gray-50: #f9fafb;
+        --gray-100: #f3f4f6;
+        --gray-200: #e5e7eb;
+        --gray-300: #d1d5db;
+        --gray-400: #9ca3af;
+        --gray-500: #6b7280;
+        --gray-600: #4b5563;
+        --gray-700: #374151;
+        --gray-800: #1f2937;
+        --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
+        --card-shadow-hover: 0 8px 20px rgba(0, 0, 0, 0.08);
+        --transition-fast: 0.15s ease;
+        --transition-normal: 0.25s ease;
+    }
+    
+    /* Page Card Styling */
+    .page-card {
+        background: white;
+        border-radius: 1.25rem;
+        padding: 1.5rem;
+        box-shadow: var(--card-shadow);
+        transition: all var(--transition-normal);
+        border: 1px solid rgba(0, 0, 0, 0.03);
+    }
+    
+    .page-card:hover {
+        box-shadow: var(--card-shadow-hover);
+    }
+    
+    .page-card h5 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 1.25rem;
+        color: var(--gray-800);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        border-left: 3px solid var(--primary);
+        padding-left: 0.75rem;
+    }
+    
+    /* Filter Form Styling */
+    form.mb-3 .row {
+        background: var(--gray-50);
+        padding: 1rem;
+        border-radius: 1rem;
+        margin: 0;
+    }
+    
+    .form-control, select.form-control {
+        border-radius: 0.75rem;
+        border: 1px solid var(--gray-200);
+        padding: 0.6rem 1rem;
+        font-size: 0.8125rem;
+        transition: all var(--transition-fast);
+        background: white;
+    }
+    
+    .form-control:focus, select.form-control:focus {
+        border-color: var(--primary-light);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        outline: none;
+    }
+    
+    .btn-dark {
+        background: linear-gradient(135deg, var(--gray-800) 0%, var(--gray-700) 100%);
+        border: none;
+        padding: 0.6rem 1rem;
+        font-size: 0.8125rem;
+        font-weight: 600;
+        border-radius: 0.75rem;
+        transition: all var(--transition-fast);
+    }
+    
+    .btn-dark:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        background: linear-gradient(135deg, var(--gray-700) 0%, var(--gray-800) 100%);
+    }
+    
+    /* Table Container Enhancement */
+    .table-responsive {
+        border-radius: 1rem;
+        overflow-x: auto;
+        background: white;
+        margin-top: 1rem;
+    }
+    
+    /* Modern Table Design */
+    .table {
+        margin-bottom: 0;
+        border-collapse: separate;
+        border-spacing: 0;
+        width: 100%;
+    }
+    
+    .table thead th {
+        background: linear-gradient(135deg, var(--gray-50) 0%, #f8fafc 100%);
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        padding: 1rem 0.875rem;
+        border-bottom: 1.5px solid var(--gray-200);
+        color: var(--gray-600);
+        font-family: 'Inter', sans-serif;
+    }
+    
+    .table thead th i {
+        margin-right: 0.35rem;
+        font-size: 0.65rem;
+        opacity: 0.7;
+    }
+    
+    .table tbody tr {
+        transition: all var(--transition-fast);
+    }
+    
+    .table tbody tr:hover {
+        background: linear-gradient(90deg, rgba(37, 99, 235, 0.02) 0%, rgba(37, 99, 235, 0.04) 100%);
+    }
+    
+    .table td {
+        padding: 1rem 0.875rem;
+        vertical-align: middle;
+        font-size: 0.8125rem;
+        color: var(--gray-700);
+        border-bottom: 1px solid var(--gray-100);
+    }
+    
+    /* Serial number column */
+    .table td:first-child,
+    .table th:first-child {
+        font-weight: 600;
+        color: var(--gray-500);
+        width: 50px;
+    }
+    
+    /* Appointment ID Badge */
+    .appointment-id {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        background: var(--gray-100);
+        padding: 0.25rem 0.75rem;
+        border-radius: 2rem;
+        font-weight: 600;
+        font-size: 0.75rem;
+        color: var(--gray-700);
+        font-family: monospace;
+    }
+    
+    .appointment-id i {
+        color: var(--primary);
+        font-size: 0.7rem;
+    }
+    
+    /* Patient & Doctor Names */
+    .patient-name, .doctor-name {
+        font-weight: 600;
+        color: var(--gray-800);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .patient-avatar, .doctor-avatar {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.65rem;
+        font-weight: 700;
+        color: white;
+        flex-shrink: 0;
+    }
+    
+    .patient-avatar {
+        background: linear-gradient(135deg, var(--teal, #14b8a6) 0%, #0d9488 100%);
+    }
+    
+    .doctor-avatar {
+        background: linear-gradient(135deg, var(--purple) 0%, #7c3aed 100%);
+    }
+    
+    /* Payment Method Badge */
+    .payment-method {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 2rem;
+        font-size: 0.7rem;
+        font-weight: 600;
+    }
+    
+    .payment-method.cash {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+    
+    .payment-method.card {
+        background: #fef3c7;
+        color: #92400e;
+    }
+    
+    .payment-method.online {
+        background: #d1fae5;
+        color: #065f46;
+    }
+    
+    .payment-method.insurance {
+        background: #e0e7ff;
+        color: #4338ca;
+    }
+    
+    /* Status Badge Styling */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.25rem 0.75rem;
+        font-size: 0.7rem;
+        font-weight: 600;
+        border-radius: 2rem;
+    }
+    
+    .status-badge.paid {
+        background: #d1fae5;
+        color: #065f46;
+    }
+    
+    .status-badge.pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+    
+    .status-badge.failed {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+    
+    .status-badge.cancelled {
+        background: #f3f4f6;
+        color: #6b7280;
+    }
+    
+    /* Amount Styling */
+    .amount-value {
+        font-weight: 700;
+        font-size: 0.875rem;
+    }
+    
+    .doctor-fee {
+        color: var(--gray-600);
+    }
+    
+    .total-amount {
+        color: var(--primary-dark);
+    }
+    
+    /* Transaction ID Styling */
+    .transaction-id {
+        font-family: 'Monaco', 'Menlo', monospace;
+        font-size: 0.7rem;
+        background: var(--gray-100);
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.5rem;
+        display: inline-block;
+        color: var(--gray-600);
+    }
+    
+    /* Action Buttons */
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+    
+    .btn-warning {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        border: none;
+        padding: 0.35rem 0.9rem;
+        font-size: 0.7rem;
+        font-weight: 600;
+        border-radius: 0.5rem;
+        color: white;
+        transition: all var(--transition-fast);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+    }
+    
+    .btn-warning:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3);
+        background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+        color: white;
+    }
+    
+    .btn-danger {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        border: none;
+        padding: 0.35rem 0.9rem;
+        font-size: 0.7rem;
+        font-weight: 600;
+        border-radius: 0.5rem;
+        color: white;
+        transition: all var(--transition-fast);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+    }
+    
+    .btn-danger:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
+        background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
+    }
+    
+    /* Pagination Styling */
+    .pagination {
+        margin-top: 1.5rem;
+        gap: 0.25rem;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .page-item .page-link {
+        border-radius: 0.5rem;
+        padding: 0.5rem 0.875rem;
+        font-size: 0.75rem;
+        color: var(--gray-700);
+        border: 1px solid var(--gray-200);
+        transition: all var(--transition-fast);
+    }
+    
+    .page-item.active .page-link {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        border-color: var(--primary);
+        color: white;
+    }
+    
+    .page-item .page-link:hover {
+        background: var(--gray-100);
+        transform: translateY(-1px);
+    }
+    
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 3rem !important;
+    }
+    
+    .empty-state-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+    
+    /* Table row animation */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .table tbody tr {
+        animation: fadeInUp 0.3s ease backwards;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 992px) {
+        .page-card {
+            padding: 1rem;
+        }
+        
+        .table thead th,
+        .table td {
+            padding: 0.75rem;
+            font-size: 0.75rem;
+        }
+        
+        .btn-warning, .btn-danger {
+            padding: 0.3rem 0.7rem;
+            font-size: 0.65rem;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .action-buttons {
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+        
+        .btn-warning, .btn-danger {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .table td:last-child {
+            min-width: 100px;
+        }
+        
+        form.mb-3 .row {
+            padding: 0.75rem;
+        }
+        
+        .page-link {
+            padding: 0.4rem 0.7rem;
+        }
+        
+        .patient-avatar, .doctor-avatar {
+            width: 24px;
+            height: 24px;
+            font-size: 0.55rem;
+        }
+    }
+    
+    /* Custom scrollbar */
+    .table-responsive::-webkit-scrollbar {
+        height: 6px;
+    }
+    
+    .table-responsive::-webkit-scrollbar-track {
+        background: var(--gray-100);
+        border-radius: 10px;
+    }
+    
+    .table-responsive::-webkit-scrollbar-thumb {
+        background: var(--gray-400);
+        border-radius: 10px;
+    }
+    
+    /* Amount column alignment */
+    .table td:nth-child(7),
+    .table td:nth-child(8) {
+        text-align: right;
+        font-weight: 600;
+    }
+    
+    .table th:nth-child(7),
+    .table th:nth-child(8) {
+        text-align: right;
+    }
+    
+    /* Currency symbol styling */
+    .currency-symbol {
+        font-size: 0.7rem;
+        color: var(--gray-500);
+        margin-right: 0.125rem;
+    }
+    
+    /* N/A text styling */
+    .na-text {
+        color: var(--gray-400);
+        font-style: italic;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-card">
+    <h5>
+        <i class="fas fa-money-bill-wave text-primary"></i>
+        Payment Transactions
+    </h5>
+
+    <form method="get" class="mb-3">
+        <div class="row g-2">
+            <div class="col-md-5">
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0" style="border-radius: 0.75rem 0 0 0.75rem;">
+                        <i class="fas fa-search text-muted"></i>
+                    </span>
+                    <input type="text" name="q" value="{{ q }}" class="form-control border-start-0" style="border-radius: 0 0.75rem 0.75rem 0;" placeholder="Search patient, doctor, or transaction ID...">
+                </div>
+            </div>
+            <div class="col-md-5">
+                <select name="status" class="form-control">
+                    <option value="">💰 All Payment Status</option>
+                    <option value="pending" {% if status == 'pending' %}selected{% endif %}>⏳ Pending</option>
+                    <option value="paid" {% if status == 'paid' %}selected{% endif %}>✅ Paid</option>
+                    <option value="failed" {% if status == 'failed' %}selected{% endif %}>❌ Failed</option>
+                    <option value="cancelled" {% if status == 'cancelled' %}selected{% endif %}>🚫 Cancelled</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-dark w-100">
+                    <i class="fas fa-filter me-1"></i> Filter
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th><i class="fas fa-hashtag"></i> #</th>
+                    <th><i class="fas fa-calendar-check"></i> Appointment</th>
+                    <th><i class="fas fa-user-injured"></i> Patient</th>
+                    <th><i class="fas fa-user-md"></i> Doctor</th>
+                    <th><i class="fas fa-credit-card"></i> Method</th>
+                    <th><i class="fas fa-chart-line"></i> Status</th>
+                    <th><i class="fas fa-stethoscope"></i> Doctor Fee</th>
+                    <th><i class="fas fa-receipt"></i> Total Amount</th>
+                    <th><i class="fas fa-fingerprint"></i> Transaction ID</th>
+                    <th><i class="fas fa-cog"></i> Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in page %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>
+                        <span class="appointment-id">
+                            <i class="fas fa-hashtag"></i> #{{ item.appointment.id }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="patient-name">
+                            <div class="patient-avatar">
+                                {{ item.patient.first_name|slice:":1" }}{{ item.patient.last_name|slice:":1" }}
+                            </div>
+                            {{ item.patient.first_name }} {{ item.patient.last_name }}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="doctor-name">
+                            <div class="doctor-avatar">
+                                {{ item.doctor.user.first_name|slice:":1" }}{{ item.doctor.user.last_name|slice:":1" }}
+                            </div>
+                            {{ item.doctor.user.first_name }} {{ item.doctor.user.last_name }}
+                        </div>
+                    </td>
+                    <td>
+                        {% if item.payment_method == 'cash' %}
+                            <span class="payment-method cash">
+                                <i class="fas fa-money-bill-wave"></i> Cash
+                            </span>
+                        {% elif item.payment_method == 'card' %}
+                            <span class="payment-method card">
+                                <i class="fas fa-credit-card"></i> Card
+                            </span>
+                        {% elif item.payment_method == 'online' %}
+                            <span class="payment-method online">
+                                <i class="fas fa-globe"></i> Online
+                            </span>
+                        {% elif item.payment_method == 'insurance' %}
+                            <span class="payment-method insurance">
+                                <i class="fas fa-shield-alt"></i> Insurance
+                            </span>
+                        {% else %}
+                            <span class="payment-method">{{ item.payment_method }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if item.payment_status == 'paid' %}
+                            <span class="status-badge paid">
+                                <i class="fas fa-check-circle"></i> Paid
+                            </span>
+                        {% elif item.payment_status == 'pending' %}
+                            <span class="status-badge pending">
+                                <i class="fas fa-hourglass-half"></i> Pending
+                            </span>
+                        {% elif item.payment_status == 'failed' %}
+                            <span class="status-badge failed">
+                                <i class="fas fa-times-circle"></i> Failed
+                            </span>
+                        {% elif item.payment_status == 'cancelled' %}
+                            <span class="status-badge cancelled">
+                                <i class="fas fa-ban"></i> Cancelled
+                            </span>
+                        {% else %}
+                            <span class="status-badge">{{ item.payment_status }}</span>
+                        {% endif %}
+                    </td>
+                    <td class="doctor-fee">
+                        <span class="amount-value">
+                            <span class="currency-symbol">$</span>{{ item.doctor_fee }}
+                        </span>
+                    </td>
+                    <td class="total-amount">
+                        <span class="amount-value">
+                            <span class="currency-symbol">$</span>{{ item.total_amount }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if item.transaction_id %}
+                            <span class="transaction-id" title="{{ item.transaction_id }}">
+                                <i class="fas fa-hashtag"></i> {{ item.transaction_id|truncatechars:12 }}
+                            </span>
+                        {% else %}
+                            <span class="na-text">—</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            <a href="{% url 'dashboard:payment_edit' item.pk %}" class="btn btn-warning">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                            <a href="{% url 'dashboard:payment_delete' item.pk %}" class="btn btn-danger" onclick="return confirm('⚠️ Delete Payment Record?\n\nAppointment: #{{ item.appointment.id }}\nPatient: {{ item.patient.first_name }} {{ item.patient.last_name }}\nAmount: ${{ item.total_amount }}\n\nThis action cannot be undone!');">
+                                <i class="fas fa-trash-alt"></i> Delete
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="10" class="empty-state">
+                        <div class="empty-state-icon">
+                            <i class="fas fa-credit-card"></i>
+                        </div>
+                        <div class="text-muted mb-2">No payment records found</div>
+                        <small class="text-muted">Try adjusting your search or filter criteria</small>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if page.has_other_pages %}
+    <nav class="mt-3">
+        <ul class="pagination justify-content-center">
+            {% if page.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page.previous_page_number }}{% if q %}&q={{ q }}{% endif %}{% if status %}&status={{ status }}{% endif %}">
+                        <i class="fas fa-chevron-left"></i> Previous
+                    </a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link"><i class="fas fa-chevron-left"></i> Previous</span>
+                </li>
+            {% endif %}
+
+            {% for num in page.paginator.page_range %}
+                {% if page.number == num %}
+                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                {% elif num > page.number|add:'-3' and num < page.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}{% if q %}&q={{ q }}{% endif %}{% if status %}&status={{ status }}{% endif %}">{{ num }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if page.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page.next_page_number }}{% if q %}&q={{ q }}{% endif %}{% if status %}&status={{ status }}{% endif %}">
+                        Next <i class="fas fa-chevron-right"></i>
+                    </a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">Next <i class="fas fa-chevron-right"></i></span>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Enhanced delete confirmation with financial context
+        const deleteButtons = document.querySelectorAll('.btn-danger');
+        
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                // The confirmation is already in the onclick attribute
+                // This is additional validation
+                const row = this.closest('tr');
+                const appointmentId = row.querySelector('.appointment-id')?.innerText.trim() || 'Unknown';
+                const amount = row.querySelector('.total-amount .amount-value')?.innerText.trim() || 'Unknown';
+                
+                console.log(`Payment deletion for ${appointmentId} - Amount: ${amount}`);
+            });
+        });
+        
+        // Add animation delays to rows
+        const rows = document.querySelectorAll('.table tbody tr');
+        rows.forEach((row, index) => {
+            if (row.querySelector('.empty-state')) return;
+            row.style.animationDelay = `${(index * 0.02) + 0.02}s`;
+        });
+        
+        // Tooltip attributes for better UX
+        const editBtns = document.querySelectorAll('.btn-warning');
+        const delBtns = document.querySelectorAll('.btn-danger');
+        
+        editBtns.forEach(btn => {
+            btn.setAttribute('title', 'Edit payment details');
+        });
+        
+        delBtns.forEach(btn => {
+            btn.setAttribute('title', 'Delete payment record');
+        });
+        
+        // Add tooltip for transaction ID if truncated
+        const transactionIds = document.querySelectorAll('.transaction-id');
+        transactionIds.forEach(tid => {
+            const fullText = tid.getAttribute('title');
+            const displayText = tid.innerText;
+            if (fullText && fullText.length > 12) {
+                tid.style.cursor = 'help';
+            }
+        });
+        
+        // Auto-submit on filter change (optional)
+        // const statusSelect = document.querySelector('select[name="status"]');
+        // if (statusSelect) {
+        //     statusSelect.addEventListener('change', () => {
+        //         statusSelect.closest('form').submit();
+        //     });
+        // }
+        
+        // Highlight pending payments
+        const pendingPayments = document.querySelectorAll('.status-badge.pending');
+        pendingPayments.forEach(payment => {
+            payment.style.animation = 'pulse 2s infinite';
+        });
+        
+        // Add pulse animation for pending payments
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes pulse {
+                0%, 100% { opacity: 1; transform: scale(1); }
+                50% { opacity: 0.85; transform: scale(1.02); }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Format currency display (adds consistency)
+        const doctorFeeCells = document.querySelectorAll('.doctor-fee .amount-value');
+        const totalAmountCells = document.querySelectorAll('.total-amount .amount-value');
+        
+        doctorFeeCells.forEach(cell => {
+            let value = cell.innerText.replace('$', '');
+            if (value && !isNaN(parseFloat(value))) {
+                cell.innerHTML = `<span class="currency-symbol">$</span>${parseFloat(value).toFixed(2)}`;
+            }
+        });
+        
+        totalAmountCells.forEach(cell => {
+            let value = cell.innerText.replace('$', '');
+            if (value && !isNaN(parseFloat(value))) {
+                cell.innerHTML = `<span class="currency-symbol">$</span>${parseFloat(value).toFixed(2)}`;
+            }
+        });
+    });
+</script>
+{% endblock %}

@@ -1,265 +1,662 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+    /* ============================================
+       DOCTOR PROFILE PAGE - PREMIUM DESIGN
+       Modern, elegant, professional with smooth animations
+    ============================================ */
+    
+    :root {
+        --primary: #2563eb;
+        --primary-dark: #1d4ed8;
+        --primary-light: #3b82f6;
+        --primary-soft: #eff6ff;
+        --primary-gradient: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --info: #06b6d4;
+        --gray-50: #f9fafb;
+        --gray-100: #f3f4f6;
+        --gray-200: #e5e7eb;
+        --gray-300: #d1d5db;
+        --gray-400: #9ca3af;
+        --gray-500: #6b7280;
+        --gray-600: #4b5563;
+        --gray-700: #374151;
+        --gray-800: #1f2937;
+        --gray-900: #111827;
+        --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+        --card-shadow-hover: 0 20px 40px -12px rgba(0, 0, 0, 0.15);
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Content Area */
+    .content {
+        padding: 2.5rem 0;
+        background: linear-gradient(135deg, #f1f5f9 0%, #e9eef5 100%);
+        min-height: calc(100vh - 80px);
+    }
+
+    /* Container */
+    .container {
+        max-width: 1280px;
+    }
+
+    /* Cards */
+    .card {
+        border: none;
+        border-radius: 1.5rem;
+        box-shadow: var(--card-shadow);
+        transition: var(--transition);
+        margin-bottom: 2rem;
+        overflow: hidden;
+        background: white;
+        position: relative;
+    }
+    
+    .card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--primary-gradient);
+    }
+    
+    .card:hover {
+        transform: translateY(-6px);
+        box-shadow: var(--card-shadow-hover);
+    }
+
+    .card-body {
+        padding: 2rem;
+    }
+
+    /* Doctor Widget */
+    .doctor-widget {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        gap: 2rem;
+    }
+
+    .doc-info-left {
+        display: flex;
+        gap: 2rem;
+        flex: 2;
+        min-width: 300px;
+    }
+
+    .doctor-img {
+        flex-shrink: 0;
+        width: 160px;
+        height: 160px;
+        border-radius: 1.5rem;
+        overflow: hidden;
+        background: linear-gradient(135deg, var(--gray-100) 0%, var(--gray-200) 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        transition: var(--transition);
+        position: relative;
+    }
+    
+    .doctor-img::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(37, 99, 235, 0.2) 0%, rgba(29, 78, 216, 0.2) 100%);
+        opacity: 0;
+        transition: var(--transition);
+    }
+    
+    .doctor-img:hover::after {
+        opacity: 1;
+    }
+    
+    .doctor-img:hover {
+        transform: scale(1.02);
+    }
+    
+    .doctor-img img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .doc-info-cont {
+        flex: 1;
+    }
+
+    .doc-name {
+        font-size: 1.75rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+        color: var(--gray-900);
+        letter-spacing: -0.02em;
+        background: linear-gradient(135deg, var(--gray-900) 0%, var(--gray-700) 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+
+    .doc-speciality {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--primary);
+        background: var(--primary-soft);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.35rem 1.25rem;
+        border-radius: 2rem;
+        margin-bottom: 1rem;
+        letter-spacing: 0.3px;
+    }
+    
+    .doc-speciality::before {
+        content: '🏥';
+        font-size: 0.875rem;
+    }
+
+    .clinic-details {
+        margin: 1rem 0;
+    }
+    
+    .doc-location {
+        font-size: 0.875rem;
+        color: var(--gray-600);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .doc-location i {
+        width: 1.25rem;
+        color: var(--primary);
+        font-size: 1rem;
+    }
+
+    .clinic-services {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin-top: 1rem;
+    }
+    
+    .clinic-services span {
+        background: linear-gradient(135deg, var(--gray-100) 0%, #f8fafc 100%);
+        padding: 0.35rem 1rem;
+        border-radius: 2rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--gray-700);
+        transition: var(--transition);
+        border: 1px solid var(--gray-200);
+    }
+    
+    .clinic-services span:hover {
+        background: var(--primary-soft);
+        color: var(--primary);
+        border-color: var(--primary-light);
+        transform: translateY(-2px);
+    }
+
+    /* Right Side */
+    .doc-info-right {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 1.25rem;
+        min-width: 240px;
+    }
+
+    .clini-infos {
+        background: linear-gradient(135deg, var(--gray-50) 0%, white 100%);
+        padding: 1rem 1.5rem;
+        border-radius: 1rem;
+        border: 1px solid var(--gray-200);
+        width: 100%;
+    }
+    
+    .clini-infos ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .clini-infos li {
+        font-size: 0.875rem;
+        color: var(--gray-700);
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-weight: 500;
+    }
+    
+    .clini-infos li:last-child {
+        margin-bottom: 0;
+    }
+    
+    .clini-infos li i {
+        width: 1.25rem;
+        color: var(--primary);
+        font-size: 1rem;
+    }
+
+    .clinic-booking {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        width: 100%;
+    }
+
+    .apt-btn {
+        padding: 0.75rem 2rem;
+        border-radius: 3rem;
+        font-size: 0.875rem;
+        font-weight: 700;
+        text-decoration: none;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        background: var(--primary-gradient);
+        color: white;
+        border: none;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        letter-spacing: 0.3px;
+    }
+    
+    .apt-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s;
+    }
+    
+    .apt-btn:hover::before {
+        left: 100%;
+    }
+    
+    .apt-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px -8px rgba(37, 99, 235, 0.5);
+        color: white;
+    }
+    
+    .apt-btn:active {
+        transform: translateY(0);
+    }
+
+    /* Tabs */
+    .user-tabs {
+        margin-bottom: 2rem;
+        margin-top: 0.5rem;
+    }
+    
+    .nav-tabs {
+        border-bottom: 2px solid var(--gray-200);
+        display: flex;
+        gap: 0.5rem;
+        background: transparent;
+    }
+    
+    .nav-tabs .nav-item {
+        margin-bottom: -2px;
+    }
+    
+    .nav-tabs .nav-link {
+        border: none;
+        font-size: 0.9375rem;
+        font-weight: 700;
+        padding: 0.875rem 2rem;
+        color: var(--gray-500);
+        transition: var(--transition);
+        background: transparent;
+        border-radius: 0;
+        position: relative;
+        letter-spacing: 0.3px;
+    }
+    
+    .nav-tabs .nav-link:hover {
+        color: var(--primary);
+        background: transparent;
+    }
+    
+    .nav-tabs .nav-link.active {
+        color: var(--primary);
+        background: transparent;
+        border-bottom: 3px solid var(--primary);
+    }
+    
+    .nav-tabs .nav-link.active::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60%;
+        height: 3px;
+        background: var(--primary-gradient);
+        border-radius: 3px 3px 0 0;
+    }
+
+    /* Tab Content */
+    .tab-content {
+        padding-top: 1.5rem;
+    }
+
+    .widget-title {
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: var(--gray-800);
+        margin-bottom: 1.25rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 3px solid var(--primary);
+        display: inline-block;
+        letter-spacing: -0.3px;
+    }
+
+    .about-widget p {
+        font-size: 0.9375rem;
+        line-height: 1.7;
+        color: var(--gray-600);
+        margin-bottom: 1.5rem;
+    }
+
+    .service-list {
+        margin-top: 1.5rem;
+    }
+    
+    .service-list h4 {
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: var(--gray-800);
+        margin-bottom: 1rem;
+    }
+    
+    .service-list ul {
+        list-style: none;
+        padding: 0;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.875rem;
+    }
+    
+    .service-list ul li {
+        background: linear-gradient(135deg, var(--gray-100) 0%, #f8fafc 100%);
+        padding: 0.5rem 1.25rem;
+        border-radius: 2rem;
+        font-size: 0.8125rem;
+        font-weight: 600;
+        color: var(--gray-700);
+        transition: var(--transition);
+        border: 1px solid var(--gray-200);
+    }
+    
+    .service-list ul li:hover {
+        background: var(--primary-soft);
+        color: var(--primary);
+        border-color: var(--primary-light);
+        transform: translateY(-2px);
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+        .doctor-widget {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        
+        .doc-info-left {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .doc-info-right {
+            align-items: center;
+        }
+        
+        .clinic-booking {
+            justify-content: center;
+        }
+        
+        .doc-location {
+            justify-content: center;
+        }
+        
+        .clinic-services {
+            justify-content: center;
+        }
+        
+        .clini-infos ul {
+            text-align: center;
+        }
+        
+        .clini-infos li {
+            justify-content: center;
+        }
+        
+        .nav-tabs .nav-link {
+            padding: 0.75rem 1.25rem;
+            font-size: 0.875rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .content {
+            padding: 1.5rem 0;
+        }
+        
+        .card-body {
+            padding: 1.5rem;
+        }
+        
+        .doc-name {
+            font-size: 1.5rem;
+        }
+        
+        .doctor-img {
+            width: 120px;
+            height: 120px;
+        }
+        
+        .nav-tabs {
+            flex-wrap: wrap;
+        }
+        
+        .nav-tabs .nav-link {
+            padding: 0.5rem 1rem;
+            font-size: 0.8125rem;
+        }
+        
+        .apt-btn {
+            padding: 0.6rem 1.5rem;
+            font-size: 0.8125rem;
+        }
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes slideInLeft {
+        from {
+            opacity: 0;
+            transform: translateX(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    
+    @keyframes slideInRight {
+        from {
+            opacity: 0;
+            transform: translateX(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    
+    .card:first-child {
+        animation: fadeInUp 0.5s ease backwards;
+    }
+    
+    .card:first-child .doc-info-left {
+        animation: slideInLeft 0.5s ease 0.2s backwards;
+    }
+    
+    .card:first-child .doc-info-right {
+        animation: slideInRight 0.5s ease 0.3s backwards;
+    }
+    
+    .card:last-child {
+        animation: fadeInUp 0.5s ease 0.1s backwards;
+    }
+    
+    /* Loading Skeleton (Optional) */
+    .skeleton {
+        background: linear-gradient(90deg, var(--gray-200) 25%, var(--gray-100) 50%, var(--gray-200) 75%);
+        background-size: 200% 100%;
+        animation: loading 1.5s infinite;
+    }
+    
+    @keyframes loading {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-    {% load static %}
+    <!-- Page Content -->
+    <div class="content">
+        <div class="container">
+            <!-- Doctor Widget -->
+            <div class="card">
+                <div class="card-body">
+                    <div class="doctor-widget">
+                        <div class="doc-info-left">
+                            <div class="doctor-img">
+                                <img src="{% if doctor.user.userprofile.profile_picture %}{{ doctor.user.userprofile.profile_picture.url }}{% else %}{% static 'images/default-doctor.jpg' %}{% endif %}" class="img-fluid" alt="Dr. {{ doctor.user.first_name }} {{ doctor.user.last_name }}">
+                            </div>
+                            <div class="doc-info-cont">
+                                <h4 class="doc-name">Dr. {{ doctor.user.first_name }} {{ doctor.user.last_name }}</h4>
+                                <p class="doc-speciality">{{ doctor.department.name }}</p>
+                                <div class="clinic-details">
+                                    <p class="doc-location">
+                                        <i class="fas fa-map-marker-alt"></i> {{ doctor.user.userprofile.address }}
+                                    </p>
+                                </div>
+                                <div class="clinic-services">
+                                    {% for disease in doctor.department.disease.all %}
+                                        <span>{{ disease }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="doc-info-right">
+                            <div class="clini-infos">
+                                <ul>
+                                    <li><i class="fas fa-thumbs-up"></i> 99% Patient Satisfaction</li>
+                                    <li><i class="fas fa-comment-dots"></i> 35+ Verified Feedback</li>
+                                    <li><i class="fas fa-map-pin"></i> {{ doctor.user.userprofile.address|truncatechars:30 }}</li>
+                                    <li><i class="fas fa-calendar-alt"></i> Available: Mon - Sat</li>
+                                </ul>
+                            </div>
+                            <div class="clinic-booking">
+                                <a class="apt-btn" href="{% url 'available_appointment' doctor_id=doctor.id %}">
+                                    <i class="fas fa-calendar-check"></i> Book Appointment
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /Doctor Widget -->
 
-    <!-- Breadcrumb -->
-			<!-- <div class="breadcrumb-bar">
-				<div class="container-fluid">
-					<div class="row align-items-center">
-						<div class="col-md-12 col-12">
-							<nav aria-label="breadcrumb" class="page-breadcrumb">
-								<ol class="breadcrumb">
-									<li class="breadcrumb-item"><a href="index-2.html">Home</a></li>
-									<li class="breadcrumb-item active" aria-current="page">Doctor Profile</li>
-								</ol>
-							</nav>
-							<h2 class="breadcrumb-title">Doctor Profile</h2>
-						</div>
-					</div>
-				</div>
-			</div> -->
-			<!-- /Breadcrumb -->
+            <!-- Doctor Details Tab -->
+            <div class="card">
+                <div class="card-body pt-0">
+                    <!-- Tab Menu -->
+                    <nav class="user-tabs mb-4">
+                        <ul class="nav nav-tabs nav-tabs-bottom nav-justified">
+                            <li class="nav-item">
+                                <a class="nav-link active" href="#doc_overview" data-toggle="tab">Overview</a>
+                            </li>
+                        </ul>
+                    </nav>
+                    <!-- /Tab Menu -->
 
-			<!-- Page Content -->
-			<div class="content">
-				<div class="container">
-					<!-- Doctor Widget -->
-					<div class="card">
-						<div class="card-body">
-							<div class="doctor-widget">
-								<div class="doc-info-left">
-									<div class="doctor-img">
-										<img src="{% if doctor.user.userprofile.profile_picture %}{{ doctor.user.userprofile.profile_picture.url }}{% else %}{% endif %}" class="img-fluid" alt="User Image">
-									</div>
-									<div class="doc-info-cont">
-										<h4 class="doc-name">{{ doctor.user.first_name }} {{ doctor.user.last_name }}</h4>
-										<p class="doc-speciality">{{ doctor.department.name }}</p>
-										<p class="doc-department"><img src="{{ doctor.department.image.url }}" class="img-fluid" alt="Speciality"></p>
-								<!--		<div class="rating">
-											<i class="fas fa-star filled"></i>
-											<i class="fas fa-star filled"></i>
-											<i class="fas fa-star filled"></i>
-											<i class="fas fa-star filled"></i>
-											<i class="fas fa-star"></i>
-											<span class="d-inline-block average-rating">(35)</span>
-										</div> -->
-										<div class="clinic-details">
-											<p class="doc-location">
-                                                <i class="fas fa-map-marker-alt"></i> {{ doctor.user.userprofile.address }}
-                                            </p>
-										</div>
-										<div class="clinic-services">
+                    <!-- Tab Content -->
+                    <div class="tab-content pt-0">
+                        <!-- Overview Content -->
+                        <div role="tabpanel" id="doc_overview" class="tab-pane fade show active">
+                            <div class="row">
+                                <div class="col-md-12 col-lg-12">
+                                    <!-- About Details -->
+                                    <div class="widget about-widget">
+                                        <h4 class="widget-title">About Me</h4>
+                                        <p>{{ doctor.biography|default:"Experienced healthcare professional dedicated to providing exceptional patient care with a compassionate approach." }}</p>
+                                    </div>
+                                    <!-- /About Details -->
+
+                                    <!-- Specializations List -->
+                                    <div class="service-list">
+                                        <h4>Specializations & Expertise</h4>
+                                        <ul class="clearfix">
                                             {% for disease in doctor.department.disease.all %}
-                                                <span>{{ disease }}</span>
+                                                <li>{{ disease }}</li>
+                                            {% empty %}
+                                                <li>General Medicine</li>
+                                                <li>Primary Care</li>
+                                                <li>Health Consultation</li>
                                             {% endfor %}
-										</div>
-									</div>
-								</div>
-								<div class="doc-info-right">
-									<div class="clini-infos">
-										<ul>
-											<li><i class="far fa-thumbs-up"></i> 99%</li>
-											<li><i class="far fa-comment"></i> 35 Feedback</li>
-											<li><i class="fas fa-map-marker-alt"></i> {{ doctor.user.userprofile.address}}</li>
-										</ul>
-									</div>
-
-									<div class="clinic-booking">
-										<a class="apt-btn" href="{% url 'available_appointment' doctor_id=doctor.id %}">Book Appointment</a>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-					<!-- /Doctor Widget -->
-
-					<!-- Doctor Details Tab -->
-					<div class="card">
-						<div class="card-body pt-0">
-
-							<!-- Tab Menu -->
-							<nav class="user-tabs mb-4">
-								<ul class="nav nav-tabs nav-tabs-bottom nav-justified">
-									<li class="nav-item">
-										<a class="nav-link active" href="#doc_overview" data-toggle="tab">Overview</a>
-									</li>
-									<li class="nav-item">
-										<a class="nav-link" href="#doc_locations" data-toggle="tab">Clinic</a>
-									</li>
-{#									<li class="nav-item">#}
-{#										<a class="nav-link" href="#doc_reviews" data-toggle="tab">Reviews</a>#}
-{#									</li>#}
-									{% comment %}<li class="nav-item">
-										<a class="nav-link" href="#doc_business_hours" data-toggle="tab">Business Hours</a>
-									</li>{% endcomment %}
-								</ul>
-							</nav>
-							<!-- /Tab Menu -->
-
-							<!-- Tab Content -->
-							<div class="tab-content pt-0">
-
-								<!-- Overview Content -->
-								<div role="tabpanel" id="doc_overview" class="tab-pane fade show active">
-									<div class="row">
-										<div class="col-md-12 col-lg-9">
-
-											<!-- About Details -->
-											<div class="widget about-widget">
-												<h4 class="widget-title">About Me</h4>
-												<p>{{ doctor.biography }}</p>
-											</div>
-											<!-- /About Details -->
-
-											<!-- Specializations List -->
-											<div class="service-list">
-												<h4>Doc Sees</h4>
-												<ul class="clearfix">
-                                                    {% for disease in doctor.department.disease.all %}
-                                                        <li>{{ disease }}</li>
-                                                    {% endfor %}
-												</ul>
-											</div>
-											<!-- /Specializations List -->
-
-										</div>
-									</div>
-								</div>
-								<!-- /Overview Content -->
-
-								<!-- Locations Content -->
-								<div role="tabpanel" id="doc_locations" class="tab-pane fade">
-
-									<!-- Location List -->
-									<div class="location-list">
-										<div class="row">
-
-											<!-- Clinic Content -->
-											<div class="col-md-6">
-												<div class="clinic-content">
-													<h4 class="clinic-name"><a href="#">{{ doctor.clinic_name}}</a></h4>
-													<p class="doc-speciality">{{ doctor.department.name }}</p>
-
-													<div class="clinic-details mb-0">
-                                                        <h5 class="clinic-direction">
-                                                            <i class="fas fa-map-marker-alt"></i>
-                                                            {{ doctor.clinic_address }}
-                                                        </h5>
-                                                    </div>
-
-												</div>
-											</div>
-											<!-- /Clinic Content -->
-
-											{% comment %}<!-- Clinic Timing -->
-											<div class="col-md-4">
-												<div class="clinic-timing">
-													<div>
-														<p class="timings-days">
-															<span> Mon - Sat </span>
-														</p>
-														<p class="timings-times">
-															<span>10:00 AM - 2:00 PM</span>
-															<span>4:00 PM - 9:00 PM</span>
-														</p>
-													</div>
-													<div>
-													<p class="timings-days">
-														<span>Sun</span>
-													</p>
-													<p class="timings-times">
-														<span>10:00 AM - 2:00 PM</span>
-													</p>
-													</div>
-												</div>
-											</div>
-											<!-- /Clinic Timing -->{% endcomment %}
-
-											<div class="col-md-2">
-
-											</div>
-										</div>
-									</div>
-									<!-- /Location List -->
-
-								</div>
-
-
-								{% comment %}<!-- Business Hours Content -->
-								<div role="tabpanel" id="doc_business_hours" class="tab-pane fade">
-									<div class="row">
-										<div class="col-md-6 offset-md-3">
-
-											<!-- Business Hours Widget -->
-											<div class="widget business-widget">
-												<div class="widget-content">
-													<div class="listing-hours">
-														<div class="listing-day current">
-															<div class="day">Today <span>5 Nov 2019</span></div>
-															<div class="time-items">
-																<span class="open-status"><span class="badge bg-success-light">Open Now</span></span>
-																<span class="time">07:00 AM - 09:00 PM</span>
-															</div>
-														</div>
-														<div class="listing-day">
-															<div class="day">Monday</div>
-															<div class="time-items">
-																<span class="time">07:00 AM - 09:00 PM</span>
-															</div>
-														</div>
-														<div class="listing-day">
-															<div class="day">Tuesday</div>
-															<div class="time-items">
-																<span class="time">07:00 AM - 09:00 PM</span>
-															</div>
-														</div>
-														<div class="listing-day">
-															<div class="day">Wednesday</div>
-															<div class="time-items">
-																<span class="time">07:00 AM - 09:00 PM</span>
-															</div>
-														</div>
-														<div class="listing-day">
-															<div class="day">Thursday</div>
-															<div class="time-items">
-																<span class="time">07:00 AM - 09:00 PM</span>
-															</div>
-														</div>
-														<div class="listing-day">
-															<div class="day">Friday</div>
-															<div class="time-items">
-																<span class="time">07:00 AM - 09:00 PM</span>
-															</div>
-														</div>
-														<div class="listing-day">
-															<div class="day">Saturday</div>
-															<div class="time-items">
-																<span class="time">07:00 AM - 09:00 PM</span>
-															</div>
-														</div>
-														<div class="listing-day closed">
-															<div class="day">Sunday</div>
-															<div class="time-items">
-																<span class="time"><span class="badge bg-danger-light">Closed</span></span>
-															</div>
-														</div>
-													</div>
-												</div>
-											</div>
-											<!-- /Business Hours Widget -->
-
-										</div>
-									</div>
-								</div>
-								<!-- /Business Hours Content -->{% endcomment %}
-
-							</div>
-						</div>
-					</div>
-					<!-- /Doctor Details Tab -->
-
-				</div>
-			</div>
-			<!-- /Page Content -->
-
+                                        </ul>
+                                    </div>
+                                    <!-- /Specializations List -->
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /Overview Content -->
+                    </div>
+                    <!-- /Tab Content -->
+                </div>
+            </div>
+            <!-- /Doctor Details Tab -->
+        </div>
+    </div>
+    <!-- /Page Content -->
 {% endblock %}

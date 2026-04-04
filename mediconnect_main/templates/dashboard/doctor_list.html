@@ -1,45 +1,520 @@
-{% extends "dashboard/base.html" %}
-{% block content %}
-<div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
-  <h2 class="mb-0">Doctors</h2>
-  <form method="get" class="d-flex gap-2">
-    <input class="form-control" style="min-width:220px" name="q" value="{{ q }}" placeholder="Search by email/clinic">
-    <button class="btn btn-outline-dark" type="submit">Search</button>
-  </form>
-</div>
+{% extends 'dashboard/list_base.html' %}
+{% load static %}
 
-<div class="card">
-  <div class="table-responsive">
-    <table class="table table-striped table-hover align-middle mb-0">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Email</th>
-          <th>Approved</th>
-          <th>Clinic</th>
-          <th>Department</th>
-          <th class="text-end">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for d in page.object_list %}
-          <tr>
-            <td>{{ d.id }}</td>
-            <td>{{ d.user.email }}</td>
-            <td>{{ d.is_approved }}</td>
-            <td>{{ d.clinic_name|default:"-" }}</td>
-            <td>{{ d.department.name|default:"-" }}</td>
-            <td class="text-end">
-              <a class="btn btn-sm btn-outline-dark" href="{% url 'dashboard:doctor_edit' d.id %}">Edit</a>
-            </td>
-          </tr>
-        {% empty %}
-          <tr><td colspan="6" class="text-center text-muted p-4">No doctors.</td></tr>
-        {% endfor %}
-      </tbody>
+{% block title %}Doctors{% endblock %}
+{% block page_title %}Doctors{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ============================================
+       MEDICONNECT DOCTORS MANAGEMENT - PREMIUM CSS
+       Modern, clean, and professional styling
+    ============================================ */
+    
+    :root {
+        --primary: #2563eb;
+        --primary-dark: #1d4ed8;
+        --primary-light: #3b82f6;
+        --primary-soft: #eff6ff;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --info: #06b6d4;
+        --purple: #8b5cf6;
+        --teal: #14b8a6;
+        --gray-50: #f9fafb;
+        --gray-100: #f3f4f6;
+        --gray-200: #e5e7eb;
+        --gray-300: #d1d5db;
+        --gray-400: #9ca3af;
+        --gray-500: #6b7280;
+        --gray-600: #4b5563;
+        --gray-700: #374151;
+        --gray-800: #1f2937;
+        --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
+        --transition-fast: 0.15s ease;
+        --transition-normal: 0.25s ease;
+    }
+    
+    /* Table Container Enhancement */
+    .table-responsive {
+        border-radius: 1rem;
+        overflow-x: auto;
+        background: white;
+        box-shadow: var(--card-shadow);
+        border: 1px solid rgba(0, 0, 0, 0.03);
+    }
+    
+    /* Modern Table Design */
+    .table {
+        margin-bottom: 0;
+        border-collapse: separate;
+        border-spacing: 0;
+        width: 100%;
+    }
+    
+    .table thead th {
+        background: linear-gradient(135deg, var(--gray-50) 0%, #f8fafc 100%);
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        padding: 1rem 1rem;
+        border-bottom: 1.5px solid var(--gray-200);
+        color: var(--gray-600);
+        font-family: 'Inter', sans-serif;
+    }
+    
+    .table thead th i {
+        margin-right: 0.35rem;
+        font-size: 0.65rem;
+        opacity: 0.7;
+    }
+    
+    .table tbody tr {
+        transition: all var(--transition-fast);
+        border-bottom: 1px solid var(--gray-100);
+    }
+    
+    .table tbody tr:hover {
+        background: linear-gradient(90deg, rgba(37, 99, 235, 0.02) 0%, rgba(37, 99, 235, 0.04) 100%);
+        transform: scale(1.001);
+    }
+    
+    .table td {
+        padding: 0.875rem 1rem;
+        vertical-align: middle;
+        font-size: 0.8125rem;
+        color: var(--gray-700);
+        border-bottom: 1px solid var(--gray-100);
+    }
+    
+    /* Serial number column */
+    .table td:first-child,
+    .table th:first-child {
+        font-weight: 600;
+        color: var(--gray-500);
+        width: 60px;
+    }
+    
+    /* Doctor Name Styling */
+    .doctor-name {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 600;
+        color: var(--gray-800);
+    }
+    
+    .doctor-avatar {
+        width: 32px;
+        height: 32px;
+        background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 0.75rem;
+        font-weight: 700;
+    }
+    
+    /* Email styling */
+    .doctor-email {
+        font-family: 'Monaco', 'Menlo', monospace;
+        font-size: 0.75rem;
+        color: var(--gray-600);
+    }
+    
+    /* Department Badge */
+    .department-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.25rem 0.75rem;
+        font-size: 0.7rem;
+        font-weight: 600;
+        border-radius: 2rem;
+        background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+        color: #4338ca;
+    }
+    
+    .department-badge i {
+        font-size: 0.65rem;
+    }
+    
+    /* Clinic Name Styling */
+    .clinic-info {
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+        color: var(--gray-700);
+    }
+    
+    .clinic-info i {
+        color: var(--teal);
+        font-size: 0.75rem;
+    }
+    
+    .clinic-name {
+        font-weight: 500;
+    }
+    
+    /* Approval Status Badge */
+    .approval-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.25rem 0.75rem;
+        font-size: 0.7rem;
+        font-weight: 600;
+        border-radius: 2rem;
+    }
+    
+    .approval-badge.approved {
+        background: #d1fae5;
+        color: #065f46;
+    }
+    
+    .approval-badge.pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+    
+    /* Action Buttons Container */
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+    
+    /* Edit Button */
+    .btn-warning {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        border: none;
+        padding: 0.35rem 0.9rem;
+        font-size: 0.7rem;
+        font-weight: 600;
+        border-radius: 0.5rem;
+        color: white;
+        transition: all var(--transition-fast);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+    }
+    
+    .btn-warning:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3);
+        background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+        color: white;
+    }
+    
+    /* Delete Button */
+    .btn-danger {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        border: none;
+        padding: 0.35rem 0.9rem;
+        font-size: 0.7rem;
+        font-weight: 600;
+        border-radius: 0.5rem;
+        color: white;
+        transition: all var(--transition-fast);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+    }
+    
+    .btn-danger:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
+        background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
+    }
+    
+    /* Empty State Styling */
+    .empty-state {
+        text-align: center;
+        padding: 3rem !important;
+    }
+    
+    .empty-state-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+    
+    /* Table row animation */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .table tbody tr {
+        animation: fadeInUp 0.3s ease backwards;
+    }
+    
+    .table tbody tr:nth-child(1) { animation-delay: 0.02s; }
+    .table tbody tr:nth-child(2) { animation-delay: 0.04s; }
+    .table tbody tr:nth-child(3) { animation-delay: 0.06s; }
+    .table tbody tr:nth-child(4) { animation-delay: 0.08s; }
+    .table tbody tr:nth-child(5) { animation-delay: 0.1s; }
+    .table tbody tr:nth-child(6) { animation-delay: 0.12s; }
+    .table tbody tr:nth-child(7) { animation-delay: 0.14s; }
+    .table tbody tr:nth-child(8) { animation-delay: 0.16s; }
+    .table tbody tr:nth-child(9) { animation-delay: 0.18s; }
+    .table tbody tr:nth-child(10) { animation-delay: 0.2s; }
+    
+    /* Responsive adjustments */
+    @media (max-width: 992px) {
+        .table thead th,
+        .table td {
+            padding: 0.75rem;
+            font-size: 0.75rem;
+        }
+        
+        .btn-warning, .btn-danger {
+            padding: 0.3rem 0.7rem;
+            font-size: 0.65rem;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .action-buttons {
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+        
+        .btn-warning, .btn-danger {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .table td:last-child {
+            min-width: 100px;
+        }
+        
+        .doctor-avatar {
+            width: 28px;
+            height: 28px;
+            font-size: 0.7rem;
+        }
+    }
+    
+    /* Custom scrollbar for table */
+    .table-responsive::-webkit-scrollbar {
+        height: 6px;
+    }
+    
+    .table-responsive::-webkit-scrollbar-track {
+        background: var(--gray-100);
+        border-radius: 10px;
+    }
+    
+    .table-responsive::-webkit-scrollbar-thumb {
+        background: var(--gray-400);
+        border-radius: 10px;
+    }
+    
+    .table-responsive::-webkit-scrollbar-thumb:hover {
+        background: var(--gray-500);
+    }
+    
+    /* Row hover effect for serial number */
+    .table tbody tr:hover td:first-child {
+        color: var(--primary);
+        font-weight: 700;
+    }
+    
+    /* N/A text styling */
+    .na-text {
+        color: var(--gray-400);
+        font-style: italic;
+    }
+    
+    /* Additional polish for table cells */
+    .table td:nth-child(2) .doctor-name {
+        font-weight: 600;
+    }
+    
+    /* Tooltip style for action buttons */
+    .btn-warning, .btn-danger {
+        cursor: pointer;
+    }
+    
+    /* Department column special styling */
+    .table td:nth-child(4) {
+        text-align: center;
+    }
+    
+    /* Clinic column */
+    .table td:nth-child(5) {
+        min-width: 120px;
+    }
+</style>
+{% endblock %}
+
+{% block list_content %}
+<div class="table-responsive">
+    <table class="table align-middle">
+        <thead>
+            <tr>
+                <th><i class="fas fa-hashtag"></i> #</th>
+                <th><i class="fas fa-user-md"></i> Doctor Name</th>
+                <th><i class="fas fa-envelope"></i> Email</th>
+                <th><i class="fas fa-building"></i> Department</th>
+                <th><i class="fas fa-clinic-medical"></i> Clinic</th>
+                <th><i class="fas fa-check-circle"></i> Status</th>
+                <th><i class="fas fa-cog"></i> Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in page %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>
+                    <div class="doctor-name">
+                        <div class="doctor-avatar">
+                            {{ item.user.first_name|slice:":1" }}{{ item.user.last_name|slice:":1" }}
+                        </div>
+                        {{ item.user.first_name }} {{ item.user.last_name }}
+                    </div>
+                </td>
+                <td>
+                    <div class="doctor-email">
+                        <i class="fas fa-envelope-open-text me-1 text-muted"></i>
+                        {{ item.user.email }}
+                    </div>
+                </td>
+                <td>
+                    {% if item.department %}
+                        <span class="department-badge">
+                            <i class="fas fa-stethoscope"></i> {{ item.department.name }}
+                        </span>
+                    {% else %}
+                        <span class="na-text">—</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if item.clinic_name %}
+                        <div class="clinic-info">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span class="clinic-name">{{ item.clinic_name }}</span>
+                        </div>
+                    {% else %}
+                        <span class="na-text">—</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if item.is_approved %}
+                        <span class="approval-badge approved">
+                            <i class="fas fa-check-circle"></i> Verified
+                        </span>
+                    {% else %}
+                        <span class="approval-badge pending">
+                            <i class="fas fa-clock"></i> Pending
+                        </span>
+                    {% endif %}
+                </td>
+                <td>
+                    <div class="action-buttons">
+                        <a href="{% url 'dashboard:doctor_edit' item.pk %}" class="btn btn-warning">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>
+                        <a href="{% url 'dashboard:doctor_delete' item.pk %}" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this doctor? This action cannot be undone.');">
+                            <i class="fas fa-trash-alt"></i> Delete
+                        </a>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7" class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-user-md-slash"></i>
+                    </div>
+                    <div class="text-muted mb-2">No doctors found in the system.</div>
+                    <small class="text-muted">Add a doctor to get started.</small>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
     </table>
-  </div>
 </div>
+{% endblock %}
 
-{% include "dashboard/pagination.html" with page=page q=q %}
+{% block extra_js %}
+<script>
+    // Enhanced delete confirmation with better UX
+    document.addEventListener('DOMContentLoaded', function() {
+        const deleteButtons = document.querySelectorAll('.btn-danger');
+        
+        deleteButtons.forEach(button => {
+            // Store original onclick if exists
+            const originalOnClick = button.getAttribute('onclick');
+            
+            button.addEventListener('click', function(e) {
+                const doctorName = this.closest('tr').querySelector('.doctor-name').innerText.trim();
+                const confirmed = confirm(`⚠️ Remove Dr. ${doctorName} from the system?\n\nThis action will permanently delete all associated data including appointments, prescriptions, and records.\n\nThis cannot be undone!`);
+                
+                if (!confirmed) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+                
+                // If there's an original onclick, let it execute
+                if (originalOnClick && originalOnClick.includes('confirm')) {
+                    // override: we already handled confirmation
+                    e.preventDefault();
+                    if (confirmed) {
+                        window.location.href = button.getAttribute('href');
+                    }
+                    return false;
+                }
+            });
+        });
+        
+        // Add animation delay to existing rows
+        const rows = document.querySelectorAll('.table tbody tr');
+        rows.forEach((row, index) => {
+            if (row.querySelector('.empty-state')) return;
+            row.style.animation = `fadeInUp 0.3s ease backwards`;
+            row.style.animationDelay = `${(index * 0.02) + 0.02}s`;
+        });
+        
+        // Tooltip attributes for better UX
+        const editBtns = document.querySelectorAll('.btn-warning');
+        const delBtns = document.querySelectorAll('.btn-danger');
+        
+        editBtns.forEach(btn => {
+            btn.setAttribute('title', 'Edit doctor details');
+        });
+        
+        delBtns.forEach(btn => {
+            btn.setAttribute('title', 'Delete doctor permanently');
+        });
+        
+        // Optional: Add status indicator glow for pending approvals
+        const pendingBadges = document.querySelectorAll('.approval-badge.pending');
+        pendingBadges.forEach(badge => {
+            badge.style.animation = 'pulse 2s infinite';
+        });
+        
+        // Add pulse animation for pending approvals
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes pulse {
+                0%, 100% { opacity: 1; }
+                50% { opacity: 0.7; }
+            }
+        `;
+        document.head.appendChild(style);
+    });
+</script>
 {% endblock %}

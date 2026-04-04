@@ -1,0 +1,610 @@
+{% extends 'dashboard/list_base.html' %}
+{% load static %}
+
+{% block title %}Remarks{% endblock %}
+{% block page_title %}Remarks{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ============================================
+       MEDICONNECT REMARKS MANAGEMENT - PREMIUM CSS
+       Modern medical notes & clinical observations styling
+    ============================================ */
+    
+    :root {
+        --primary: #2563eb;
+        --primary-dark: #1d4ed8;
+        --primary-light: #3b82f6;
+        --primary-soft: #eff6ff;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --info: #06b6d4;
+        --purple: #8b5cf6;
+        --teal: #14b8a6;
+        --gray-50: #f9fafb;
+        --gray-100: #f3f4f6;
+        --gray-200: #e5e7eb;
+        --gray-300: #d1d5db;
+        --gray-400: #9ca3af;
+        --gray-500: #6b7280;
+        --gray-600: #4b5563;
+        --gray-700: #374151;
+        --gray-800: #1f2937;
+        --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
+        --transition-fast: 0.15s ease;
+        --transition-normal: 0.25s ease;
+    }
+    
+    /* Table Container Enhancement */
+    .table-responsive {
+        border-radius: 1rem;
+        overflow-x: auto;
+        background: white;
+        box-shadow: var(--card-shadow);
+        border: 1px solid rgba(0, 0, 0, 0.03);
+    }
+    
+    /* Modern Table Design */
+    .table {
+        margin-bottom: 0;
+        border-collapse: separate;
+        border-spacing: 0;
+        width: 100%;
+    }
+    
+    .table thead th {
+        background: linear-gradient(135deg, var(--gray-50) 0%, #f8fafc 100%);
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        padding: 1rem 0.875rem;
+        border-bottom: 1.5px solid var(--gray-200);
+        color: var(--gray-600);
+        font-family: 'Inter', sans-serif;
+    }
+    
+    .table thead th i {
+        margin-right: 0.35rem;
+        font-size: 0.65rem;
+        opacity: 0.7;
+    }
+    
+    .table tbody tr {
+        transition: all var(--transition-fast);
+        border-bottom: 1px solid var(--gray-100);
+    }
+    
+    .table tbody tr:hover {
+        background: linear-gradient(90deg, rgba(37, 99, 235, 0.02) 0%, rgba(37, 99, 235, 0.04) 100%);
+    }
+    
+    .table td {
+        padding: 1rem 0.875rem;
+        vertical-align: middle;
+        font-size: 0.8125rem;
+        color: var(--gray-700);
+        border-bottom: 1px solid var(--gray-100);
+    }
+    
+    /* Serial number column */
+    .table td:first-child,
+    .table th:first-child {
+        font-weight: 600;
+        color: var(--gray-500);
+        width: 50px;
+    }
+    
+    /* Appointment ID Badge */
+    .appointment-id {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        background: var(--gray-100);
+        padding: 0.25rem 0.75rem;
+        border-radius: 2rem;
+        font-weight: 600;
+        font-size: 0.75rem;
+        color: var(--gray-700);
+        font-family: monospace;
+    }
+    
+    .appointment-id i {
+        color: var(--primary);
+        font-size: 0.7rem;
+    }
+    
+    /* Doctor & Patient Info */
+    .doctor-info, .patient-info {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .doctor-avatar, .patient-avatar {
+        width: 32px;
+        height: 32px;
+        background: linear-gradient(135deg, var(--purple) 0%, #7c3aed 100%);
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 0.7rem;
+        font-weight: 700;
+        flex-shrink: 0;
+    }
+    
+    .patient-avatar {
+        background: linear-gradient(135deg, var(--teal) 0%, #0d9488 100%);
+    }
+    
+    .doctor-name, .patient-name {
+        font-weight: 600;
+        color: var(--gray-800);
+    }
+    
+    /* Diagnosis & Symptoms - Clinical text styling */
+    .diagnosis-text, .symptoms-text {
+        max-width: 200px;
+        line-height: 1.4;
+        font-size: 0.75rem;
+    }
+    
+    .diagnosis-text {
+        color: var(--gray-800);
+        font-weight: 500;
+    }
+    
+    .symptoms-text {
+        color: var(--gray-600);
+    }
+    
+    .diagnosis-label, .symptoms-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        font-size: 0.65rem;
+        font-weight: 600;
+        color: var(--gray-500);
+        margin-bottom: 0.25rem;
+    }
+    
+    .diagnosis-content, .symptoms-content {
+        display: block;
+        word-break: break-word;
+    }
+    
+    /* Follow Up Date Styling */
+    .follow-up-date {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 2rem;
+        font-size: 0.7rem;
+        font-weight: 500;
+    }
+    
+    .follow-up-date.scheduled {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+    
+    .follow-up-date.passed {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+    
+    .follow-up-date.today {
+        background: #d1fae5;
+        color: #065f46;
+    }
+    
+    .follow-up-date.na {
+        background: var(--gray-100);
+        color: var(--gray-500);
+    }
+    
+    /* Created Date Styling */
+    .created-date {
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+        font-size: 0.7rem;
+        color: var(--gray-600);
+        white-space: nowrap;
+    }
+    
+    .created-date i {
+        color: var(--gray-400);
+    }
+    
+    /* Action Buttons */
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+    
+    .btn-warning {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        border: none;
+        padding: 0.35rem 0.9rem;
+        font-size: 0.7rem;
+        font-weight: 600;
+        border-radius: 0.5rem;
+        color: white;
+        transition: all var(--transition-fast);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+    }
+    
+    .btn-warning:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3);
+        background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+        color: white;
+    }
+    
+    .btn-danger {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        border: none;
+        padding: 0.35rem 0.9rem;
+        font-size: 0.7rem;
+        font-weight: 600;
+        border-radius: 0.5rem;
+        color: white;
+        transition: all var(--transition-fast);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+    }
+    
+    .btn-danger:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
+        background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
+    }
+    
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 3rem !important;
+    }
+    
+    .empty-state-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+    
+    /* Table row animation */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .table tbody tr {
+        animation: fadeInUp 0.3s ease backwards;
+    }
+    
+    .table tbody tr:nth-child(1) { animation-delay: 0.02s; }
+    .table tbody tr:nth-child(2) { animation-delay: 0.04s; }
+    .table tbody tr:nth-child(3) { animation-delay: 0.06s; }
+    .table tbody tr:nth-child(4) { animation-delay: 0.08s; }
+    .table tbody tr:nth-child(5) { animation-delay: 0.1s; }
+    .table tbody tr:nth-child(6) { animation-delay: 0.12s; }
+    .table tbody tr:nth-child(7) { animation-delay: 0.14s; }
+    .table tbody tr:nth-child(8) { animation-delay: 0.16s; }
+    .table tbody tr:nth-child(9) { animation-delay: 0.18s; }
+    .table tbody tr:nth-child(10) { animation-delay: 0.2s; }
+    
+    /* Truncated text with tooltip on hover */
+    .truncate-text {
+        cursor: help;
+        position: relative;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 992px) {
+        .table thead th,
+        .table td {
+            padding: 0.75rem;
+            font-size: 0.75rem;
+        }
+        
+        .btn-warning, .btn-danger {
+            padding: 0.3rem 0.7rem;
+            font-size: 0.65rem;
+        }
+        
+        .diagnosis-text, .symptoms-text {
+            max-width: 150px;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .action-buttons {
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+        
+        .btn-warning, .btn-danger {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .table td:last-child {
+            min-width: 100px;
+        }
+        
+        .doctor-avatar, .patient-avatar {
+            width: 28px;
+            height: 28px;
+            font-size: 0.65rem;
+        }
+    }
+    
+    /* Custom scrollbar */
+    .table-responsive::-webkit-scrollbar {
+        height: 6px;
+    }
+    
+    .table-responsive::-webkit-scrollbar-track {
+        background: var(--gray-100);
+        border-radius: 10px;
+    }
+    
+    .table-responsive::-webkit-scrollbar-thumb {
+        background: var(--gray-400);
+        border-radius: 10px;
+    }
+    
+    .table-responsive::-webkit-scrollbar-thumb:hover {
+        background: var(--gray-500);
+    }
+    
+    /* N/A text styling */
+    .na-text {
+        color: var(--gray-400);
+        font-style: italic;
+    }
+    
+    /* Row hover effect for serial number */
+    .table tbody tr:hover td:first-child {
+        color: var(--primary);
+        font-weight: 700;
+    }
+    
+    /* Medical note icon */
+    .medical-note-icon {
+        color: var(--primary);
+        margin-right: 0.25rem;
+    }
+</style>
+{% endblock %}
+
+{% block list_content %}
+<div class="table-responsive">
+    <table class="table align-middle">
+        <thead>
+            <tr>
+                <th><i class="fas fa-hashtag"></i> S.N</th>
+                <th><i class="fas fa-hashtag"></i> Appointment</th>
+                <th><i class="fas fa-user-md"></i> Doctor</th>
+                <th><i class="fas fa-user-injured"></i> Patient</th>
+                <th><i class="fas fa-stethoscope"></i> Diagnosis</th>
+                <th><i class="fas fa-head-side-medical"></i> Symptoms</th>
+                <th><i class="fas fa-calendar-week"></i> Follow Up</th>
+                <th><i class="fas fa-clock"></i> Created</th>
+                <th><i class="fas fa-cog"></i> Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in page %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>
+                    <span class="appointment-id">
+                        <i class="fas fa-calendar-check"></i> #{{ item.appointment.id }}
+                    </span>
+                </td>
+                <td>
+                    <div class="doctor-info">
+                        <div class="doctor-avatar">
+                            {{ item.doctor.user.first_name|slice:":1" }}{{ item.doctor.user.last_name|slice:":1" }}
+                        </div>
+                        <div class="doctor-name">
+                            {{ item.doctor.user.first_name }} {{ item.doctor.user.last_name }}
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="patient-info">
+                        <div class="patient-avatar">
+                            {% if item.appointment.patient %}
+                                {{ item.appointment.patient.first_name|slice:":1" }}{{ item.appointment.patient.last_name|slice:":1" }}
+                            {% else %}
+                                ?
+                            {% endif %}
+                        </div>
+                        <div class="patient-name">
+                            {% if item.appointment.patient %}
+                                {{ item.appointment.patient.first_name }} {{ item.appointment.patient.last_name }}
+                            {% else %}
+                                <span class="na-text">N/A</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                 </td>
+                <td>
+                    {% if item.diagnosis %}
+                        <div class="diagnosis-text truncate-text" title="{{ item.diagnosis }}">
+                            <div class="diagnosis-label">
+                                <i class="fas fa-clipboard-list medical-note-icon"></i>
+                                <span>DX:</span>
+                            </div>
+                            <div class="diagnosis-content">
+                                {{ item.diagnosis|truncatechars:50 }}
+                            </div>
+                        </div>
+                    {% else %}
+                        <span class="na-text">—</span>
+                    {% endif %}
+                 </td>
+                <td>
+                    {% if item.symptoms %}
+                        <div class="symptoms-text truncate-text" title="{{ item.symptoms }}">
+                            <div class="symptoms-label">
+                                <i class="fas fa-notes-medical medical-note-icon"></i>
+                                <span>SX:</span>
+                            </div>
+                            <div class="symptoms-content">
+                                {{ item.symptoms|truncatechars:50 }}
+                            </div>
+                        </div>
+                    {% else %}
+                        <span class="na-text">—</span>
+                    {% endif %}
+                 </td>
+                <td>
+                    {% if item.follow_up_date %}
+                        {% with follow_date=item.follow_up_date|date:"Y-m-d" %}
+                            {% with today="now"|date:"Y-m-d" %}
+                                {% if follow_date < today %}
+                                    <span class="follow-up-date passed">
+                                        <i class="fas fa-calendar-times"></i> {{ item.follow_up_date }}
+                                    </span>
+                                {% elif follow_date == today %}
+                                    <span class="follow-up-date today">
+                                        <i class="fas fa-calendar-day"></i> {{ item.follow_up_date }}
+                                    </span>
+                                {% else %}
+                                    <span class="follow-up-date scheduled">
+                                        <i class="fas fa-calendar-alt"></i> {{ item.follow_up_date }}
+                                    </span>
+                                {% endif %}
+                            {% endwith %}
+                        {% endwith %}
+                    {% else %}
+                        <span class="follow-up-date na">
+                            <i class="fas fa-minus-circle"></i> No follow up
+                        </span>
+                    {% endif %}
+                 </td>
+                <td>
+                    <div class="created-date">
+                        <i class="far fa-calendar-alt"></i>
+                        {{ item.created_at|date:"Y-m-d H:i" }}
+                    </div>
+                 </td>
+                <td>
+                    <div class="action-buttons">
+                        <a href="{% url 'dashboard:remark_edit' item.pk %}" class="btn btn-warning">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>
+                        <a href="{% url 'dashboard:remark_delete' item.pk %}" class="btn btn-danger" onclick="return confirm('⚠️ Delete Medical Remark?\n\nThis clinical note will be permanently removed from the patient record.\n\nThis action cannot be undone!');">
+                            <i class="fas fa-trash-alt"></i> Delete
+                        </a>
+                    </div>
+                 </td>
+             </tr>
+            {% empty %}
+            <tr>
+                <td colspan="9" class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-notes-medical"></i>
+                    </div>
+                    <div class="text-muted mb-2">No medical remarks found</div>
+                    <small class="text-muted">Clinical notes and observations will appear here</small>
+                </td>
+             </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Enhanced delete confirmation with clinical context
+        const deleteButtons = document.querySelectorAll('.btn-danger');
+        
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                const row = this.closest('tr');
+                const appointmentId = row.querySelector('.appointment-id')?.innerText.trim() || 'Unknown';
+                const patientName = row.querySelector('.patient-name')?.innerText.trim() || 'Unknown patient';
+                
+                const confirmed = confirm(`⚠️ Delete Medical Remark\n\nAppointment: ${appointmentId}\nPatient: ${patientName}\n\nThis clinical note will be permanently deleted from the medical record.\n\nThis action cannot be undone!`);
+                
+                if (!confirmed) {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+        });
+        
+        // Add animation delays to rows
+        const rows = document.querySelectorAll('.table tbody tr');
+        rows.forEach((row, index) => {
+            if (row.querySelector('.empty-state')) return;
+            row.style.animationDelay = `${(index * 0.02) + 0.02}s`;
+        });
+        
+        // Tooltip attributes for better UX
+        const editBtns = document.querySelectorAll('.btn-warning');
+        const delBtns = document.querySelectorAll('.btn-danger');
+        
+        editBtns.forEach(btn => {
+            btn.setAttribute('title', 'Edit clinical remark');
+        });
+        
+        delBtns.forEach(btn => {
+            btn.setAttribute('title', 'Delete medical note');
+        });
+        
+        // Add tooltip for truncated text
+        const truncateElements = document.querySelectorAll('.truncate-text');
+        truncateElements.forEach(el => {
+            const fullText = el.getAttribute('title');
+            if (fullText && fullText.length > 50) {
+                el.style.cursor = 'help';
+            }
+        });
+        
+        // Highlight follow-up dates that are overdue
+        const passedDates = document.querySelectorAll('.follow-up-date.passed');
+        passedDates.forEach(date => {
+            // Add subtle animation for overdue items
+            date.style.animation = 'pulse 2s infinite';
+        });
+        
+        // Add pulse animation for overdue follow-ups
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes pulse {
+                0%, 100% { opacity: 1; }
+                50% { opacity: 0.7; }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Optional: Add status indicator for follow-up dates
+        const todayDates = document.querySelectorAll('.follow-up-date.today');
+        todayDates.forEach(date => {
+            date.style.fontWeight = '600';
+        });
+    });
+</script>
+{% endblock %}
