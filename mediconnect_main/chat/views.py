@@ -80,4 +80,4 @@ def conversation_messages(request, conversation_id):
             'read_at': message.read_at.strftime("%d %b %Y, %I:%M %p") if message.read_at else '',
         })
 
-    return JsonResponse({'messages': data})
+    return JsonResponse({'messages': data}) 
