@@ -4,9 +4,30 @@
 
 {% block content %}
 
+{% if messages %}
+    {% for message in messages %}
+        <div class="modal fade custom-modal" id="messageModal{{ forloop.counter }}" tabindex="-1" role="dialog" aria-labelledby="messageModalLabel{{ forloop.counter }}" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="messageModalLabel{{ forloop.counter }}">Booking Notice</h5>
+                        <button type="button" class="close modal-close-btn" data-dismiss="modal" aria-label="Close" data-target-modal="messageModal{{ forloop.counter }}">
+                            <span>&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        {{ message }}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary modal-close-btn" data-dismiss="modal" data-target-modal="messageModal{{ forloop.counter }}">OK</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% endif %}
+
 <style>
-    /* ========== BOOKING PAGE - ADVANCED MODERN STYLING ========== */
-    
     :root {
         --primary: #2563eb;
         --primary-dark: #1e40af;
@@ -35,21 +56,19 @@
         --radius-lg: 1rem;
         --radius-xl: 1.5rem;
     }
-    
-    /* Main Content */
+
     .content {
         padding: 3rem 0;
         background: linear-gradient(135deg, #f0f9ff 0%, #f1f5f9 100%);
         min-height: calc(100vh - 200px);
     }
-    
+
     .container {
         max-width: 1400px;
         margin: 0 auto;
         padding: 0 2rem;
     }
-    
-    /* Doctor Info Card */
+
     .card {
         border: none;
         border-radius: var(--radius-xl);
@@ -59,27 +78,27 @@
         background: #ffffff;
         margin-bottom: 1.5rem;
     }
-    
+
     .card:hover {
         box-shadow: var(--shadow-lg);
         transform: translateY(-2px);
     }
-    
+
     .card-body {
         padding: 1.75rem;
     }
-    
+
     .booking-doc-info {
         display: flex;
         align-items: center;
         gap: 1.5rem;
         flex-wrap: wrap;
     }
-    
+
     .booking-doc-img {
         flex-shrink: 0;
     }
-    
+
     .booking-doc-img img {
         width: 90px;
         height: 90px;
@@ -89,19 +108,19 @@
         box-shadow: var(--shadow-md);
         transition: all 0.3s ease;
     }
-    
+
     .booking-doc-img img:hover {
         transform: scale(1.02);
         border-color: var(--primary);
     }
-    
+
     .booking-info h4 {
         font-size: 1.35rem;
         font-weight: 700;
         color: var(--gray-800);
         margin-bottom: 0.5rem;
     }
-    
+
     .booking-info p {
         color: var(--gray-600);
         font-size: 0.875rem;
@@ -110,13 +129,12 @@
         align-items: center;
         gap: 0.5rem;
     }
-    
+
     .booking-info p i {
         color: var(--primary);
         width: 20px;
     }
-    
-    /* Payment Summary Card */
+
     .payment-summary-card {
         background: linear-gradient(135deg, #ffffff 0%, var(--gray-50) 100%);
         border: 1px solid var(--gray-200);
@@ -126,11 +144,11 @@
         box-shadow: var(--shadow-md);
         transition: all 0.3s ease;
     }
-    
+
     .payment-summary-card:hover {
         box-shadow: var(--shadow-lg);
     }
-    
+
     .payment-summary-card h4 {
         font-size: 1.25rem;
         font-weight: 700;
@@ -142,12 +160,12 @@
         align-items: center;
         gap: 0.5rem;
     }
-    
+
     .payment-summary-card h4::before {
         content: "💰";
         font-size: 1.25rem;
     }
-    
+
     .payment-summary-row {
         display: flex;
         justify-content: space-between;
@@ -156,7 +174,7 @@
         font-size: 0.9375rem;
         color: var(--gray-600);
     }
-    
+
     .payment-summary-row.total {
         font-weight: 800;
         font-size: 1.125rem;
@@ -165,7 +183,7 @@
         padding-top: 0.75rem;
         margin-top: 0.75rem;
     }
-    
+
     .payment-note {
         font-size: 0.75rem;
         color: var(--gray-500);
@@ -175,20 +193,19 @@
         border-radius: var(--radius-md);
         text-align: center;
     }
-    
-    /* Schedule Widget */
+
     .schedule-widget {
         background: #ffffff;
         border-radius: var(--radius-xl);
         overflow: hidden;
         box-shadow: var(--shadow-md);
     }
-    
+
     .schedule-header {
         background: linear-gradient(135deg, var(--dark) 0%, #1e293b 100%);
         padding: 1rem;
     }
-    
+
     .day-slot ul {
         display: flex;
         list-style: none;
@@ -198,7 +215,7 @@
         flex-wrap: wrap;
         justify-content: space-around;
     }
-    
+
     .day-slot ul li {
         flex: 1;
         text-align: center;
@@ -208,40 +225,39 @@
         transition: all 0.2s ease;
         cursor: pointer;
     }
-    
+
     .day-slot ul li:hover {
         background: rgba(255, 255, 255, 0.2);
         transform: translateY(-2px);
     }
-    
+
     .day-slot ul li span {
         display: block;
         color: white;
     }
-    
+
     .day-slot ul li span:first-child {
         font-weight: 700;
         font-size: 0.875rem;
         text-transform: uppercase;
         letter-spacing: 0.5px;
     }
-    
+
     .slot-date {
         font-size: 0.75rem;
         opacity: 0.9;
     }
-    
+
     .slot-year {
         font-size: 0.7rem;
         opacity: 0.7;
     }
-    
-    /* Schedule Content */
+
     .schedule-cont {
         padding: 1.5rem;
         background: var(--gray-50);
     }
-    
+
     .time-slot ul {
         display: flex;
         list-style: none;
@@ -251,7 +267,7 @@
         overflow-x: auto;
         padding-bottom: 0.5rem;
     }
-    
+
     .time-slot ul li {
         min-width: 180px;
         background: white;
@@ -260,16 +276,16 @@
         box-shadow: var(--shadow-sm);
         transition: all 0.3s ease;
     }
-    
+
     .time-slot ul li:hover {
         transform: translateY(-3px);
         box-shadow: var(--shadow-md);
     }
-    
+
     .day-column {
         width: 100%;
     }
-    
+
     .day-column h5 {
         font-size: 0.875rem;
         font-weight: 700;
@@ -278,13 +294,13 @@
         padding-bottom: 0.5rem;
         border-bottom: 1px solid var(--gray-200);
     }
-    
+
     .day-slots {
         display: flex;
         flex-direction: column;
         gap: 0.5rem;
     }
-    
+
     .timing {
         display: block;
         padding: 0.625rem 0.75rem;
@@ -295,7 +311,7 @@
         transition: all 0.2s ease;
         text-decoration: none;
     }
-    
+
     .timing.available {
         background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
         color: white !important;
@@ -303,7 +319,7 @@
         border: none;
         box-shadow: var(--shadow-sm);
     }
-    
+
     .timing.available:hover {
         transform: translateY(-2px);
         box-shadow: var(--shadow-md);
@@ -311,7 +327,7 @@
         text-decoration: none;
         color: white;
     }
-    
+
     .timing.booked {
         background: #fef2f2;
         color: var(--danger) !important;
@@ -319,12 +335,12 @@
         border: 1px solid #fecaca;
         opacity: 0.7;
     }
-    
+
     .timing.booked small {
         font-size: 0.7rem;
         opacity: 0.8;
     }
-    
+
     .slot-empty {
         color: var(--gray-400);
         font-size: 0.75rem;
@@ -332,70 +348,68 @@
         padding: 0.5rem;
         font-style: italic;
     }
-    
+
     .past .timing.available {
         background: var(--gray-300);
         cursor: not-allowed;
         opacity: 0.5;
         pointer-events: none;
     }
-    
+
     .past {
         opacity: 0.6;
     }
-    
-    /* Modal Styling */
+
     .custom-modal .modal-content {
         border: none;
         border-radius: var(--radius-xl);
         overflow: hidden;
         box-shadow: var(--shadow-xl);
     }
-    
+
     .custom-modal .modal-header {
         background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
         color: white;
         padding: 1.25rem 1.5rem;
         border-bottom: none;
     }
-    
+
     .custom-modal .modal-header .modal-title {
         font-weight: 700;
         font-size: 1.125rem;
     }
-    
+
     .custom-modal .modal-header .close {
         color: white;
         opacity: 0.8;
         text-shadow: none;
         font-size: 1.5rem;
     }
-    
+
     .custom-modal .modal-header .close:hover {
         opacity: 1;
     }
-    
+
     .custom-modal .modal-body {
         padding: 1.5rem;
     }
-    
+
     .custom-modal .modal-footer {
         padding: 1rem 1.5rem;
         border-top: 1px solid var(--gray-200);
     }
-    
+
     .amount-box {
         background: linear-gradient(135deg, var(--gray-50) 0%, #ffffff 100%);
         border: 1px solid var(--gray-200);
         border-radius: var(--radius-lg);
         padding: 1rem;
     }
-    
-    /* Form Controls */
+
     .form-group {
         margin-bottom: 1.25rem;
     }
-    
+
     .form-group label {
         font-weight: 600;
         color: var(--gray-700);
@@ -403,7 +417,7 @@
         font-size: 0.875rem;
         display: block;
     }
-    
+
     .form-control, select.form-control {
         width: 100%;
         padding: 0.75rem 1rem;
@@ -413,23 +427,22 @@
         transition: all 0.2s ease;
         background: #ffffff;
     }
-    
+
     .form-control:focus, select.form-control:focus {
         border-color: var(--primary);
         outline: none;
         box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
     }
-    
+
     textarea.form-control {
         resize: vertical;
         min-height: 80px;
     }
-    
+
     input[type="file"].form-control {
         padding: 0.5rem;
     }
-    
-    /* Buttons */
+
     .btn {
         padding: 0.625rem 1.5rem;
         font-size: 0.875rem;
@@ -438,86 +451,84 @@
         transition: all 0.2s ease;
         cursor: pointer;
     }
-    
+
     .btn-primary {
         background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
         color: white;
         border: none;
     }
-    
+
     .btn-primary:hover {
         transform: translateY(-2px);
         box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3);
     }
-    
+
     .btn-secondary {
         background: var(--gray-200);
         color: var(--gray-700);
         border: none;
     }
-    
+
     .btn-secondary:hover {
         background: var(--gray-300);
         transform: translateY(-2px);
     }
-    
-    /* Responsive Design */
+
     @media (max-width: 1199.98px) {
         .container {
             padding: 0 1.5rem;
         }
     }
-    
+
     @media (max-width: 991.98px) {
         .content {
             padding: 2rem 0;
         }
-        
+
         .card-body {
             padding: 1.5rem;
         }
-        
+
         .time-slot ul {
             gap: 1rem;
         }
-        
+
         .time-slot ul li {
             min-width: 160px;
         }
     }
-    
+
     @media (max-width: 768px) {
         .container {
             padding: 0 1rem;
         }
-        
+
         .booking-doc-info {
             flex-direction: column;
             text-align: center;
         }
-        
+
         .booking-info p {
             justify-content: center;
         }
-        
+
         .day-slot ul {
             flex-direction: column;
         }
-        
+
         .time-slot ul {
             flex-direction: column;
         }
-        
+
         .time-slot ul li {
             min-width: 100%;
         }
-        
+
         .custom-modal .modal-dialog {
             margin: 1rem;
         }
     }
-    
-    /* Animations */
+
     @keyframes fadeInUp {
         from {
             opacity: 0;
@@ -528,7 +539,7 @@
             transform: translateY(0);
         }
     }
-    
+
     @keyframes slideIn {
         from {
             opacity: 0;
@@ -539,16 +550,16 @@
             transform: translateX(0);
         }
     }
-    
+
     .card, .payment-summary-card, .schedule-widget {
         animation: fadeInUp 0.4s ease-out;
     }
-    
+
     .time-slot ul li {
         animation: slideIn 0.3s ease-out;
         animation-fill-mode: both;
     }
-    
+
     .time-slot ul li:nth-child(1) { animation-delay: 0.05s; }
     .time-slot ul li:nth-child(2) { animation-delay: 0.1s; }
     .time-slot ul li:nth-child(3) { animation-delay: 0.15s; }
@@ -556,31 +567,29 @@
     .time-slot ul li:nth-child(5) { animation-delay: 0.25s; }
     .time-slot ul li:nth-child(6) { animation-delay: 0.3s; }
     .time-slot ul li:nth-child(7) { animation-delay: 0.35s; }
-    
-    /* Scrollbar Styling */
+
     .time-slot ul::-webkit-scrollbar {
         height: 6px;
     }
-    
+
     .time-slot ul::-webkit-scrollbar-track {
         background: var(--gray-200);
         border-radius: 10px;
     }
-    
+
     .time-slot ul::-webkit-scrollbar-thumb {
         background: var(--gray-400);
         border-radius: 10px;
     }
-    
+
     .time-slot ul::-webkit-scrollbar-thumb:hover {
         background: var(--primary);
     }
-    
-    /* Modal Backdrop */
+
     .modal-backdrop {
         background-color: rgba(0, 0, 0, 0.5);
     }
-    
+
     .modal-backdrop.fade.show {
         opacity: 0.5;
     }
@@ -590,7 +599,6 @@
     <div class="container">
         <div class="row">
             <div class="col-12">
-                <!-- Doctor Info Card -->
                 <div class="card">
                     <div class="card-body">
                         <div class="booking-doc-info">
@@ -615,14 +623,14 @@
                         </div>
                     </div>
                 </div>
-                {% if existing_active_appointment %}
-    <div class="alert alert-warning">
-        You already have an active appointment with Dr. {{ doctor.user.first_name }} {{ doctor.user.last_name }}.
-        Please wait until it is completed or cancelled before booking again.
-    </div>
-{% endif %}
 
-                <!-- Payment Summary Card -->
+                {% if existing_active_appointment %}
+                    <div class="alert alert-warning">
+                        You already have an active appointment with Dr. {{ doctor.user.first_name }} {{ doctor.user.last_name }}.
+                        Please wait until it is completed or cancelled before booking again.
+                    </div>
+                {% endif %}
+
                 <div class="payment-summary-card">
                     <h4 class="mb-3">Payment Summary</h4>
                     <div class="payment-summary-row">
@@ -648,7 +656,6 @@
                     {% endif %}
                 </div>
 
-                <!-- Schedule Widget -->
                 <div class="card booking-schedule schedule-widget">
                     <div class="schedule-header">
                         <div class="row">
@@ -716,10 +723,9 @@
                 </div>
             </div>
         </div>
-    </div>
+     </div>
 </div>
 
-<!-- Appointment Modal -->
 <div class="modal fade custom-modal" id="appointmentModal" tabindex="-1" role="dialog" aria-labelledby="appointmentModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
@@ -727,7 +733,7 @@
                 {% csrf_token %}
                 <div class="modal-header">
                     <h5 class="modal-title" id="appointmentModalLabel">Confirm Appointment</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close modal-close-btn" data-dismiss="modal" aria-label="Close" data-target-modal="appointmentModal">
                         <span>&times;</span>
                     </button>
                 </div>
@@ -745,9 +751,9 @@
                     <div class="form-group">
                         <label for="appointment_type">Appointment Type</label>
                         <select name="appointment_type" id="appointment_type" class="form-control">
-    <option value="checkup" selected>Check Up</option>
-</select>
-<small class="text-muted">Follow-up appointments can only be created by the doctor after your previous appointment is completed.</small>
+                            <option value="checkup" selected>Check Up</option>
+                        </select>
+                        <small class="text-muted">Follow-up appointments can only be created by the doctor after your previous appointment is completed.</small>
                     </div>
 
                     <div class="form-group">
@@ -758,7 +764,9 @@
                                 <option value="esewa">eSewa</option>
                             {% endif %}
                         </select>
-                        <small class="form-text text-muted">For now, this only saves payment details in the database.</small>
+                        <small class="form-text text-muted">
+                            If you choose eSewa, you will be redirected to the eSewa sandbox payment page.
+                        </small>
                     </div>
 
                     <div class="amount-box mb-3">
@@ -787,7 +795,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-secondary modal-close-btn" data-dismiss="modal" data-target-modal="appointmentModal">Cancel</button>
                     <button type="submit" class="btn btn-primary">Book Now</button>
                 </div>
             </form>
@@ -796,17 +804,12 @@
 </div>
 
 <script>
-    function openAppointmentModal(doctorId, timeSlotId, appointmentDate, timeRange) {
-        document.getElementById('modal-doctor-id').value = doctorId;
-        document.getElementById('modal-time-slot-id').value = timeSlotId;
-        document.getElementById('modal-appointment-date').value = appointmentDate;
-        document.getElementById('selected-appointment-date-text').textContent = appointmentDate;
-        document.getElementById('selected-time-slot-text').textContent = timeRange;
-
-        var modalEl = document.getElementById('appointmentModal');
+    function showModalById(modalId) {
+        var modalEl = document.getElementById(modalId);
+        if (!modalEl) return;
 
         if (typeof $ !== 'undefined' && typeof $.fn !== 'undefined' && typeof $.fn.modal !== 'undefined') {
-            $('#appointmentModal').modal('show');
+            $('#' + modalId).modal('show');
         } else if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
             var bsModal = bootstrap.Modal.getOrCreateInstance(modalEl);
             bsModal.show();
@@ -826,15 +829,40 @@
         }
     }
 
-    function closeModalFallback() {
-        var modalEl = document.getElementById('appointmentModal');
-        var backdrop = document.getElementById('manual-backdrop');
-        modalEl.style.display = '';
-        modalEl.classList.remove('show');
-        modalEl.setAttribute('aria-hidden', 'true');
-        modalEl.removeAttribute('aria-modal');
-        document.body.classList.remove('modal-open');
-        if (backdrop) backdrop.remove();
+    function hideModalById(modalId) {
+        var modalEl = document.getElementById(modalId);
+        if (!modalEl) return;
+
+        if (typeof $ !== 'undefined' && typeof $.fn !== 'undefined' && typeof $.fn.modal !== 'undefined') {
+            $('#' + modalId).modal('hide');
+        } else if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+            var bsModal = bootstrap.Modal.getOrCreateInstance(modalEl);
+            bsModal.hide();
+        } else {
+            modalEl.style.display = '';
+            modalEl.classList.remove('show');
+            modalEl.setAttribute('aria-hidden', 'true');
+            modalEl.removeAttribute('aria-modal');
+            document.body.classList.remove('modal-open');
+
+            var backdrop = document.getElementById('manual-backdrop');
+            if (backdrop) {
+                backdrop.remove();
+            }
+        }
+    }
+
+    function openAppointmentModal(doctorId, timeSlotId, appointmentDate, timeRange) {
+        document.getElementById('modal-doctor-id').value = doctorId;
+        document.getElementById('modal-time-slot-id').value = timeSlotId;
+        document.getElementById('modal-appointment-date').value = appointmentDate;
+        document.getElementById('selected-appointment-date-text').textContent = appointmentDate;
+        document.getElementById('selected-time-slot-text').textContent = timeRange;
+        showModalById('appointmentModal');
+    }
+
+    function showMessageModal(modalId) {
+        showModalById(modalId);
     }
 
     document.addEventListener('DOMContentLoaded', function () {
@@ -850,13 +878,35 @@
             });
         });
 
-        document.querySelectorAll('#appointmentModal [data-dismiss="modal"]').forEach(function (btn) {
-            btn.addEventListener('click', function () {
-                if (!document.getElementById('manual-backdrop') === false) {
-                    closeModalFallback();
+        document.querySelectorAll('.modal-close-btn').forEach(function (btn) {
+            btn.addEventListener('click', function (e) {
+                e.preventDefault();
+                var targetModalId = this.getAttribute('data-target-modal');
+                var parentModal = this.closest('.modal');
+                hideModalById(targetModalId || (parentModal ? parentModal.id : 'appointmentModal'));
+            });
+        });
+
+        document.querySelectorAll('.modal').forEach(function(modalEl) {
+            modalEl.addEventListener('click', function(e) {
+                if (e.target === modalEl) {
+                    hideModalById(modalEl.id);
                 }
             });
         });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.modal.show').forEach(function(modalEl) {
+                    hideModalById(modalEl.id);
+                });
+            }
+        });
+
+        const hasMessages = "{% if messages %}true{% else %}false{% endif %}" === "true";
+        if (hasMessages) {
+            showMessageModal('messageModal1');
+        }
     });
 </script>
 

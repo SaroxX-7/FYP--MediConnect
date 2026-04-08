@@ -1,6 +1,9 @@
+from datetime import datetime
+
 from accounts.models import User, UserProfile
 from doctor.models import Doctor
 from django.conf import settings
+
 
 def get_doctor(request):
     try:
@@ -17,21 +20,21 @@ def get_user_profile(request):
     except:
         user_profile = None
 
-    return dict(user_profile=user_profile)
+    user_age = None
+    if user_profile and user_profile.date_of_birth:
+        user_age = (datetime.now().date() - user_profile.date_of_birth).days // 365
+
+    return {
+        'user_profile': user_profile,
+        'user_age': user_age,
+    }
 
 
 def get_google_api(request):
     return {'GOOGLE_API_KEY': settings.GOOGLE_API_KEY}
 
-# def get_stripe_public_key(request):
-#     return {'STRIPE_PUBLIC_KEY': settings.STRIPE_PUBLIC_KEY}
-
-# def get_doctors(request):
-#     doctors = Doctor.objects.all()
-#     return dict(doctors=doctors)
 
 def get_doctors(request):
-    # Using select_related to fetch related UserProfile in the same query
     doctors = Doctor.objects.select_related('user__userprofile').all()
     for doctor in doctors:
         doctor.user_profile = doctor.user.userprofile
@@ -39,9 +42,7 @@ def get_doctors(request):
 
 
 def get_users(request):
-    # Assume you have User model imported and it's the one connected to UserProfile
-    users = User.objects.select_related('userprofile').all()  # Efficiently prefetch UserProfile objects
+    users = User.objects.select_related('userprofile').all()
     for user in users:
-        # Now you can access UserProfile directly via user.userprofile
-        print(user.userprofile.phone_number)  # Example usage
+        print(user.userprofile.phone_number)
     return dict(users=users)

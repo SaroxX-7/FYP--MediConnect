@@ -509,7 +509,7 @@
                                                     <tbody>
                                                         {% for appointment in appointments %}
                                                         {% with appointment_date=appointment.appointment_date|date:"Y-m-d" %}
-                                                        <tr {% if appointment.get_appointment_status_display == "pending" and appointment_date < now|date:"Y-m-d" %}class="missed"{% endif %}>
+                                                        <tr {% if appointment.appointment_status == "pending" and appointment_date < now|date:"Y-m-d" %}class="missed"{% endif %}>
                                                             <td data-label="Patient Name">
                                                                 <h2 class="table-avatar">
                                                                     <a href="#" class="avatar avatar-sm mr-2">
@@ -522,7 +522,7 @@
                                                             </td>
                                                             <td data-label="Appt Date/Time">
                                                                 {{ appointment.appointment_date|date:"d M Y" }}
-                                                                <span class="d-block text-info">{{ appointment.time_slot.start_time|date:"g:i A" }}</span>
+                                                                <span class="d-block text-info">{{ appointment.time_slot.start_time|time:"g:i A" }}</span>
                                                             </td>
                                                             <td data-label="Type">{{ appointment.get_appointment_type_display }}</td>
                                                             <td data-label="Status">
@@ -537,24 +537,26 @@
                                                             </td>
                                                             <td data-label="Actions" class="text-right">
                                                                 <div class="table-action">
-                                                                    {% if appointment.get_appointment_status_display != "pending" or appointment_date >= now|date:"Y-m-d" %}
+                                                                    {% if appointment.appointment_status != "pending" or appointment_date >= now|date:"Y-m-d" %}
                                                                         <a href="{% url 'appointment_details' appointment_id=appointment.id %}" class="btn btn-sm bg-info-light">
                                                                             <i class="far fa-eye"></i> View
                                                                         </a>
-                                                                        {% if appointment.appointment_status != 'confirmed' and appointment.appointment_status != 'cancelled' %}
-                                                                        <a href="{% url 'accept_appointment' appointment_id=appointment.id %}" class="btn btn-sm bg-success-light">
-                                                                            <i class="fas fa-check"></i> Accept
-                                                                        </a>
-                                                                        {% endif %}
-                                                                        {% if appointment.appointment_status != 'cancelled' %}
-                                                                        <a href="{% url 'reject_appointment' appointment_id=appointment.id %}" class="btn btn-sm bg-danger-light">
-                                                                            <i class="fas fa-times"></i> Cancel
-                                                                        </a>
-                                                                        {% endif %}
                                                                     {% else %}
                                                                         <span class="text-danger">
                                                                             <i class="fas fa-clock"></i> Missed
                                                                         </span>
+                                                                    {% endif %}
+                                                                    
+                                                                    {% if appointment.appointment_status == 'pending' %}
+                                                                        <a href="{% url 'accept_appointment' appointment_id=appointment.id %}" class="btn btn-sm bg-success-light">
+                                                                            <i class="fas fa-check"></i> Accept
+                                                                        </a>
+                                                                    {% endif %}
+
+                                                                    {% if appointment.appointment_status == 'pending' or appointment.appointment_status == 'confirmed' %}
+                                                                        <a href="{% url 'reject_appointment' appointment_id=appointment.id %}" class="btn btn-sm bg-danger-light">
+                                                                            <i class="fas fa-times"></i> Cancel
+                                                                        </a>
                                                                     {% endif %}
                                                                 </div>
                                                             </td>

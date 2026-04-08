@@ -9,6 +9,9 @@ urlpatterns = [
     path('pharmacist/medicine/<int:pk>/edit/', views.medicine_edit, name='medicine_edit'),
     path('pharmacist/prescription/<int:pk>/', views.prescription_detail, name='pharmacy_prescription_detail'),
     path('pharmacist/prescription/<int:pk>/dispense/', views.dispense_prescription, name='dispense_prescription'),
+    path('cart/checkout/esewa/', views.cart_checkout_esewa, name='cart_checkout_esewa'),
+path('cart/checkout/success/', views.cart_checkout_success, name='cart_checkout_success'),
+path('cart/checkout/failure/', views.cart_checkout_failure, name='cart_checkout_failure'),
 
     # Doctor
     path('doctor/appointment/<int:appointment_id>/prescription/', views.doctor_prescription_for_appointment, name='doctor_prescription_for_appointment'),

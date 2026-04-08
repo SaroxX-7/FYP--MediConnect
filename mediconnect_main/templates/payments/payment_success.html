@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Payment Success</title>
+</head>
+<body>
+    <h2>Payment Successful</h2>
+    <p>Your eSewa payment was completed successfully.</p>
+    <p>Payment Status: {{ payment.payment_status }}</p>
+    <p>Total Amount: Rs. {{ payment.total_amount }}</p>
+
+    <a href="{% url 'appointment_details' payment.appointment.id %}">Go to Appointment Details</a>
+</body>
+</html>

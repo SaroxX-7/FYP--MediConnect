@@ -441,6 +441,121 @@
         gap: 0.5rem;
     }
 
+    /* ===== NEW STYLES FOR PAYMENT SECTION ===== */
+    .payment-section {
+    background: #ffffff;
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border: 1px solid var(--gray-200);
+    transition: all 0.2s ease;
+}
+
+.payment-section:hover {
+    border-color: var(--gray-300);
+    box-shadow: var(--shadow-sm);
+}
+
+.payment-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--dark);
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--gray-200);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+    .payment-title::before {
+        content: "💰";
+        font-size: 1.25rem;
+    }
+
+    .payment-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1rem;
+    }
+
+    .payment-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.875rem 1rem;
+        background: #ffffff;
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-sm);
+        border-left: 3px solid var(--success);
+    }
+
+    .payment-label {
+        font-weight: 600;
+        color: var(--gray-600);
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+    }
+
+    .payment-value {
+        font-weight: 700;
+        color: var(--gray-800);
+        font-size: 1rem;
+    }
+
+    .payment-value.paid {
+        color: #166534;
+        background: #dcfce7;
+        padding: 0.25rem 0.75rem;
+        border-radius: 999px;
+        font-size: 0.75rem;
+    }
+
+    .payment-value.pending {
+        color: #92400e;
+        background: #fef3c7;
+        padding: 0.25rem 0.75rem;
+        border-radius: 999px;
+        font-size: 0.75rem;
+    }
+
+    .payment-amount {
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: var(--success);
+    }
+
+    /* Payment status badge styles */
+    .payment-status-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 999px;
+        font-size: 0.7rem;
+        font-weight: 600;
+    }
+
+    .payment-status-badge.paid {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .payment-status-badge.pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .payment-status-badge.failed {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .payment-status-badge.refunded {
+        background: #e0e7ff;
+        color: #3730a3;
+    }
+
+    /* ===== RESPONSIVE STYLES ===== */
     @media (max-width: 768px) {
         .appointment-page {
             padding: 1rem;
@@ -448,7 +563,7 @@
 
         .appointment-header {
             padding: 1.25rem;
-        }
+        }.pa
 
         .appointment-content {
             padding: 1.25rem;
@@ -496,6 +611,16 @@
         .action-buttons .btn {
             width: 100%;
         }
+
+        .payment-item {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .payment-value {
+            width: 100%;
+        }
     }
 
     @media (max-width: 480px) {
@@ -510,6 +635,10 @@
         .pdf-btn,
         .cart-btn {
             width: 100%;
+        }
+
+        .payment-section {
+            padding: 1rem;
         }
     }
 
@@ -535,8 +664,8 @@
 
                 <div class="appointment-actions">
                     <a href="{% url 'download_prescription_pdf' appointment.id %}" class="pdf-btn" target="_blank">
-    Download Prescription
-</a>
+                        Download Prescription
+                    </a>
                 </div>
             </div>
         </div>
@@ -612,6 +741,66 @@
                     {% endif %}
                 </div>
             </div>
+
+            <!-- ===== PAYMENT INFORMATION SECTION - STYLED AND CONNECTED ===== -->
+            {% if appointment.payment %}
+            <div class="payment-section">
+                <div class="payment-title">
+                    Payment Information
+                </div>
+                <div class="payment-grid">
+                    <div class="payment-item">
+                        <span class="payment-label">Payment Method</span>
+                        <span class="payment-value">
+                            {% if appointment.payment.payment_method == 'esewa' %}
+                                💳 eSewa
+                            {% elif appointment.payment.payment_method == 'khalti' %}
+                                💰 Khalti
+                            {% elif appointment.payment.payment_method == 'cash' %}
+                                💵 Cash
+                            {% else %}
+                                {{ appointment.payment.payment_method|default:"-" }}
+                            {% endif %}
+                        </span>
+                    </div>
+
+                    <div class="payment-item">
+                        <span class="payment-label">Payment Status</span>
+                        <span class="payment-value">
+                            <span class="payment-status-badge 
+                                {% if appointment.payment.payment_status == 'Paid' or appointment.payment.payment_status == 'completed' %}paid
+                                {% elif appointment.payment.payment_status == 'Pending' or appointment.payment.payment_status == 'pending' %}pending
+                                {% elif appointment.payment.payment_status == 'Failed' or appointment.payment.payment_status == 'failed' %}failed
+                                {% elif appointment.payment.payment_status == 'Refunded' or appointment.payment.payment_status == 'refunded' %}refunded
+                                {% endif %}">
+                                {{ appointment.payment.payment_status|default:"-" }}
+                            </span>
+                        </span>
+                    </div>
+
+                    <div class="payment-item">
+                        <span class="payment-label">Total Amount</span>
+                        <span class="payment-value payment-amount">
+                            रु {{ appointment.payment.total_amount|floatformat:2 }}
+                        </span>
+                    </div>
+
+                    {% if appointment.payment.transaction_id %}
+                    <div class="payment-item">
+                        <span class="payment-label">Transaction ID</span>
+                        <span class="payment-value">{{ appointment.payment.transaction_id }}</span>
+                    </div>
+                    {% endif %}
+
+                    {% if appointment.payment.payment_date %}
+                    <div class="payment-item">
+                        <span class="payment-label">Payment Date</span>
+                        <span class="payment-value">{{ appointment.payment.payment_date|date:"M d, Y H:i" }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
 
             <!-- Action Buttons for Doctor -->
             {% if request.user == appointment.doctor.user and appointment.appointment_status != 'completed' and appointment.appointment_status != 'cancelled' %}
@@ -815,7 +1004,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Set minimum date for follow-up
+    // Set minimum date for follow-up (tomorrow)
     var dateInput = document.getElementById('appointment_date');
     if (dateInput) {
         var today = new Date();

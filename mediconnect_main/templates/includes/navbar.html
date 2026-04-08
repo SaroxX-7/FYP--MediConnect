@@ -615,29 +615,39 @@
                         </span>
                     </a>
                     <div class="dropdown-menu dropdown-menu-right">
-                        <div class="user-header">
-                            <div class="avatar avatar-sm">
-                                <img src="{% if user_profile.profile_picture %}{{ user_profile.profile_picture.url }}{% else %}{% static 'doctors/doctor-01.jpg' %}{% endif %}"
-                                     alt="User Image"
-                                     class="avatar-img rounded-circle">
-                            </div>
-                            <div class="user-text">
-                                <h6>{{ request.user.first_name }} {{ request.user.last_name }}</h6>
-                                <p class="text-muted mb-0">
-                                    {% if request.user.role == 1 %}
-                                        Doctor
-                                    {% elif request.user.role == 3 %}
-                                        Pharmacist
-                                    {% else %}
-                                        Patient
-                                    {% endif %}
-                                </p>
-                            </div>
-                        </div>
-                        <a class="dropdown-item" href="{% url 'custDashboard' %}">Dashboard</a>
-                        <a class="dropdown-item" href="{% url 'cprofile' %}">Profile Settings</a>
-                        <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
-                    </div>
+    <div class="user-header">
+        <div class="avatar avatar-sm">
+            <img src="{% if user_profile.profile_picture %}{{ user_profile.profile_picture.url }}{% else %}{% static 'doctors/doctor-01.jpg' %}{% endif %}"
+                 alt="User Image"
+                 class="avatar-img rounded-circle">
+        </div>
+        <div class="user-text">
+            <h6>{{ request.user.first_name }} {{ request.user.last_name }}</h6>
+            <p class="text-muted mb-0">
+                {% if request.user.role == 1 %}
+                    Doctor
+                {% elif request.user.role == 3 %}
+                    Pharmacist
+                {% else %}
+                    Patient
+                {% endif %}
+            </p>
+        </div>
+    </div>
+
+    {% if request.user.role == 1 %}
+        <a class="dropdown-item" href="{% url 'doctor' %}">Dashboard</a>
+        <a class="dropdown-item" href="{% url 'dprofile' %}">Profile Settings</a>
+    {% elif request.user.role == 3 %}
+        <a class="dropdown-item" href="{% url 'pharmacistDashboard' %}">Dashboard</a>
+        <a class="dropdown-item" href="{% url 'pharmacistProfile' %}">Profile Settings</a>
+    {% else %}
+        <a class="dropdown-item" href="{% url 'custDashboard' %}">Dashboard</a>
+        <a class="dropdown-item" href="{% url 'cprofile' %}">Profile Settings</a>
+    {% endif %}
+
+    <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
+</div>
                 </li>
                 {% else %}
                 <li class="nav-item">

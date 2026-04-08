@@ -1,6 +1,5 @@
+{% load static %}
 <style>
-    /* ========== CUSTOMER SIDEBAR - MODERN & STYLISH ========== */
-
     .profile-sidebar {
         background: #ffffff;
         border-radius: 24px;
@@ -16,7 +15,6 @@
         transform: translateY(-2px);
     }
 
-    /* Gradient top border on hover */
     .profile-sidebar::before {
         content: '';
         position: absolute;
@@ -34,7 +32,6 @@
         opacity: 1;
     }
 
-    /* ========== WIDGET PROFILE CARD ========== */
     .widget-profile {
         background: linear-gradient(135deg, #0f2b3d 0%, #1a4a6f 100%);
         padding: 28px 24px;
@@ -129,7 +126,6 @@
         color: rgba(255, 255, 255, 0.7);
     }
 
-    /* ========== DASHBOARD WIDGET / MENU ========== */
     .dashboard-widget {
         padding: 16px 0;
         background: #ffffff;
@@ -182,7 +178,6 @@
         letter-spacing: -0.2px;
     }
 
-    /* Active menu item */
     .dashboard-menu ul li.active {
         background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
         box-shadow: 0 2px 6px rgba(37, 99, 235, 0.08);
@@ -196,7 +191,6 @@
         color: #2563eb;
     }
 
-    /* Hover effects for non-active items */
     .dashboard-menu ul li:not(.active):hover {
         background: #f8fafc;
     }
@@ -211,7 +205,6 @@
         transform: scale(1.05);
     }
 
-    /* Logout special styling */
     .dashboard-menu ul li:last-child {
         margin-top: 12px;
         border-top: 1px solid #e2e8f0;
@@ -239,7 +232,6 @@
         color: #dc2626;
     }
 
-    /* ========== RESPONSIVE ADJUSTMENTS ========== */
     @media (max-width: 991.98px) {
         .profile-sidebar {
             margin-bottom: 32px;
@@ -286,7 +278,6 @@
         }
     }
 
-    /* ========== ANIMATIONS ========== */
     @keyframes slideInRight {
         from {
             opacity: 0;
@@ -311,77 +302,79 @@
     .dashboard-menu ul li:nth-child(2) { animation-delay: 0.1s; }
     .dashboard-menu ul li:nth-child(3) { animation-delay: 0.15s; }
     .dashboard-menu ul li:nth-child(4) { animation-delay: 0.2s; }
-
-    /* ========== SCROLLBAR STYLING ========== */
-    .dashboard-menu::-webkit-scrollbar { width: 4px; }
-    .dashboard-menu::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
-    .dashboard-menu::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-
-    /* ========== RIPPLE EFFECT ========== */
-    .dashboard-menu ul li a::after {
-        content: '';
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 0;
-        height: 0;
-        background: rgba(37, 99, 235, 0.1);
-        border-radius: 50%;
-        transform: translate(-50%, -50%);
-        transition: width 0.4s, height 0.4s;
-    }
-
-    .dashboard-menu ul li a:active::after {
-        width: 200px;
-        height: 200px;
-    }
-
-    /* Focus styles for accessibility */
-    .dashboard-menu ul li a:focus {
-        outline: 2px solid #2563eb;
-        outline-offset: 2px;
-        border-radius: 16px;
-    }
+    .dashboard-menu ul li:nth-child(5) { animation-delay: 0.25s; }
 </style>
 
-<!-- Profile Sidebar -->
 <div class="col-md-5 col-lg-4 col-xl-3 theiaStickySidebar">
     <div class="profile-sidebar">
         <div class="widget-profile pro-widget-content">
             <div class="profile-info-widget">
                 <a href="#" class="booking-doc-img">
-                    <img src="{% if profile.profile_picture %}{{ profile.profile_picture.url }}{% else %}lifelink_main/static/img/favicon.png{% endif %}" alt="User Image">
+                    <img src="{% if user_profile and user_profile.profile_picture %}{{ user_profile.profile_picture.url }}{% else %}{% static 'img/favicon.png' %}{% endif %}" alt="User Image">
                 </a>
                 <div class="profile-det-info">
-                    <h3>{{ request.user.first_name }} {{ request.user.last_name }}</h3>
+                    <h3>
+                        {% if request.user.first_name or request.user.last_name %}
+                            {{ request.user.first_name }} {{ request.user.last_name }}
+                        {% else %}
+                            {{ request.user.username }}
+                        {% endif %}
+                    </h3>
+
                     <div class="patient-details">
-                        <h5><i class="fas fa-birthday-cake"></i> {{ profile.date_of_birth }}, {{ age }} years</h5>
-                        <h5 class="mb-0"><i class="fas fa-map-marker-alt"></i> {{ profile.address }}</h5>
+                        <h5>
+                            <i class="fas fa-birthday-cake"></i>
+                            {% if user_profile and user_profile.date_of_birth %}
+                                {{ user_profile.date_of_birth|date:"M. j, Y" }}{% if user_age %}, {{ user_age }} years{% endif %}
+                            {% else %}
+                                Date of birth not added
+                            {% endif %}
+                        </h5>
+
+                        <h5 class="mb-0">
+                            <i class="fas fa-map-marker-alt"></i>
+                            {% if user_profile and user_profile.address %}
+                                {{ user_profile.address }}
+                            {% else %}
+                                Address not added
+                            {% endif %}
+                        </h5>
                     </div>
                 </div>
             </div>
         </div>
+
         <div class="dashboard-widget">
             <nav class="dashboard-menu">
                 <ul>
-                    <li class="{% if request.resolver_match.url_name == 'custDashboard' %}active{% endif %}">
+                    <li class="{% if request.resolver_match.url_name == 'customer' or request.resolver_match.url_name == 'custDashboard' %}active{% endif %}">
                         <a href="{% url 'custDashboard' %}">
                             <i class="fas fa-columns"></i>
                             <span>Dashboard</span>
                         </a>
                     </li>
+
                     <li class="{% if request.resolver_match.url_name == 'cprofile' %}active{% endif %}">
                         <a href="{% url 'cprofile' %}">
                             <i class="fas fa-user-cog"></i>
                             <span>Profile Settings</span>
                         </a>
                     </li>
-                    <li class="{% if request.resolver_match.url_name == 'update_password' %}active{% endif %}">
+
+                    <li class="{% if request.resolver_match.url_name == 'update_password' or request.resolver_match.url_name == 'change_password' %}active{% endif %}">
                         <a href="{% url 'update_password' %}">
                             <i class="fas fa-lock"></i>
                             <span>Change Password</span>
                         </a>
                     </li>
+
+                    <li class="{% if request.resolver_match.url_name == 'payment_history' %}active{% endif %}">
+                        <a href="{% url 'payment_history' %}">
+                            <i class="fas fa-credit-card"></i>
+                            <span>Payment History</span>
+                        </a>
+                    </li>
+
                     <li>
                         <a href="{% url 'logout' %}">
                             <i class="fas fa-sign-out-alt"></i>
@@ -393,4 +386,3 @@
         </div>
     </div>
 </div>
-<!-- / Profile Sidebar -->

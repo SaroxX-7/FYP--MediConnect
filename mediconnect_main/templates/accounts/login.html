@@ -3,383 +3,503 @@
 {% block content %}
 
 <style>
-    /* ========== LOGIN PAGE - MODERN & STYLISH ========== */
-    
-    /* Page Content Background */
+    /* ========== LOGIN PAGE - FULL BACKGROUND SLIDESHOW DESIGN ========== */
+
     .content {
-        background: linear-gradient(135deg, #f0f9ff 0%, #eef2ff 100%);
-        min-height: calc(100vh - 200px);
+        min-height: calc(100vh - 80px);
+        position: relative;
+        overflow: hidden;
+        background-image: url("{% static 'img/doctors/doctor-01.jpg' %}");
+        background-size: cover;
+        background-position: center center;
+        background-repeat: no-repeat;
+        transition: background-image 1s ease-in-out;
+        padding: 0;
+        margin: 0;
+    }
+
+    /* Full dark overlay over slideshow */
+    .content::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background:
+            linear-gradient(rgba(15, 23, 42, 0.42), rgba(15, 23, 42, 0.42)),
+            linear-gradient(135deg, rgba(59, 130, 246, 0.14), rgba(139, 92, 246, 0.14));
+        z-index: 1;
+    }
+
+    /* soft light effect */
+    .content::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background:
+            radial-gradient(circle at 20% 20%, rgba(255,255,255,0.08), transparent 35%),
+            radial-gradient(circle at 80% 80%, rgba(255,255,255,0.06), transparent 35%);
+        z-index: 1;
+        pointer-events: none;
+    }
+
+    .login-stage {
+        min-height: calc(100vh - 80px);
         display: flex;
         align-items: center;
-        padding: 3rem 0;
+        justify-content: center;
+        padding: 2rem 0;
+        position: relative;
+        z-index: 2;
     }
-    
-    /* Account Content Container */
+
     .account-content {
         background: transparent;
         padding: 0;
+        position: relative;
+        z-index: 2;
+        width: 100%;
     }
-    
-    /* Login Left Image Section */
-    .login-left {
-        animation: fadeInLeft 0.6s ease-out;
+
+    .login-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
-    
-    .login-left img {
-        max-width: 100%;
-        height: auto;
-        filter: drop-shadow(0 10px 25px rgba(0, 0, 0, 0.1));
-        transition: transform 0.3s ease;
-    }
-    
-    .login-left img:hover {
-        transform: scale(1.02);
-    }
-    
-    /* Login Right Card */
+
     .login-right {
-        background: #ffffff;
-        border-radius: 32px;
-        padding: 2.5rem;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
-        animation: fadeInRight 0.6s ease-out;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        backdrop-filter: blur(0px);
+        background: rgba(255, 255, 255, 0.97);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-radius: 42px;
+        padding: 2.8rem 2.5rem;
+        box-shadow:
+            0 30px 60px -20px rgba(0, 0, 0, 0.35),
+            0 0 0 1px rgba(255, 255, 255, 0.35) inset;
+        animation: slideUpFade 0.7s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
-    
-    /* Login Header */
+
+    .login-right:hover {
+        transform: translateY(-4px);
+        box-shadow:
+            0 40px 70px -20px rgba(0, 0, 0, 0.4),
+            0 0 0 1px rgba(255, 255, 255, 0.45) inset;
+    }
+
     .login-header {
         text-align: center;
-        margin-bottom: 2rem;
+        margin-bottom: 2.5rem;
     }
-    
+
     .login-header h3 {
-        font-size: 1.875rem;
-        font-weight: 700;
-        color: #0f2b3d;
+        font-size: 2.25rem;
+        font-weight: 800;
         margin: 0;
+        letter-spacing: -0.02em;
+        background: linear-gradient(135deg, #0f2b3d 0%, #1e3a5f 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        line-height: 1.2;
     }
-    
+
     .login-header h3 span {
-        background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+        background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
         -webkit-background-clip: text;
         background-clip: text;
         color: transparent;
         display: inline-block;
     }
-    
-    /* Form Group with Floating Labels */
+
     .form-group {
-        margin-bottom: 1.5rem;
+        margin-bottom: 1.75rem;
         position: relative;
     }
-    
+
     .form-focus {
         position: relative;
     }
-    
+
     .form-focus .form-control {
-        height: 56px;
-        padding: 1rem 1rem 0.5rem;
+        height: 62px;
+        padding: 1.2rem 1.2rem 0.5rem;
         font-size: 1rem;
-        border: 2px solid #e2e8f0;
-        border-radius: 16px;
-        transition: all 0.2s ease;
-        background: #ffffff;
+        border: 2px solid #e8eefc;
+        border-radius: 24px;
+        transition: all 0.25s ease;
+        background: rgba(255, 255, 255, 0.96);
         width: 100%;
-        font-family: inherit;
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        font-weight: 500;
+        color: #1e293b;
     }
-    
+
     .form-focus .form-control:focus {
-        border-color: #2563eb;
+        border-color: #3b82f6;
         outline: none;
-        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+        background: #ffffff;
     }
-    
+
     .form-focus .focus-label {
         position: absolute;
-        left: 1rem;
+        left: 1.2rem;
         top: 50%;
         transform: translateY(-50%);
-        font-size: 1rem;
+        font-size: 0.95rem;
         color: #94a3b8;
-        transition: all 0.2s ease;
+        transition: all 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1);
         pointer-events: none;
         background: transparent;
-        padding: 0 0.25rem;
+        padding: 0 0.3rem;
         margin: 0;
-        font-weight: 400;
+        font-weight: 500;
+        letter-spacing: -0.01em;
     }
-    
+
     .form-focus .form-control:focus ~ .focus-label,
     .form-focus .form-control:not(:placeholder-shown) ~ .focus-label {
         top: 0;
-        font-size: 0.75rem;
+        font-size: 0.7rem;
         transform: translateY(-50%);
         background: white;
-        color: #2563eb;
-        font-weight: 500;
+        color: #3b82f6;
+        font-weight: 600;
+        letter-spacing: 0;
     }
-    
-    /* Forgot Password Link */
+
     .text-right {
         text-align: right;
-        margin-bottom: 1.5rem;
+        margin-bottom: 1.75rem;
     }
-    
+
     .forgot-link {
         color: #2563eb;
         text-decoration: none;
-        font-size: 0.875rem;
-        font-weight: 500;
-        transition: color 0.2s ease;
+        font-size: 0.85rem;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        position: relative;
+        padding-bottom: 2px;
     }
-    
+
+    .forgot-link::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 0;
+        height: 1.5px;
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        transition: width 0.25s ease;
+    }
+
+    .forgot-link:hover::after {
+        width: 100%;
+    }
+
     .forgot-link:hover {
         color: #1e40af;
-        text-decoration: underline;
     }
-    
-    /* Login Button */
+
     .login-btn {
-        background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+        background: linear-gradient(105deg, #2563eb 0%, #1e3a8a 50%, #2563eb 100%);
+        background-size: 200% auto;
         color: white;
         border: none;
-        padding: 0.875rem 1.5rem;
+        padding: 1rem 1.5rem;
         font-size: 1rem;
-        font-weight: 600;
+        font-weight: 700;
         border-radius: 40px;
         width: 100%;
         cursor: pointer;
-        transition: all 0.3s ease;
-        margin-bottom: 1rem;
+        transition: all 0.4s ease;
+        margin-bottom: 1.25rem;
+        position: relative;
+        overflow: hidden;
+        letter-spacing: 0.3px;
     }
-    
+
+    .login-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left 0.5s ease;
+    }
+
+    .login-btn:hover::before {
+        left: 100%;
+    }
+
     .login-btn:hover {
+        background-position: right center;
         transform: translateY(-2px);
-        box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.4);
+        box-shadow: 0 15px 25px -10px rgba(37, 99, 235, 0.4);
     }
-    
+
     .login-btn:active {
-        transform: translateY(0);
+        transform: translateY(1px);
     }
-    
-    /* Register Links */
+
     .dont-have {
         text-align: center;
-        font-size: 0.9375rem;
+        font-size: 0.85rem;
         color: #64748b;
         margin-top: 1.5rem;
-        padding-top: 1rem;
-        border-top: 1px solid #e2e8f0;
+        padding-top: 1.25rem;
+        border-top: 2px solid #f1f5f9;
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        flex-wrap: wrap;
     }
-    
+
     .dont-have a {
-        color: #2563eb;
+        color: #3b82f6;
         text-decoration: none;
-        font-weight: 600;
-        transition: color 0.2s ease;
-        margin: 0 0.25rem;
+        font-weight: 700;
+        transition: all 0.2s ease;
+        padding: 0.25rem 0.75rem;
+        border-radius: 40px;
+        background: rgba(59, 130, 246, 0.05);
+        font-size: 0.8rem;
     }
-    
+
     .dont-have a:hover {
+        background: rgba(59, 130, 246, 0.15);
         color: #1e40af;
-        text-decoration: underline;
+        transform: translateY(-1px);
     }
-    
-    /* Error Messages Styling (if any) */
+
+    .dont-have span {
+        color: #cbd5e1;
+        font-weight: 300;
+    }
+
     .error-message {
-        background: #fee2e2;
+        background: #fef2f2;
         color: #dc2626;
-        padding: 0.75rem 1rem;
-        border-radius: 12px;
-        font-size: 0.875rem;
-        margin-bottom: 1rem;
-        border-left: 3px solid #dc2626;
+        padding: 0.85rem 1.2rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        margin-bottom: 1.5rem;
+        border-left: 4px solid #dc2626;
+        font-weight: 500;
+        animation: shake 0.4s ease;
     }
-    
+
     .success-message {
-        background: #dcfce7;
-        color: #16a34a;
-        padding: 0.75rem 1rem;
-        border-radius: 12px;
-        font-size: 0.875rem;
-        margin-bottom: 1rem;
-        border-left: 3px solid #16a34a;
+        background: #ecfdf5;
+        color: #10b981;
+        padding: 0.85rem 1.2rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        margin-bottom: 1.5rem;
+        border-left: 4px solid #10b981;
+        font-weight: 500;
+        animation: fadeSlideDown 0.4s ease;
     }
-    
-    /* Animations */
-    @keyframes fadeInLeft {
+
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
+    }
+
+    @keyframes fadeSlideDown {
         from {
             opacity: 0;
-            transform: translateX(-30px);
+            transform: translateY(-10px);
         }
         to {
             opacity: 1;
-            transform: translateX(0);
+            transform: translateY(0);
         }
     }
-    
-    @keyframes fadeInRight {
+
+    @keyframes slideUpFade {
         from {
             opacity: 0;
-            transform: translateX(30px);
+            transform: translateY(40px);
         }
         to {
             opacity: 1;
-            transform: translateX(0);
+            transform: translateY(0);
         }
     }
-    
-    /* Responsive Design */
+
     @media (max-width: 991.98px) {
+        .login-stage {
+            min-height: calc(100vh - 80px);
+            padding: 1.75rem 0;
+        }
+
         .login-right {
-            padding: 2rem;
-            margin-top: 2rem;
+            padding: 2.2rem;
+            border-radius: 36px;
         }
-        
-        .login-left {
-            text-align: center;
-        }
-        
-        .login-left img {
-            max-width: 80%;
+
+        .login-header h3 {
+            font-size: 1.9rem;
         }
     }
-    
+
     @media (max-width: 768px) {
         .content {
-            padding: 2rem 0;
+            min-height: calc(100vh - 70px);
+            background-position: center center;
         }
-        
+
+        .login-stage {
+            min-height: calc(100vh - 70px);
+            padding: 1.2rem 0;
+        }
+
         .login-right {
-            padding: 1.75rem;
-            border-radius: 24px;
+            padding: 1.8rem;
+            border-radius: 30px;
         }
-        
+
         .login-header h3 {
-            font-size: 1.5rem;
+            font-size: 1.7rem;
         }
-        
+
         .form-focus .form-control {
-            height: 50px;
-            font-size: 0.9375rem;
+            height: 54px;
+            font-size: 0.9rem;
+            border-radius: 20px;
         }
-        
+
         .login-btn {
-            padding: 0.75rem 1.25rem;
-            font-size: 0.9375rem;
+            padding: 0.85rem 1.25rem;
+            font-size: 0.9rem;
         }
-        
+
         .dont-have {
-            font-size: 0.875rem;
+            font-size: 0.75rem;
+            gap: 0.3rem;
+        }
+
+        .dont-have a {
+            font-size: 0.75rem;
+            padding: 0.2rem 0.6rem;
         }
     }
-    
+
     @media (max-width: 480px) {
         .login-right {
             padding: 1.5rem;
+            border-radius: 26px;
         }
-        
+
         .login-header h3 {
-            font-size: 1.375rem;
+            font-size: 1.5rem;
         }
-        
+
         .form-focus .form-control {
-            height: 48px;
+            height: 50px;
+            border-radius: 18px;
         }
-        
-        .dont-have a {
-            display: inline-block;
-            margin: 0.25rem;
+
+        .form-focus .focus-label {
+            font-size: 0.85rem;
+            left: 1rem;
+        }
+
+        .login-btn {
+            border-radius: 32px;
         }
     }
-    
-    /* Input placeholder styling */
+
     .form-control::placeholder {
         color: transparent;
     }
-    
+
     .form-control:focus::placeholder {
         color: #cbd5e1;
     }
-    
-    /* Remove spinner from number inputs */
+
     input[type="number"]::-webkit-inner-spin-button,
     input[type="number"]::-webkit-outer-spin-button {
         -webkit-appearance: none;
         margin: 0;
     }
+
+    input:focus {
+        outline: none;
+    }
+
+    html {
+        scroll-behavior: smooth;
+    }
 </style>
 
-<!-- Page Content -->
-<div class="content">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-8 offset-md-2">
-                <!-- Login Tab Content -->
-                <div class="account-content">
-                    <div class="row align-items-center justify-content-center">
-                        <div class="col-md-7 col-lg-6 login-left">
-                            <img src="{% static 'img/login-banner.png' %}" class="img-fluid" alt="MediConnect Login">
-                        </div>
-                        <div class="col-md-12 col-lg-6 login-right">
-                            <div class="login-header">
-                                <h3>Login <span>MediConnect</span></h3>
-                            </div>
-                            
-                            <!-- Display Django messages if any -->
-                            {% if messages %}
-                                {% for message in messages %}
-                                    <div class="{% if message.tags == 'error' %}error-message{% else %}success-message{% endif %}">
-                                        {{ message }}
+<div class="content" id="loginBackground">
+    <div class="login-stage">
+        <div class="container-fluid">
+            <div class="row justify-content-center">
+                <div class="col-md-10 col-lg-6 col-xl-5">
+                    <div class="account-content">
+                        <div class="login-wrapper">
+                            <div class="login-right">
+                                <div class="login-header">
+                                    <h3>Welcome back to <span>MediConnect</span></h3>
+                                </div>
+
+                                {% if messages %}
+                                    {% for message in messages %}
+                                        <div class="{% if message.tags == 'error' %}error-message{% else %}success-message{% endif %}">
+                                            {{ message }}
+                                        </div>
+                                    {% endfor %}
+                                {% endif %}
+
+                                <form action="{% url 'login' %}" method="post" enctype="multipart/form-data">
+                                    {% csrf_token %}
+                                    <div class="form-group form-focus">
+                                        <input type="email" name="email" id="email" class="form-control floating" placeholder=" ">
+                                        <label class="focus-label" for="email">Email address</label>
                                     </div>
-                                {% endfor %}
-                            {% endif %}
-                            
-                            <form action="{% url 'login' %}" method="post" enctype="multipart/form-data">
-                                {% csrf_token %}
-                                <div class="form-group form-focus">
-                                    <input type="email" name="email" id="email" class="form-control floating" placeholder=" ">
-                                    <label class="focus-label" for="email">Email</label>
-                                </div>
-                                <div class="form-group form-focus">
-                                    <input type="password" name="password" id="password" class="form-control floating" placeholder=" ">
-                                    <label class="focus-label" for="password">Password</label>
-                                </div>
-                                <div class="text-right">
-                                    <a class="forgot-link" href="{% url 'forgot_password' %}">Forgot Password ?</a>
-                                </div>
-                                <button class="btn btn-primary btn-block btn-lg login-btn" type="submit">Login</button>
-                                <div class="text-center dont-have">
-                                    Don't have an account? 
-                                    <a href="{% url 'registerUser' %}">Patient</a> | 
-                                    <a href="{% url 'registerDoctor' %}">Doctor</a> | 
-                                    <a href="{% url 'registerPharmacist' %}">Pharmacist</a>
-                                </div>
-                            </form>
+                                    <div class="form-group form-focus">
+                                        <input type="password" name="password" id="password" class="form-control floating" placeholder=" ">
+                                        <label class="focus-label" for="password">Password</label>
+                                    </div>
+                                    <div class="text-right">
+                                        <a class="forgot-link" href="{% url 'forgot_password' %}">Forgot Password?</a>
+                                    </div>
+                                    <button class="btn btn-primary btn-block btn-lg login-btn" type="submit">Sign In</button>
+                                    <div class="text-center dont-have">
+                                        <span>New to MediConnect?</span>
+                                        <a href="{% url 'registerUser' %}">Patient</a>
+                                        <span>•</span>
+                                        <a href="{% url 'registerDoctor' %}">Doctor</a>
+                                        <span>•</span>
+                                        <a href="{% url 'registerPharmacist' %}">Pharmacist</a>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                     </div>
+                    <!-- /Login Tab Content -->
                 </div>
-                <!-- /Login Tab Content -->
             </div>
         </div>
     </div>
 </div>
 
 <script>
-    // Optional: Add floating label enhancement for better UX
     document.addEventListener('DOMContentLoaded', function() {
-        // Handle floating labels on page load
         const floatingInputs = document.querySelectorAll('.form-focus .form-control');
-        
+
         floatingInputs.forEach(input => {
-            // Check if input has value on load
             if (input.value.trim() !== '') {
                 input.classList.add('filled');
+                input.dispatchEvent(new Event('input'));
             }
-            
-            // Add event listener for input
+
             input.addEventListener('input', function() {
                 if (this.value.trim() !== '') {
                     this.classList.add('filled');
@@ -387,8 +507,81 @@
                     this.classList.remove('filled');
                 }
             });
+
+            input.addEventListener('blur', function() {
+                if (this.value.trim() === '') {
+                    this.classList.remove('filled');
+                }
+            });
         });
+
+        const loginBtn = document.querySelector('.login-btn');
+        if (loginBtn) {
+            loginBtn.addEventListener('mouseenter', function(e) {
+                const ripple = document.createElement('span');
+                ripple.classList.add('ripple-effect');
+                ripple.style.position = 'absolute';
+                ripple.style.borderRadius = '50%';
+                ripple.style.backgroundColor = 'rgba(255,255,255,0.3)';
+                ripple.style.pointerEvents = 'none';
+                ripple.style.transform = 'scale(0)';
+                ripple.style.animation = 'ripple 0.6s linear';
+
+                const rect = this.getBoundingClientRect();
+                ripple.style.left = `${e.clientX - rect.left}px`;
+                ripple.style.top = `${e.clientY - rect.top}px`;
+                ripple.style.width = ripple.style.height = '100px';
+                this.style.position = 'relative';
+                this.style.overflow = 'hidden';
+                this.appendChild(ripple);
+
+                setTimeout(() => ripple.remove(), 600);
+            });
+        }
+
+        const doctorImages = [
+            "{% static 'img/doctors/doctor-01.jpg' %}",
+            "{% static 'img/doctors/doctor-02.jpg' %}",
+            "{% static 'img/doctors/doctor-03.jpg' %}",
+            "{% static 'img/doctors/doctor-04.jpg' %}",
+            "{% static 'img/doctors/doctor-05.jpg' %}",
+            "{% static 'img/doctors/doctor-06.jpg' %}",
+            "{% static 'img/doctors/doctor-07.jpg' %}",
+            "{% static 'img/doctors/doctor-08.jpg' %}",
+            "{% static 'img/doctors/doctor-09.jpg' %}",
+            "{% static 'img/doctors/doctor-10.jpg' %}",
+            "{% static 'img/doctors/doctor-11.jpg' %}",
+            "{% static 'img/doctors/doctor-12.jpg' %}"
+        ];
+
+        const background = document.getElementById('loginBackground');
+
+        if (background) {
+            let currentIndex = Math.floor(Math.random() * doctorImages.length);
+            background.style.backgroundImage = `url('${doctorImages[currentIndex]}')`;
+
+            setInterval(() => {
+                let nextIndex;
+                do {
+                    nextIndex = Math.floor(Math.random() * doctorImages.length);
+                } while (nextIndex === currentIndex && doctorImages.length > 1);
+
+                background.style.backgroundImage = `url('${doctorImages[nextIndex]}')`;
+                currentIndex = nextIndex;
+            }, 3000);
+        }
     });
+
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+    `;
+    document.head.appendChild(style);
 </script>
 
 {% endblock %}

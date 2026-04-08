@@ -5,6 +5,7 @@ from django.db import transaction
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib import messages
+from django.utils import timezone
 from django.utils.dateparse import parse_date
 from django.views.decorators.http import require_http_methods
 from django.db.models import Prefetch
@@ -22,7 +23,7 @@ from .forms import (
     DoctorForm, EducationForm, ExperienceForm, AwardForm,
     MembershipForm, RegistrationForm, DoctorBillingForm
 )
-from .models import Doctor, Education, Experience, Award, Membership, Registration
+from .models import Education, Experience, Award, Membership, Registration
 from accounts.models import UserProfile, Department
 from pharmacy.models import Medicine
 
@@ -33,6 +34,11 @@ try:
 except ImportError:
     XHTML2PDF_AVAILABLE = False
     pisa = None
+
+
+@login_required
+def appointment_details(request, appointment_id):
+    return doctor_appointment_details(request, appointment_id)
 
 
 @login_required
@@ -79,13 +85,20 @@ def doctor_appointment_details(request, appointment_id):
     existing_remark = appointment.remarks.filter(doctor=doctor).first()
 
     if request.method == 'POST':
+        follow_up_date_str = request.POST.get('follow_up_date')
+        follow_up_date = parse_date(follow_up_date_str) if follow_up_date_str else None
+
+        if follow_up_date and follow_up_date < timezone.localdate():
+            messages.error(request, "Follow-up date cannot be in the past.")
+            return redirect('doctor_appointment_details', appointment_id=appointment.id)
+
         if existing_remark:
             remark = existing_remark
             remark.diagnosis = request.POST.get('diagnosis')
             remark.symptoms = request.POST.get('symptoms')
             remark.note = request.POST.get('note')
             remark.advice = request.POST.get('advice')
-            remark.follow_up_date = request.POST.get('follow_up_date') or None
+            remark.follow_up_date = follow_up_date
             remark.save()
         else:
             remark = Remark.objects.create(
@@ -95,7 +108,7 @@ def doctor_appointment_details(request, appointment_id):
                 symptoms=request.POST.get('symptoms'),
                 note=request.POST.get('note'),
                 advice=request.POST.get('advice'),
-                follow_up_date=request.POST.get('follow_up_date') or None,
+                follow_up_date=follow_up_date,
             )
 
         medicine_ids = request.POST.getlist('medicine_id[]')
@@ -409,19 +422,20 @@ def dashboard_view(request):
 
 @login_required
 def accept_appointment(request, appointment_id):
-    """Accept a pending appointment with proper error handling"""
     appointment = get_object_or_404(
         Appointment.objects.select_related('doctor__user', 'patient', 'time_slot'),
         id=appointment_id,
         doctor__user=request.user
     )
 
+    if appointment.appointment_status != 'pending':
+        messages.error(request, 'Only pending appointments can be accepted.')
+        return redirect('doctor')
+
     try:
-        # Change status to confirmed and save
         appointment.appointment_status = 'confirmed'
         appointment.save()
-        
-        # Send email notification
+
         patient_email = appointment.patient.email
         patient_name = appointment.patient.first_name + ' ' + appointment.patient.last_name
         patient_username = appointment.patient.username
@@ -448,21 +462,17 @@ def accept_appointment(request, appointment_id):
             messages.warning(request, 'Appointment accepted but email notification failed.')
 
         messages.success(request, f'Appointment #{appointment.id} has been accepted successfully.')
-        
+
     except ValidationError as e:
-        # Handle validation errors from the model
-        error_message = str(e)
-        messages.error(request, f'Cannot accept appointment: {error_message}')
+        messages.error(request, f'Cannot accept appointment: {str(e)}')
     except Exception as e:
-        # Handle any other unexpected errors
         messages.error(request, f'An unexpected error occurred: {str(e)}')
-    
+
     return redirect('doctor')
 
 
 @login_required
 def reject_appointment(request, appointment_id):
-    """Reject/cancel a pending appointment with proper error handling"""
     with transaction.atomic():
         appointment = get_object_or_404(
             Appointment.objects.select_related('doctor__user', 'patient', 'time_slot'),
@@ -470,23 +480,23 @@ def reject_appointment(request, appointment_id):
             doctor__user=request.user
         )
 
+        if appointment.appointment_status not in ['pending', 'confirmed']:
+            messages.error(request, 'Only pending or confirmed appointments can be cancelled.')
+            return redirect('doctor')
+
         try:
-            # Delete associated booking if exists
             Booking.objects.filter(
                 time_slot=appointment.time_slot,
                 date=appointment.appointment_date
             ).delete()
 
-            # Update appointment status
             appointment.appointment_status = 'cancelled'
             appointment.save()
 
-            # Make time slot available again
             if appointment.time_slot:
                 appointment.time_slot.availability = True
                 appointment.time_slot.save()
 
-            # Send rejection email
             patient_email = appointment.patient.email
             patient_name = appointment.patient.first_name + ' ' + appointment.patient.last_name
             doctor_name = appointment.doctor.user.first_name + ' ' + appointment.doctor.user.last_name
@@ -510,36 +520,31 @@ def reject_appointment(request, appointment_id):
                 messages.warning(request, 'Appointment rejected but email notification failed.')
 
             messages.error(request, f'Appointment #{appointment.id} has been rejected.')
-            
+
         except ValidationError as e:
             messages.error(request, f'Cannot reject appointment: {str(e)}')
         except Exception as e:
             messages.error(request, f'An unexpected error occurred: {str(e)}')
-    
+
     return redirect('doctor')
 
 
 @login_required
-def appointment_details(request, appointment_id):
-    doctor = get_object_or_404(Doctor, user=request.user)
-    appointment = get_object_or_404(Appointment, pk=appointment_id, doctor=doctor)
-    return redirect('doctor_appointment_details', appointment_id=appointment.id)
-
-
-@login_required
 def complete_appointment(request, appointment_id):
-    doctor = get_object_or_404(Doctor, user=request.user)
-    appointment = get_object_or_404(Appointment, id=appointment_id, doctor=doctor)
+    appointment = get_object_or_404(
+        Appointment.objects.select_related('doctor__user', 'patient', 'time_slot'),
+        id=appointment_id,
+        doctor__user=request.user
+    )
 
-    try:
-        appointment.appointment_status = 'completed'
-        appointment.save()
-        messages.success(request, f'Appointment #{appointment.id} marked as completed.')
-    except ValidationError as e:
-        messages.error(request, f'Cannot complete appointment: {str(e)}')
-    except Exception as e:
-        messages.error(request, f'An unexpected error occurred: {str(e)}')
-    
+    if appointment.appointment_status != 'confirmed':
+        messages.error(request, 'Only confirmed appointments can be marked as completed.')
+        return redirect('doctor_appointment_details', appointment_id=appointment.id)
+
+    appointment.appointment_status = 'completed'
+    appointment.save()
+
+    messages.success(request, f'Appointment #{appointment.id} marked as completed successfully.')
     return redirect('doctor_appointment_details', appointment_id=appointment.id)
 
 
@@ -562,6 +567,10 @@ def create_followup_appointment(request, appointment_id):
 
     if not appointment_date or not time_slot_id:
         messages.error(request, 'Please select follow-up date and time slot.')
+        return redirect('doctor_appointment_details', appointment_id=previous_appointment.id)
+
+    if appointment_date < timezone.localdate():
+        messages.error(request, 'Follow-up date cannot be in the past.')
         return redirect('doctor_appointment_details', appointment_id=previous_appointment.id)
 
     time_slot = get_object_or_404(
@@ -605,7 +614,7 @@ def create_followup_appointment(request, appointment_id):
 
         messages.success(request, 'Follow-up appointment created successfully.')
         return redirect('doctor_appointment_details', appointment_id=followup_appointment.id)
-    
+
     except ValidationError as e:
         messages.error(request, f'Cannot create follow-up: {str(e)}')
         return redirect('doctor_appointment_details', appointment_id=previous_appointment.id)
@@ -652,13 +661,11 @@ def get_available_time_slots(request):
 
 @login_required
 def prescription_view(request, appointment_id):
-    """View for displaying prescription details"""
     appointment = get_object_or_404(
         Appointment.objects.select_related('doctor__user', 'patient', 'time_slot'),
         id=appointment_id
     )
 
-    # Get the latest remark for this appointment
     latest_remark = appointment.remarks.order_by('-created_at').first()
 
     remark_medicines = []
@@ -675,41 +682,34 @@ def prescription_view(request, appointment_id):
 
 @login_required
 def download_prescription_pdf(request, appointment_id):
-    """Download prescription as PDF using xhtml2pdf"""
-    
-    # Check if xhtml2pdf is installed
     if not XHTML2PDF_AVAILABLE:
         return HttpResponse(
             'PDF generation is not available. Please install xhtml2pdf using: pip install xhtml2pdf',
             status=500
         )
-    
-    # Get appointment with related data
+
     appointment = get_object_or_404(
         Appointment.objects.select_related('doctor__user', 'patient', 'time_slot'),
         id=appointment_id
     )
-    
-    # Check if user has permission (either doctor or patient)
+
     if request.user.is_authenticated:
         is_doctor = hasattr(request.user, 'doctor')
         is_patient = appointment.patient == request.user
-        
+
         if not (is_doctor or is_patient):
             messages.error(request, 'You do not have permission to download this prescription.')
             return redirect('home')
     else:
         messages.error(request, 'Please login to download prescription.')
         return redirect('login')
-    
-    # Get the latest remark for this appointment
+
     latest_remark = appointment.remarks.order_by('-created_at').first()
-    
+
     remark_medicines = []
     if latest_remark:
         remark_medicines = latest_remark.medicines.select_related('medicine').all()
-    
-    # Render the PDF template
+
     template = get_template('doctors/prescription_pdf.html')
     html = template.render({
         'appointment': appointment,
@@ -717,15 +717,13 @@ def download_prescription_pdf(request, appointment_id):
         'remark_medicines': remark_medicines,
         'generated_date': now(),
     })
-    
-    # Create PDF response
+
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="prescription_{appointment.id}_{now().date()}.pdf"'
-    
-    # Generate PDF
+
     pisa_status = pisa.CreatePDF(html, dest=response, encoding='utf-8')
-    
+
     if pisa_status.err:
         return HttpResponse(f'Error generating PDF: {pisa_status.err}', status=500)
-    
+
     return response

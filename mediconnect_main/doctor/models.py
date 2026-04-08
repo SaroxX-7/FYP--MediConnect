@@ -166,9 +166,10 @@ class DoctorBilling(models.Model):
 
 class Payment(models.Model):
     PAYMENT_METHOD_CHOICES = [
-        ('cash', 'Cash'),
-        ('esewa', 'eSewa'),
-    ]
+    ('cash', 'Cash'),
+    ('esewa', 'eSewa'),
+]
+
 
     PAYMENT_STATUS_CHOICES = [
         ('pending', 'Pending'),
@@ -225,12 +226,21 @@ class Payment(models.Model):
         default=0.00
     )
 
+    transaction_uuid = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True,
+        unique=True
+    )
     transaction_id = models.CharField(
         max_length=150,
         blank=True,
         null=True
     )
-    payment_date = models.DateTimeField(blank=True, null=True)
+    payment_date = models.DateTimeField(
+        blank=True,
+        null=True
+    )
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

@@ -1,10 +1,326 @@
 {% autoescape off %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirm Your Registration | MediConnect</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-Hi {{user.first_name}},
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            background: linear-gradient(135deg, #e8f0f8 0%, #d4e2f0 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
 
-Please click on below link to confirm your registration.
-http://{{domain}}{% url 'activate' uidb64=uid token=token %}
+        .email-container {
+            max-width: 560px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 32px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            animation: fadeInUp 0.6s ease-out;
+        }
 
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
+        /* Header Section with Gradient */
+        .email-header {
+            background: linear-gradient(135deg, #2c5f8a 0%, #1a3a5c 100%);
+            padding: 40px 32px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
 
+        .email-header::before {
+            content: '';
+            position: absolute;
+            top: -30%;
+            right: -20%;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .email-header::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -10%;
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .logo-icon {
+            width: 70px;
+            height: 70px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            backdrop-filter: blur(4px);
+        }
+
+        .logo-icon svg {
+            width: 40px;
+            height: 40px;
+            fill: white;
+        }
+
+        .email-header h1 {
+            color: white;
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            margin-bottom: 8px;
+        }
+
+        .email-header .subhead {
+            color: rgba(255,255,255,0.85);
+            font-size: 15px;
+        }
+
+        /* Body Content */
+        .email-body {
+            padding: 40px 32px;
+            background: white;
+        }
+
+        .greeting {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1a3a5c;
+            margin-bottom: 16px;
+        }
+
+        .greeting span {
+            background: linear-gradient(135deg, #2c5f8a, #1a3a5c);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .message {
+            color: #334155;
+            font-size: 16px;
+            margin-bottom: 28px;
+            line-height: 1.6;
+        }
+
+        .highlight-box {
+            background: #f0f9ff;
+            border-left: 4px solid #2c5f8a;
+            padding: 18px 20px;
+            border-radius: 16px;
+            margin: 24px 0;
+            font-size: 14px;
+            color: #1e293b;
+        }
+
+        /* CTA Button */
+        .btn-container {
+            text-align: center;
+            margin: 32px 0 28px;
+        }
+
+        .confirm-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #2c5f8a, #1a3a5c);
+            color: white;
+            text-decoration: none;
+            padding: 14px 32px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 50px;
+            box-shadow: 0 8px 20px rgba(44, 95, 138, 0.3);
+            transition: all 0.3s ease;
+            letter-spacing: 0.3px;
+        }
+
+        .confirm-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(44, 95, 138, 0.4);
+            background: linear-gradient(135deg, #1a3a5c, #0f2e47);
+        }
+
+        /* Alternative link (fallback) */
+        .alt-link {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .alt-link p {
+            font-size: 13px;
+            color: #64748b;
+            margin-bottom: 10px;
+        }
+
+        .link-fallback {
+            font-size: 13px;
+            word-break: break-all;
+            background: #f8fafc;
+            padding: 10px 12px;
+            border-radius: 12px;
+            display: inline-block;
+            max-width: 100%;
+            color: #2c5f8a;
+            text-decoration: none;
+            font-family: monospace;
+        }
+
+        /* Info footer */
+        .email-footer {
+            background: #f8fafc;
+            padding: 24px 32px;
+            text-align: center;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .email-footer p {
+            color: #64748b;
+            font-size: 12px;
+            margin-bottom: 12px;
+        }
+
+        .social-icons {
+            margin: 16px 0 8px;
+        }
+
+        .social-icons a {
+            color: #94a3b8;
+            margin: 0 8px;
+            text-decoration: none;
+            transition: color 0.2s;
+            font-size: 18px;
+        }
+
+        .social-icons a:hover {
+            color: #2c5f8a;
+        }
+
+        .footer-note {
+            font-size: 11px;
+            color: #94a3b8;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 20px 12px;
+            }
+            .email-body {
+                padding: 28px 20px;
+            }
+            .email-header {
+                padding: 32px 20px;
+            }
+            .confirm-btn {
+                padding: 12px 28px;
+                font-size: 15px;
+            }
+            .greeting {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <!-- Header with brand & illustration -->
+        <div class="email-header">
+            <div class="logo-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="40" height="40" fill="white">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 4c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm0 13c-2.33 0-4.31-1.46-5.11-3.5h10.22c-.8 2.04-2.78 3.5-5.11 3.5z"/>
+                </svg>
+            </div>
+            <h1>MediConnect</h1>
+            <div class="subhead">Your Health, Our Priority</div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="email-body">
+            <div class="greeting">
+                Welcome, <span>{{ user.first_name|default:"Valued User" }}</span>! 👋
+            </div>
+            
+            <div class="message">
+                Thank you for choosing <strong>MediConnect</strong> — your trusted partner in healthcare. 
+                We're excited to have you on board! To complete your registration and start booking 
+                appointments with top doctors, please verify your email address.
+            </div>
+
+            <div class="highlight-box">
+                <strong>✨ Why verify your email?</strong><br>
+                ✓ Secure access to your medical records<br>
+                ✓ Receive appointment reminders & updates<br>
+                ✓ Connect with verified healthcare professionals<br>
+                ✓ Manage prescriptions & health history
+            </div>
+
+            <!-- Primary CTA Button -->
+            <div class="btn-container">
+                <a href="http://{{ domain }}{% url 'activate' uidb64=uid token=token %}" class="confirm-btn">
+                    ✓ Confirm My Account
+                </a>
+            </div>
+
+            <!-- Alternative link (in case button doesn't work) -->
+            <div class="alt-link">
+                <p>🔗 If the button above doesn't work, copy and paste this link into your browser:</p>
+                <div class="link-fallback">
+                    http://{{ domain }}{% url 'activate' uidb64=uid token=token %}
+                </div>
+                <p style="margin-top: 14px; font-size: 12px;">This link will expire in <strong>24 hours</strong> for security reasons.</p>
+            </div>
+
+            <div class="highlight-box" style="background: #fef9e3; border-left-color: #e67e22; margin-top: 20px;">
+                💡 <strong>Didn't request this?</strong> If you didn't create an account on MediConnect, 
+                please ignore this email. Your information remains safe with us.
+            </div>
+        </div>
+
+        <!-- Footer with support info -->
+        <div class="email-footer">
+            <div class="social-icons">
+                <a href="#" style="text-decoration: none;">📘</a>
+                <a href="#" style="text-decoration: none;">🐦</a>
+                <a href="#" style="text-decoration: none;">📷</a>
+                <a href="#" style="text-decoration: none;">🔗</a>
+            </div>
+            <p>
+                Need help? Contact our support team<br>
+                <strong style="color:#2c5f8a;">support@mediconnect.com</strong> | 📞 +977 1-1234567
+            </p>
+            <div class="footer-note">
+                © 2025 MediConnect • Secure Healthcare Platform<br>
+                This is an automated message, please do not reply directly.
+            </div>
+        </div>
+    </div>
+</body>
+</html>
 {% endautoescape %}

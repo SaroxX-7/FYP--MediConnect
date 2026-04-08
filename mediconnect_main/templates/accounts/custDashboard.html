@@ -15,7 +15,6 @@
 
                         <div class="tab-content pt-0">
 
-                            <!-- Appointment Tab -->
                             <div id="pat_appointments" class="tab-pane fade show active">
                                 <div class="card card-table mb-0">
                                     <div class="card-body">
@@ -25,90 +24,179 @@
                                                 <thead>
                                                     <tr>
                                                         <th>Doctor Name</th>
-                                                        <th>Get Connected</th>
-                                                        <th>Appt Date/Time</th>
-                                                        <th>Type</th>
+                                                        <th>Total Appointments</th>
+                                                        <th>Latest Appointment</th>
                                                         <th>Status</th>
+                                                        <th>Get Connected</th>
                                                         <th class="text-center">Actions</th>
                                                     </tr>
                                                 </thead>
 
                                                 <tbody>
-                                                    {% for appointment in appointments %}
-                                                    <tr>
-                                                        <!-- Doctor Info -->
+                                                    {% for group in grouped_appointments %}
+                                                    {% with doctor=group.doctor latest_appointment=group.appointments.0 %}
+                                                    <tr class="group-summary-row">
                                                         <td>
-                                                            <h2 class="table-avatar">
-                                                                <a href="#" class="avatar avatar-sm mr-2">
-                                                                    <img
-                                                                        class="avatar-img rounded-circle"
-                                                                        src="{% if appointment.doctor.user.userprofile.profile_picture %}{{ appointment.doctor.user.userprofile.profile_picture.url }}{% else %}{% static 'img/favicon.png' %}{% endif %}"
-                                                                        alt="Doctor Image"
-                                                                    >
-                                                                </a>
-                                                                <a href="#">
-                                                                    Dr. {{ appointment.doctor.user.first_name }} {{ appointment.doctor.user.last_name }}
-                                                                </a>
-                                                            </h2>
+                                                            <div class="doctor-summary-cell">
+                                                                <h2 class="table-avatar mb-0">
+                                                                    <a href="#" class="avatar avatar-sm mr-2">
+                                                                        <img
+                                                                            class="avatar-img rounded-circle"
+                                                                            src="{% if doctor.user.userprofile.profile_picture %}{{ doctor.user.userprofile.profile_picture.url }}{% else %}{% static 'img/favicon.png' %}{% endif %}"
+                                                                            alt="Doctor Image"
+                                                                        >
+                                                                    </a>
+                                                                    <a href="#">
+                                                                        Dr. {{ doctor.user.first_name }} {{ doctor.user.last_name }}
+                                                                    </a>
+                                                                </h2>
+                                                            </div>
                                                         </td>
 
-                                                        <!-- Get Connected -->
                                                         <td>
-                                                            <button
-                                                                type="button"
-                                                                class="btn btn-sm btn-primary start-chat-btn"
-                                                                data-appointment-id="{{ appointment.id }}"
-                                                                data-other-name="Dr. {{ appointment.doctor.user.first_name }} {{ appointment.doctor.user.last_name }}"
-                                                                data-other-image="{% if appointment.doctor.user.userprofile.profile_picture %}{{ appointment.doctor.user.userprofile.profile_picture.url }}{% else %}{% static 'img/favicon.png' %}{% endif %}"
-                                                                data-has-conversation="{% if appointment.has_conversation %}1{% else %}0{% endif %}"
-                                                                data-conversation-id="{{ appointment.conversation_id }}"
-                                                            >
-                                                                <i class="fas fa-comments"></i>
-                                                                {% if appointment.has_conversation %}Open Chat{% else %}Start Chatting{% endif %}
-                                                            </button>
-                                                        </td>
-
-                                                        <!-- Appointment Date and Time -->
-                                                        <td>
-                                                            {{ appointment.appointment_date|date:"d M Y" }}
-                                                            <span class="d-block text-info">
-                                                                {{ appointment.time_slot.start_time|date:"g:i A" }}
+                                                            <span class="appointment-count-badge">
+                                                                {{ group.appointments|length }} Appointment{{ group.appointments|length|pluralize }}
                                                             </span>
                                                         </td>
 
-                                                        <!-- Appointment Type -->
-                                                        <td>{{ appointment.get_appointment_type_display }}</td>
-
-                                                        <!-- Appointment Status -->
                                                         <td>
-                                                            {% if appointment.appointment_status == "pending" %}
+                                                            {{ latest_appointment.appointment_date|date:"d M Y" }}
+                                                            <span class="d-block text-info">
+                                                                {{ latest_appointment.time_slot.start_time|time:"g:i A" }}
+                                                            </span>
+                                                        </td>
+
+                                                        <td>
+                                                            {% if latest_appointment.appointment_status == "pending" %}
                                                                 <span class="badge badge-pill bg-warning-light">
-                                                                    {{ appointment.get_appointment_status_display }}
+                                                                    {{ latest_appointment.get_appointment_status_display }}
                                                                 </span>
-                                                            {% elif appointment.appointment_status == "confirmed" %}
+                                                            {% elif latest_appointment.appointment_status == "confirmed" %}
                                                                 <span class="badge badge-pill bg-success-light">
-                                                                    {{ appointment.get_appointment_status_display }}
+                                                                    {{ latest_appointment.get_appointment_status_display }}
                                                                 </span>
-                                                            {% elif appointment.appointment_status == "cancelled" %}
+                                                            {% elif latest_appointment.appointment_status == "cancelled" %}
                                                                 <span class="badge badge-pill bg-danger-light">
-                                                                    {{ appointment.get_appointment_status_display }}
+                                                                    {{ latest_appointment.get_appointment_status_display }}
                                                                 </span>
                                                             {% else %}
                                                                 <span class="badge badge-pill bg-secondary-light">
-                                                                    {{ appointment.get_appointment_status_display }}
+                                                                    {{ latest_appointment.get_appointment_status_display }}
                                                                 </span>
                                                             {% endif %}
                                                         </td>
 
-                                                        <!-- Actions -->
+                                                        <td>
+                                                            <button
+                                                                type="button"
+                                                                class="btn btn-sm btn-primary start-chat-btn"
+                                                                data-appointment-id="{{ latest_appointment.id }}"
+                                                                data-other-name="Dr. {{ doctor.user.first_name }} {{ doctor.user.last_name }}"
+                                                                data-other-image="{% if doctor.user.userprofile.profile_picture %}{{ doctor.user.userprofile.profile_picture.url }}{% else %}{% static 'img/favicon.png' %}{% endif %}"
+                                                                data-has-conversation="{% if latest_appointment.has_conversation %}1{% else %}0{% endif %}"
+                                                                data-conversation-id="{{ latest_appointment.conversation_id }}"
+                                                            >
+                                                                <i class="fas fa-comments"></i>
+                                                                {% if latest_appointment.has_conversation %}Open Chat{% else %}Start Chatting{% endif %}
+                                                            </button>
+                                                        </td>
+
                                                         <td class="text-right">
-                                                            <div class="table-action">
-                                                                <a href="{% url 'appointment_details' appointment_id=appointment.id %}" class="btn btn-sm bg-info-light">
-                                                                    <i class="far fa-eye"></i> View
+                                                            <div class="table-action group-actions">
+                                                                <button
+                                                                    class="btn btn-sm bg-primary-light dropdown-toggle-btn"
+                                                                    type="button"
+                                                                    data-toggle-target="appointments-{{ doctor.id }}"
+                                                                >
+                                                                    <i class="fas fa-chevron-down"></i> View All
+                                                                </button>
+                                                                <a href="{% url 'appointment_details' appointment_id=latest_appointment.id %}" class="btn btn-sm bg-info-light">
+                                                                    <i class="far fa-eye"></i> Latest
                                                                 </a>
                                                             </div>
                                                         </td>
                                                     </tr>
+
+                                                    <tr id="appointments-{{ doctor.id }}" class="appointment-dropdown-row" style="display: none;">
+                                                        <td colspan="6" class="appointment-dropdown-cell">
+                                                            <div class="appointment-dropdown-wrapper">
+                                                                <div class="nested-table-responsive">
+                                                                    <table class="table nested-appointments-table mb-0">
+                                                                        <thead>
+                                                                            <tr>
+                                                                                <th>S.N</th>
+                                                                                <th>Appt Date/Time</th>
+                                                                                <th>Type</th>
+                                                                                <th>Status</th>
+                                                                                <th>Get Connected</th>
+                                                                                <th class="text-center">Actions</th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            {% for appointment in group.appointments %}
+                                                                            <tr>
+                                                                                <td>{{ forloop.counter }}</td>
+
+                                                                                <td>
+                                                                                    {{ appointment.appointment_date|date:"d M Y" }}
+                                                                                    <span class="d-block text-info">
+                                                                                        {{ appointment.time_slot.start_time|time:"g:i A" }}
+                                                                                    </span>
+                                                                                </td>
+
+                                                                                <td>{{ appointment.get_appointment_type_display }}</td>
+
+                                                                                <td>
+                                                                                    {% if appointment.appointment_status == "pending" %}
+                                                                                        <span class="badge badge-pill bg-warning-light">
+                                                                                            {{ appointment.get_appointment_status_display }}
+                                                                                        </span>
+                                                                                    {% elif appointment.appointment_status == "confirmed" %}
+                                                                                        <span class="badge badge-pill bg-success-light">
+                                                                                            {{ appointment.get_appointment_status_display }}
+                                                                                        </span>
+                                                                                    {% elif appointment.appointment_status == "cancelled" %}
+                                                                                        <span class="badge badge-pill bg-danger-light">
+                                                                                            {{ appointment.get_appointment_status_display }}
+                                                                                        </span>
+                                                                                    {% else %}
+                                                                                        <span class="badge badge-pill bg-secondary-light">
+                                                                                            {{ appointment.get_appointment_status_display }}
+                                                                                        </span>
+                                                                                    {% endif %}
+                                                                                </td>
+
+                                                                                <td>
+                                                                                    <button
+                                                                                        type="button"
+                                                                                        class="btn btn-sm btn-primary start-chat-btn"
+                                                                                        data-appointment-id="{{ appointment.id }}"
+                                                                                        data-other-name="Dr. {{ doctor.user.first_name }} {{ doctor.user.last_name }}"
+                                                                                        data-other-image="{% if doctor.user.userprofile.profile_picture %}{{ doctor.user.userprofile.profile_picture.url }}{% else %}{% static 'img/favicon.png' %}{% endif %}"
+                                                                                        data-has-conversation="{% if appointment.has_conversation %}1{% else %}0{% endif %}"
+                                                                                        data-conversation-id="{{ appointment.conversation_id }}"
+                                                                                    >
+                                                                                        <i class="fas fa-comments"></i>
+                                                                                        {% if appointment.has_conversation %}Open Chat{% else %}Start Chatting{% endif %}
+                                                                                    </button>
+                                                                                </td>
+
+                                                                                <td class="text-right">
+                                                                                    <div class="table-action">
+                                                                                        <a href="{% url 'appointment_details' appointment_id=appointment.id %}" class="btn btn-sm bg-info-light">
+                                                                                            <i class="far fa-eye"></i> View
+                                                                                        </a>
+                                                                                    </div>
+                                                                                </td>
+                                                                            </tr>
+                                                                            {% endfor %}
+                                                                        </tbody>
+                                                                    </table>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    {% endwith %}
 
                                                     {% empty %}
                                                     <tr>
@@ -122,7 +210,6 @@
                                     </div>
                                 </div>
                             </div>
-                            <!-- /Appointment Tab -->
 
                         </div>
 
@@ -134,13 +221,7 @@
     </div>
 </div>
 
-<!-- ============================================
-     ENHANCED CSS - ORGANIZED & WELL STRUCTURED
-     ============================================ -->
 <style>
-    /* --------------------------------------------
-       1. GLOBAL & UTILITY CLASSES
-    -------------------------------------------- */
     .content {
         padding: 1.5rem 1rem;
     }
@@ -150,7 +231,6 @@
         margin: 0 auto;
     }
 
-    /* Card Modern Styling */
     .card {
         border: none;
         border-radius: 1.25rem;
@@ -163,9 +243,6 @@
         padding: 1.5rem;
     }
 
-    /* --------------------------------------------
-       2. TABLE & AVATAR STYLES
-    -------------------------------------------- */
     .table {
         margin-bottom: 0;
     }
@@ -212,9 +289,6 @@
         box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
     }
 
-    /* --------------------------------------------
-       3. BADGE STYLES (Status Indicators)
-    -------------------------------------------- */
     .badge-pill {
         padding: 0.4rem 0.8rem;
         border-radius: 30px;
@@ -245,9 +319,12 @@
         color: #4a627a;
     }
 
-    /* --------------------------------------------
-       4. BUTTON STYLES
-    -------------------------------------------- */
+    .bg-primary-light {
+        background-color: #eef4ff;
+        color: #2563eb;
+        border: none;
+    }
+
     .btn-sm {
         padding: 0.4rem 0.9rem;
         font-size: 0.75rem;
@@ -297,7 +374,8 @@
         transform: translateY(-1px);
     }
 
-    .table-action a {
+    .table-action a,
+    .table-action button {
         background: #f8fafc;
         padding: 0.4rem 1rem;
         border-radius: 30px;
@@ -308,11 +386,70 @@
         align-items: center;
         gap: 0.4rem;
         transition: 0.2s;
+        border: none;
     }
 
-    /* --------------------------------------------
-       5. CHAT LAUNCHER (Floating Button)
-    -------------------------------------------- */
+    .group-summary-row {
+        background: #fcfdff;
+    }
+
+    .appointment-count-badge {
+        display: inline-block;
+        padding: 0.45rem 0.8rem;
+        border-radius: 999px;
+        background: #eef4ff;
+        color: #2563eb;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .group-actions {
+        justify-content: flex-end;
+    }
+
+    .dropdown-toggle-btn i {
+        transition: transform 0.2s ease;
+    }
+
+    .dropdown-toggle-btn.active i {
+        transform: rotate(180deg);
+    }
+
+    .appointment-dropdown-row {
+        background: #f8fbff;
+    }
+
+    .appointment-dropdown-cell {
+        padding: 0 !important;
+        border-bottom: none !important;
+    }
+
+    .appointment-dropdown-wrapper {
+        padding: 1rem 1.25rem 1.25rem;
+        background: #f8fbff;
+    }
+
+    .nested-table-responsive {
+        overflow-x: auto;
+    }
+
+    .nested-appointments-table {
+        background: #ffffff;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: inset 0 0 0 1px #edf2f7;
+    }
+
+    .nested-appointments-table thead th {
+        background: #f5f8fd;
+        font-size: 0.78rem;
+    }
+
+    .nested-appointments-table tbody td {
+        font-size: 0.82rem;
+        padding: 0.85rem 0.75rem;
+    }
+
     .chat-launcher {
         position: fixed;
         bottom: 24px;
@@ -351,7 +488,6 @@
         transform: scale(1.08);
     }
 
-    /* Chat Launcher Badge with Pulse Animation */
     .chat-launcher-badge {
         position: absolute;
         top: -5px;
@@ -387,9 +523,6 @@
         animation: badgePop 0.3s ease-out, pulseGlow 0.8s ease-in-out 1;
     }
 
-    /* --------------------------------------------
-       6. CHAT WIDGET (Main Chat Window)
-    -------------------------------------------- */
     .chat-widget {
         position: fixed;
         bottom: 100px;
@@ -418,7 +551,6 @@
         }
     }
 
-    /* Chat Widget Header */
     .chat-widget-header {
         display: flex;
         align-items: center;
@@ -481,7 +613,6 @@
         transform: scale(1.04);
     }
 
-    /* Chat Widget Body (Messages Area) */
     .chat-widget-body {
         flex: 1;
         overflow-y: auto;
@@ -512,7 +643,6 @@
         padding: 1rem;
     }
 
-    /* Message Bubbles */
     .chat-message-row {
         margin-bottom: 18px;
         display: flex;
@@ -579,7 +709,6 @@
         font-weight: 500;
     }
 
-    /* Chat Widget Footer (Input Area) */
     .chat-widget-footer {
         padding: 12px 16px;
         border-top: 1px solid #edf2f7;
@@ -626,9 +755,14 @@
         box-shadow: 0 6px 12px rgba(59, 130, 246, 0.3);
     }
 
-    /* --------------------------------------------
-       7. RESPONSIVE DESIGN
-    -------------------------------------------- */
+    @media (max-width: 768px) {
+        .group-summary-row td,
+        .nested-appointments-table td,
+        .nested-appointments-table th {
+            white-space: nowrap;
+        }
+    }
+
     @media (max-width: 576px) {
         .chat-widget {
             width: 94vw;
@@ -659,9 +793,6 @@
     }
 </style>
 
-<!-- ============================================
-     CHAT UI COMPONENTS
-     ============================================ -->
 <button id="chat-launcher" class="chat-launcher" type="button" aria-label="Open chat">
     <img id="chat-launcher-image" src="{% static 'img/favicon.png' %}" alt="Chat User">
     <span id="chat-launcher-badge" class="chat-launcher-badge"></span>
@@ -691,9 +822,6 @@
 
 {{ request.user.id|json_script:"current-user-id" }}
 
-<!-- ============================================
-     JAVASCRIPT - CHAT FUNCTIONALITY
-     ============================================ -->
 <script>
     const currentUserId = JSON.parse(document.getElementById('current-user-id').textContent);
 
@@ -708,11 +836,25 @@
     const chatLog = document.getElementById('chat-log');
     const messageInput = document.getElementById('chat-message-input');
     const submitButton = document.getElementById('chat-message-submit');
+    const dropdownButtons = document.querySelectorAll('.dropdown-toggle-btn');
 
     let currentConversationId = null;
     let chatSocket = null;
     let widgetOpen = false;
     let unreadCount = 0;
+
+    dropdownButtons.forEach(function(button) {
+        button.addEventListener('click', function() {
+            const targetId = this.getAttribute('data-toggle-target');
+            const targetRow = document.getElementById(targetId);
+
+            if (!targetRow) return;
+
+            const isOpen = targetRow.style.display === 'table-row';
+            targetRow.style.display = isOpen ? 'none' : 'table-row';
+            this.classList.toggle('active', !isOpen);
+        });
+    });
 
     function updateLauncherBadge() {
         if (unreadCount > 0) {

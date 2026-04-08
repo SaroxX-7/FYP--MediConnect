@@ -1,8 +1,10 @@
 from datetime import datetime, timedelta
 from decimal import Decimal, ROUND_HALF_UP
+from functools import wraps
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.db.models import Prefetch, Q
 from django.http import HttpResponse
@@ -10,6 +12,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.dateparse import parse_date
 from django.views.decorators.http import require_http_methods
 from django.views.generic import ListView
+from django.utils.decorators import method_decorator
 
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
@@ -24,13 +27,27 @@ from reportlab.platypus import (
 )
 
 from accounts.forms import UserInfoForm, UserProfileForm
-from accounts.models import UserProfile, Department, Disease
+from accounts.models import User, UserProfile, Department, Disease
 from appointment.models import TimeSlot, Appointment, Booking, Remark, RemarkMedicine
 from doctor.models import Doctor, Payment
 from pharmacy.models import Medicine
 
 
+def customer_required(view_func):
+    @wraps(view_func)
+    def _wrapped_view(request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect('login')
+
+        if request.user.role != User.CUSTOMER:
+            return redirect('doctor')
+
+        return view_func(request, *args, **kwargs)
+    return _wrapped_view
+
+
 @login_required(login_url='login')
+@customer_required
 def cprofile(request):
     profile = get_object_or_404(UserProfile, user=request.user)
 
@@ -66,6 +83,8 @@ def cprofile(request):
     return render(request, 'customers/cprofile.html', context)
 
 
+@method_decorator(login_required, name='dispatch')
+@method_decorator(customer_required, name='dispatch')
 class DoctorsByDepartmentView(ListView):
     model = Doctor
     template_name = 'customers/doctors_by_department.html'
@@ -92,6 +111,8 @@ class DoctorsByDepartmentView(ListView):
         return context
 
 
+@login_required
+@customer_required
 def search_doctors(request):
     query = request.GET.get('query', '').strip()
 
@@ -136,6 +157,7 @@ def search_doctors(request):
 
 @require_http_methods(["POST"])
 @login_required
+@customer_required
 def book_appointment(request):
     time_slot_id = request.POST.get('time_slot_id')
     doctor_id = request.POST.get('doctor_id')
@@ -156,8 +178,16 @@ def book_appointment(request):
         return redirect('available_appointment', doctor_id=doctor_id)
 
     with transaction.atomic():
-        doctor = get_object_or_404(Doctor.objects.select_related('billing'), id=doctor_id)
-        time_slot = get_object_or_404(TimeSlot, id=time_slot_id, doctor=doctor, availability=True)
+        doctor = get_object_or_404(
+            Doctor.objects.select_related('billing'),
+            id=doctor_id
+        )
+        time_slot = get_object_or_404(
+            TimeSlot,
+            id=time_slot_id,
+            doctor=doctor,
+            availability=True
+        )
 
         existing_active_appointment = Appointment.objects.filter(
             patient=request.user,
@@ -177,6 +207,21 @@ def book_appointment(request):
                 "You already have a pending or confirmed appointment with this doctor."
             )
             return redirect('appointment_details', appointment_id=latest_active.id)
+
+        cancelled_booking = Appointment.objects.filter(
+            patient=request.user,
+            doctor=doctor,
+            appointment_date=appointment_date,
+            time_slot=time_slot,
+            appointment_status='cancelled'
+        ).first()
+
+        if cancelled_booking:
+            messages.warning(
+                request,
+                "Your previous booking for this slot has been cancelled."
+            )
+            return redirect('available_appointment', doctor_id=doctor_id)
 
         if Booking.objects.filter(time_slot=time_slot, date=appointment_date).exists():
             messages.error(request, "This time slot is already booked.")
@@ -230,7 +275,7 @@ def book_appointment(request):
             image_upload=image_upload
         )
 
-        Payment.objects.create(
+        payment = Payment.objects.create(
             appointment=appointment,
             doctor=doctor,
             patient=request.user,
@@ -242,9 +287,9 @@ def book_appointment(request):
             total_amount=total_amount
         )
 
-        # Do NOT set time_slot.availability = False here.
-        # A TimeSlot is a reusable weekly schedule slot.
-        # Date-wise blocking is handled by Booking(date + time_slot).
+    if payment_method == 'esewa':
+        messages.success(request, "Your appointment has been booked. Please complete payment.")
+        return redirect('esewa_pay', payment_id=payment.id)
 
     messages.success(request, "Your appointment has been successfully booked!")
     return redirect('appointment_details', appointment_id=appointment.id)
@@ -258,6 +303,7 @@ def get_week_dates(start_date=None):
 
 
 @login_required
+@customer_required
 def available_appointment(request, doctor_id, start_date=None):
     doctor = get_object_or_404(
         Doctor.objects.select_related('billing', 'user'),
@@ -350,6 +396,7 @@ def available_appointment(request, doctor_id, start_date=None):
 
 
 @login_required
+@customer_required
 def appointment_details(request, appointment_id):
     appointment = get_object_or_404(
         Appointment.objects.select_related(
@@ -386,6 +433,23 @@ def appointment_details(request, appointment_id):
 
 
 @login_required
+def payment_history(request):
+    payments = Payment.objects.select_related(
+        'doctor',
+        'doctor__user',
+        'appointment'
+    ).filter(
+        patient=request.user
+    ).order_by('-created_at')
+
+    context = {
+        'payments': payments
+    }
+    return render(request, 'customers/payment_history.html', context)
+
+
+@login_required
+@customer_required
 def download_prescription_pdf(request, appointment_id):
     import re
     from xml.sax.saxutils import escape
@@ -477,8 +541,7 @@ def download_prescription_pdf(request, appointment_id):
         for old, new in replacements.items():
             text = text.replace(old, new)
 
-        text = re.sub(r"\n{3,}", "\n\n", text)
-        text = escape(text)
+        text = text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
         text = text.replace("\n", "<br/>")
         return text
 

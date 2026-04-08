@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from django.contrib.auth import authenticate
 from django.http.response import HttpResponse
 from django.shortcuts import redirect, render
@@ -18,7 +20,6 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import PermissionDenied
 
 
-# Restrict the vendor from accessing the customer page
 def check_role_vendor(user):
     if user.role == 1:
         return True
@@ -26,7 +27,6 @@ def check_role_vendor(user):
         raise PermissionDenied
 
 
-# Restrict the customer from accessing the vendor page
 def check_role_customer(user):
     if user.role == 2:
         return True
@@ -34,14 +34,12 @@ def check_role_customer(user):
         raise PermissionDenied
 
 
-# Restrict non-pharmacist from accessing pharmacist pages
 def check_role_pharmacist(user):
     if user.role == 3:
         return True
     else:
         raise PermissionDenied
 
-# Create your views here.
 
 def registerUser(request):
     if request.user.is_authenticated:
@@ -50,18 +48,21 @@ def registerUser(request):
     elif request.method == 'POST':
         form = UserForm(request.POST)
         if form.is_valid():
-
-            # Create the user using create_user method
             first_name = form.cleaned_data['first_name']
             last_name = form.cleaned_data['last_name']
             username = form.cleaned_data['username']
             email = form.cleaned_data['email']
             password = form.cleaned_data['password']
-            user = User.objects.create_user(first_name=first_name, last_name=last_name, username=username, email=email, password=password)
+            user = User.objects.create_user(
+                first_name=first_name,
+                last_name=last_name,
+                username=username,
+                email=email,
+                password=password
+            )
             user.role = User.CUSTOMER
             user.save()
 
-            # Send verification email
             mail_subject = 'Please activate your account'
             email_template = 'accounts/email/account_verification_email.html'
             send_verification_email(request, user, mail_subject, email_template)
@@ -84,7 +85,6 @@ def registerDoctor(request):
         messages.warning(request, 'You are already logged in!')
         return redirect('dashboard')
     elif request.method == 'POST':
-        # store the data and create the user
         form = UserForm(request.POST)
         v_form = DoctorForm(request.POST, request.FILES)
         if form.is_valid() and v_form.is_valid:
@@ -93,7 +93,13 @@ def registerDoctor(request):
             username = form.cleaned_data['username']
             email = form.cleaned_data['email']
             password = form.cleaned_data['password']
-            user = User.objects.create_user(first_name=first_name, last_name=last_name, username=username, email=email, password=password)
+            user = User.objects.create_user(
+                first_name=first_name,
+                last_name=last_name,
+                username=username,
+                email=email,
+                password=password
+            )
             user.role = User.DOCTOR
             user.is_admin = True
             user.save()
@@ -103,7 +109,6 @@ def registerDoctor(request):
             vendor.user_profile = user_profile
             vendor.save()
 
-            # Send verification email
             mail_subject = 'Please activate your account'
             email_template = 'accounts/email/account_verification_email.html'
             print("sending activation mail")
@@ -138,7 +143,13 @@ def registerPharmacist(request):
             username = form.cleaned_data['username']
             email = form.cleaned_data['email']
             password = form.cleaned_data['password']
-            user = User.objects.create_user(first_name=first_name, last_name=last_name, username=username, email=email, password=password)
+            user = User.objects.create_user(
+                first_name=first_name,
+                last_name=last_name,
+                username=username,
+                email=email,
+                password=password
+            )
             user.role = User.PHARMACIST
             user.save()
 
@@ -156,8 +167,8 @@ def registerPharmacist(request):
 
     return render(request, 'accounts/registerPharmacist.html', {'form': form})
 
+
 def activate(request, uidb64, token):
-    # Activate the user by setting the is_active status to True
     try:
         uid = urlsafe_base64_decode(uidb64).decode()
         user = User._default_manager.get(pk=uid)
@@ -177,24 +188,6 @@ def activate(request, uidb64, token):
         return redirect('myAccount')
 
 
-# def login(request):
-#     if request.user.is_authenticated:
-#         messages.warning(request, 'You are already logged in!')
-#         return redirect('myAccount')
-#     elif request.method == 'POST':
-#         email = request.POST['email']
-#         password = request.POST['password']
-#
-#         user = auth.authenticate(email=email, password=password)
-#
-#         if user is not None:
-#             auth.login(request, user)
-#             messages.success(request, 'You are now logged in.')
-#             return redirect('myAccount')
-#         else:
-#             messages.error(request, 'Invalid login credentials')
-#             return redirect('login')
-#     return render(request, 'accounts/login.html')
 from django.contrib.auth import authenticate, login as auth_login
 from django.contrib import messages
 from django.shortcuts import render, redirect
@@ -213,13 +206,11 @@ def login(request):
             auth_login(request, user)
             messages.success(request, 'You are now logged in.')
 
-            # Check if user is a doctor
             if user.is_doctor():
                 doctor = Doctor.objects.get(user=user)
                 if not doctor.clinic_address or not doctor.contact_phone or not doctor.department:
                     return redirect('doctor')
 
-            # Check if user is a customer
             elif user.is_customer():
                 user_profile = UserProfile.objects.get(user=user)
                 if not user_profile.gender or not user_profile.address:
@@ -230,7 +221,6 @@ def login(request):
             messages.error(request, 'Invalid login credentials')
             return redirect('login')
     return render(request, 'accounts/login.html')
-
 
 
 def logout(request):
@@ -248,22 +238,23 @@ def myAccount(request):
 
 @login_required(login_url='login')
 @user_passes_test(check_role_customer)
-@login_required(login_url='login')
-@user_passes_test(check_role_customer)
 def custDashboard(request):
     profile = UserProfile.objects.get(user=request.user)
     customer = User.objects.get(pk=request.user.id)
 
-    appointments = Appointment.objects.select_related(
+    appointments_qs = Appointment.objects.select_related(
         'doctor',
         'doctor__user',
         'doctor__user__userprofile',
-        'patient'
+        'patient',
+        'time_slot'
     ).filter(
         patient=customer
-    ).order_by('-appointment_date')
+    ).order_by('-appointment_date', '-time_slot__start_time', '-id')
 
-    for appointment in appointments:
+    grouped_appointments = OrderedDict()
+
+    for appointment in appointments_qs:
         if hasattr(appointment, 'conversation'):
             appointment.has_conversation = True
             appointment.conversation_id = appointment.conversation.id
@@ -271,31 +262,48 @@ def custDashboard(request):
             appointment.has_conversation = False
             appointment.conversation_id = ''
 
+        doctor_id = appointment.doctor.id
+
+        if doctor_id not in grouped_appointments:
+            grouped_appointments[doctor_id] = {
+                'doctor': appointment.doctor,
+                'appointments': []
+            }
+
+        grouped_appointments[doctor_id]['appointments'].append(appointment)
+
     context = {
         'profile': profile,
-        'appointments': appointments
+        'appointments': appointments_qs,
+        'grouped_appointments': grouped_appointments.values(),
     }
     return render(request, 'accounts/custDashboard.html', context)
+
+
 @login_required(login_url='login')
 @user_passes_test(check_role_pharmacist)
 def pharmacistDashboard(request):
-    # Simple dashboard managed by pharmacist user
     return redirect('pharmacist_dashboard')
 
+
 from django.utils.timezone import now
+
 @login_required(login_url='login')
 @user_passes_test(check_role_vendor)
 def doctorDashboard(request):
     doctor = Doctor.objects.get(user=request.user)
 
-    appointments = Appointment.objects.select_related(
+    appointments_qs = Appointment.objects.select_related(
         'patient',
-        'patient__userprofile'
+        'patient__userprofile',
+        'time_slot'
     ).filter(
         doctor=doctor
-    ).order_by('-appointment_date')
+    ).order_by('-appointment_date', '-time_slot__start_time', '-id')
 
-    for appointment in appointments:
+    grouped_appointments = OrderedDict()
+
+    for appointment in appointments_qs:
         if hasattr(appointment, 'conversation'):
             appointment.has_conversation = True
             appointment.conversation_id = appointment.conversation.id
@@ -303,7 +311,17 @@ def doctorDashboard(request):
             appointment.has_conversation = False
             appointment.conversation_id = ''
 
-    appointment_count = appointments.count()
+        patient_id = appointment.patient.id
+
+        if patient_id not in grouped_appointments:
+            grouped_appointments[patient_id] = {
+                'patient': appointment.patient,
+                'appointments': []
+            }
+
+        grouped_appointments[patient_id]['appointments'].append(appointment)
+
+    appointment_count = appointments_qs.count()
 
     patient_count = Appointment.objects.filter(
         doctor=doctor
@@ -315,7 +333,8 @@ def doctorDashboard(request):
     ).count()
 
     context = {
-        'appointments': appointments,
+        'appointments': appointments_qs,
+        'grouped_appointments': grouped_appointments.values(),
         'now': now(),
         'appointment_count': appointment_count,
         'patient_count': patient_count,
@@ -324,6 +343,7 @@ def doctorDashboard(request):
 
     return render(request, 'accounts/doctorDashboard.html', context)
 
+
 def forgot_password(request):
     if request.method == 'POST':
         email = request.POST['email']
@@ -331,7 +351,6 @@ def forgot_password(request):
         if User.objects.filter(email=email).exists():
             user = User.objects.get(email__exact=email)
 
-            # send reset password email
             mail_subject = 'Reset Your Password'
             email_template = 'accounts/email/reset_password_email.html'
             send_verification_email(request, user, mail_subject, email_template)
@@ -345,7 +364,6 @@ def forgot_password(request):
 
 
 def reset_password_validate(request, uidb64, token):
-    # validate the user by decoding the token and user pk
     try:
         uid = urlsafe_base64_decode(uidb64).decode()
         user = User._default_manager.get(pk=uid)
@@ -383,6 +401,7 @@ def reset_password(request):
             return redirect('reset_password')
     return render(request, 'accounts/reset_password.html')
 
+
 def change_password(request):
     profile = UserProfile.objects.get(user=request.user)
     if request.method == 'POST':
@@ -407,9 +426,9 @@ def change_password(request):
             messages.error(request, 'Passwords do not match!')
         return redirect('change_password')
     context = {
-        "profile":profile
+        "profile": profile
     }
-    return render(request, 'accounts/change_password.html',context)
+    return render(request, 'accounts/change_password.html', context)
 
 
 def change_password_view(request):

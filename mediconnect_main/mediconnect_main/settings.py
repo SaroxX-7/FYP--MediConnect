@@ -49,7 +49,9 @@ INSTALLED_APPS = [
     'pharmacy',
     'django.contrib.gis',
     'chat',
+    'payments',
 ]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -144,8 +146,10 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT= BASE_DIR/'static'
+
 STATICFILES_DIRS = [
     "mediconnect_main/static"
+    
 ]
 
 # Default primary key field type
@@ -159,11 +163,15 @@ MESSAGE_TAGS = {
 }
 
 # Email configuration
+# Email configuration
+EMAIL_BACKEND = config('EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
 EMAIL_HOST = config('EMAIL_HOST')
 EMAIL_PORT = config('EMAIL_PORT', cast=int)
 EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
-EMAIL_USE_TLS = True
+EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool, default=True)
+EMAIL_USE_SSL = config('EMAIL_USE_SSL', cast=bool, default=False)
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default=f"MediConnect <{EMAIL_HOST_USER}>")
 
 # EMAIL_HOST = 'smtp.gmail.com'
 # EMAIL_PORT = 587
@@ -309,3 +317,17 @@ CHANNEL_LAYERS = {
         "BACKEND": "channels.layers.InMemoryChannelLayer",
     },
 }
+# ──────────────────────────────────────────
+# eSewa Payment Gateway
+# ──────────────────────────────────────────
+ESEWA_TEST = True
+ESEWA_MERCHANT_ID = "EPAYTEST"
+ESEWA_SECRET_KEY = "8gBm/:&EnhH.1/q"
+
+if ESEWA_TEST:
+    ESEWA_PAYMENT_URL = "https://rc-epay.esewa.com.np/api/epay/main/v2/form"
+    ESEWA_STATUS_URL  = "https://rc.esewa.com.np/api/epay/transaction/status/"
+else:
+    ESEWA_PAYMENT_URL = "https://epay.esewa.com.np/api/epay/main/v2/form"
+    ESEWA_STATUS_URL  = "https://esewa.com.np/api/epay/transaction/status/"
+

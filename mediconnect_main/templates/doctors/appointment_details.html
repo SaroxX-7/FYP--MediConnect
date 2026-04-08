@@ -15,6 +15,7 @@
         --danger: #ef4444;
         --danger-dark: #dc2626;
         --success: #10b981;
+        --success-dark: #059669;
         --warning: #f59e0b;
         --dark: #0f172a;
         --gray-50: #f8fafc;
@@ -189,8 +190,8 @@
     }
 
     .action-box {
-        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-        border: 1px solid #fbbf24;
+        background: var(--gray-50);
+        border: 1px solid var(--gray-200);
         border-radius: var(--radius-lg);
         padding: 1.5rem;
         margin-bottom: 2rem;
@@ -198,8 +199,8 @@
     }
 
     .action-box:hover {
-        box-shadow: var(--shadow-md);
-        transform: translateY(-2px);
+        border-color: var(--gray-300);
+        box-shadow: var(--shadow-sm);
     }
 
     .action-title {
@@ -242,6 +243,8 @@
         background: var(--primary-dark);
         transform: translateY(-2px);
         box-shadow: var(--shadow-md);
+        color: white;
+        text-decoration: none;
     }
 
     .btn-success {
@@ -250,9 +253,11 @@
     }
 
     .btn-success:hover {
-        background: #0ea5e9;
+        background: var(--success-dark);
         transform: translateY(-2px);
         box-shadow: var(--shadow-md);
+        color: white;
+        text-decoration: none;
     }
 
     .btn-danger {
@@ -264,6 +269,18 @@
         background: var(--danger-dark);
         transform: translateY(-2px);
         box-shadow: var(--shadow-md);
+        color: white;
+        text-decoration: none;
+    }
+
+    .btn-secondary {
+        background: #e2e8f0;
+        color: #1e293b;
+    }
+
+    .btn-secondary:hover {
+        background: #cbd5e1;
+        color: #0f172a;
     }
 
     .form-group {
@@ -371,12 +388,85 @@
         font-style: italic;
     }
 
-    .mt-3 {
-        margin-top: 1rem;
+    .custom-modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.55);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        padding: 1rem;
     }
 
-    .mb-3 {
-        margin-bottom: 1rem;
+    .custom-modal-overlay.show {
+        display: flex;
+        animation: fadeIn 0.2s ease;
+    }
+
+    .custom-modal {
+        width: 100%;
+        max-width: 460px;
+        background: #ffffff;
+        border-radius: 20px;
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25);
+        overflow: hidden;
+        animation: modalPop 0.22s ease;
+    }
+
+    .custom-modal-header {
+        padding: 1.1rem 1.25rem;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: #f8fafc;
+    }
+
+    .custom-modal-title {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin: 0;
+    }
+
+    .custom-modal-close {
+        background: transparent;
+        border: none;
+        font-size: 1.25rem;
+        line-height: 1;
+        cursor: pointer;
+        color: #64748b;
+    }
+
+    .custom-modal-body {
+        padding: 1.25rem;
+        color: #334155;
+        font-size: 0.95rem;
+    }
+
+    .custom-modal-actions {
+        padding: 1rem 1.25rem 1.25rem;
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @keyframes modalPop {
+        from {
+            opacity: 0;
+            transform: scale(0.96) translateY(8px);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
     }
 
     @media (max-width: 768px) {
@@ -429,6 +519,15 @@
             width: 100%;
             justify-content: center;
         }
+
+        .custom-modal-actions {
+            flex-direction: column;
+        }
+
+        .custom-modal-actions .btn {
+            width: 100%;
+            justify-content: center;
+        }
     }
 
     @keyframes fadeInUp {
@@ -446,17 +545,14 @@
 <div class="appointment-page">
     <div class="appointment-box">
 
-        <!-- Header -->
         <div class="appointment-header">
             <div class="appointment-topbar">
                 <h1 class="appointment-title">Doctor Appointment Management</h1>
             </div>
         </div>
 
-        <!-- Body -->
         <div class="appointment-content">
 
-            <!-- Appointment Information -->
             <div class="section-card">
                 <div class="section-title">
                     <span>📌</span> Appointment Information
@@ -525,21 +621,34 @@
                 </div>
             </div>
 
-            <!-- Action Box for Doctor -->
             {% if request.user == appointment.doctor.user and appointment.appointment_status != 'completed' and appointment.appointment_status != 'cancelled' %}
             <div class="action-box">
                 <div class="action-title">
                     <span>⚡</span> Quick Actions
                 </div>
                 <div class="action-buttons">
-                    <a href="{% url 'complete_appointment' appointment.id %}" class="btn btn-success" onclick="return confirm('Mark this appointment as completed?')">
+                    <a href="{% url 'complete_appointment' appointment.id %}"
+                       class="btn btn-success action-confirm"
+                       data-title="Complete Appointment"
+                       data-message="Mark this appointment as completed?"
+                       data-confirm-text="Yes, Complete">
                         ✓ Mark as Completed
                     </a>
+
                     {% if appointment.appointment_status == 'pending' %}
-                        <a href="{% url 'accept_appointment' appointment.id %}" class="btn btn-primary" onclick="return confirm('Accept this appointment?')">
+                        <a href="{% url 'accept_appointment' appointment.id %}"
+                           class="btn btn-primary action-confirm"
+                           data-title="Accept Appointment"
+                           data-message="Accept this appointment?"
+                           data-confirm-text="Yes, Accept">
                             ✓ Accept Appointment
                         </a>
-                        <a href="{% url 'reject_appointment' appointment.id %}" class="btn btn-danger" onclick="return confirm('Reject this appointment?')">
+
+                        <a href="{% url 'reject_appointment' appointment.id %}"
+                           class="btn btn-danger action-confirm"
+                           data-title="Reject Appointment"
+                           data-message="Reject this appointment?"
+                           data-confirm-text="Yes, Reject">
                             ✗ Reject Appointment
                         </a>
                     {% endif %}
@@ -547,19 +656,23 @@
             </div>
             {% endif %}
 
-            <!-- Create Follow Up Appointment -->
             {% if request.user == appointment.doctor.user and appointment.appointment_status == 'completed' %}
             <div class="section-card">
                 <div class="section-title">
                     <span>🔄</span> Create Follow Up Appointment
                 </div>
-                
+
                 <form method="POST" action="{% url 'create_followup_appointment' appointment.id %}">
                     {% csrf_token %}
 
                     <div class="form-group">
                         <label for="appointment_date">Follow-up Date</label>
-                        <input type="date" name="appointment_date" id="appointment_date" class="form-control" required>
+                        <input
+                            type="date"
+                            name="appointment_date"
+                            id="appointment_date"
+                            class="form-control"
+                            required>
                     </div>
 
                     <div class="form-group">
@@ -576,7 +689,7 @@
 
                     <div class="form-group">
                         <label for="message">Message (Optional)</label>
-                        <textarea name="message" id="message" class="form-control" rows="3" 
+                        <textarea name="message" id="message" class="form-control" rows="3"
                                   placeholder="Write follow-up note if needed"></textarea>
                     </div>
 
@@ -585,7 +698,6 @@
             </div>
             {% endif %}
 
-            <!-- Current Remark -->
             <div class="section-card">
                 <div class="section-title">
                     <span>📋</span> Current Remark
@@ -666,14 +778,13 @@
                 {% endif %}
             </div>
 
-            <!-- Write/Update Remark Form -->
             <div class="section-card">
                 <div class="section-title">
                     <span>✏️</span>
                     {% if latest_remark %}Update Remark{% else %}Write Remark{% endif %}
                 </div>
 
-                <form method="POST">
+                <form method="POST" id="remark-form">
                     {% csrf_token %}
 
                     <div class="form-group">
@@ -697,9 +808,13 @@
                     </div>
 
                     <div class="form-group">
-                        <label>Follow Up Date</label>
-                        <input type="date" name="follow_up_date" class="form-control"
-                               value="{% if latest_remark and latest_remark.follow_up_date %}{{ latest_remark.follow_up_date|date:'Y-m-d' }}{% endif %}">
+                        <label for="follow_up_date">Follow Up Date</label>
+                        <input
+                            type="date"
+                            name="follow_up_date"
+                            id="follow_up_date"
+                            class="form-control"
+                            value="{% if latest_remark and latest_remark.follow_up_date %}{{ latest_remark.follow_up_date|date:'Y-m-d' }}{% endif %}">
                     </div>
 
                     <div class="section-title" style="margin-top: 1.5rem;">
@@ -776,13 +891,28 @@
     </div>
 </div>
 
+<div class="custom-modal-overlay" id="confirmModal">
+    <div class="custom-modal">
+        <div class="custom-modal-header">
+            <h3 class="custom-modal-title" id="confirmModalTitle">Confirm Action</h3>
+            <button type="button" class="custom-modal-close" id="confirmModalClose">&times;</button>
+        </div>
+        <div class="custom-modal-body" id="confirmModalMessage">
+            Are you sure you want to continue?
+        </div>
+        <div class="custom-modal-actions">
+            <button type="button" class="btn btn-secondary" id="confirmModalCancel">Cancel</button>
+            <button type="button" class="btn btn-primary" id="confirmModalOk">Confirm</button>
+        </div>
+    </div>
+</div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.10.5/viewer.min.js" crossorigin="anonymous"></script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Image viewer
-    var viewer;
-    var image = document.getElementById('image-preview');
+    let viewer;
+    const image = document.getElementById('image-preview');
 
     if (image && typeof Viewer !== 'undefined') {
         image.addEventListener('click', function () {
@@ -804,76 +934,247 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Add medicine row
-    document.getElementById('add-medicine').addEventListener('click', function() {
-        let tableBody = document.getElementById('medicine-body');
-        let newRow = document.createElement('tr');
+    const confirmModal = document.getElementById('confirmModal');
+    const confirmModalTitle = document.getElementById('confirmModalTitle');
+    const confirmModalMessage = document.getElementById('confirmModalMessage');
+    const confirmModalOk = document.getElementById('confirmModalOk');
+    const confirmModalCancel = document.getElementById('confirmModalCancel');
+    const confirmModalClose = document.getElementById('confirmModalClose');
 
-        newRow.innerHTML = `
-            <td>
-                <select name="medicine_id[]" class="form-control">
-                    <option value="">Select Medicine</option>
-                    {% for medicine in medicines %}
-                        <option value="{{ medicine.id }}">{{ medicine }}</option>
-                    {% endfor %}
-                </select>
-            </td>
-            <td><input type="text" name="dosage[]" class="form-control" placeholder="e.g. 500mg"></td>
-            <td><input type="number" name="quantity[]" class="form-control" value="1" min="1"></td>
-            <td><input type="text" name="frequency[]" class="form-control" placeholder="e.g. 2 times a day"></td>
-            <td><input type="text" name="duration[]" class="form-control" placeholder="e.g. 5 days"></td>
-            <td><input type="text" name="instruction[]" class="form-control" placeholder="e.g. After meal"></td>
-            <td><button type="button" class="btn btn-danger remove-row">Remove</button></td>
-        `;
+    let pendingActionUrl = null;
 
-        tableBody.appendChild(newRow);
-        
-        // Add animation
-        newRow.style.opacity = '0';
-        setTimeout(() => {
-            newRow.style.transition = 'opacity 0.3s';
-            newRow.style.opacity = '1';
-        }, 10);
+    function openConfirmModal(title, message, confirmText, confirmClass, targetUrl, infoOnly = false) {
+        pendingActionUrl = targetUrl || null;
+        confirmModalTitle.textContent = title || 'Confirm Action';
+        confirmModalMessage.textContent = message || 'Are you sure you want to continue?';
+        confirmModalOk.textContent = confirmText || 'Confirm';
+
+        confirmModalOk.className = 'btn';
+        if (confirmClass && confirmClass.includes('btn-danger')) {
+            confirmModalOk.classList.add('btn', 'btn-danger');
+        } else if (confirmClass && confirmClass.includes('btn-success')) {
+            confirmModalOk.classList.add('btn', 'btn-success');
+        } else {
+            confirmModalOk.classList.add('btn', 'btn-primary');
+        }
+
+        confirmModalCancel.style.display = infoOnly ? 'none' : '';
+        confirmModal.classList.add('show');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeConfirmModal() {
+        confirmModal.classList.remove('show');
+        pendingActionUrl = null;
+        confirmModalCancel.style.display = '';
+        document.body.style.overflow = '';
+    }
+
+    document.querySelectorAll('.action-confirm').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            openConfirmModal(
+                this.dataset.title,
+                this.dataset.message,
+                this.dataset.confirmText,
+                this.className,
+                this.getAttribute('href')
+            );
+        });
     });
 
-    // Remove medicine row
+    confirmModalOk.addEventListener('click', function() {
+        if (pendingActionUrl) {
+            window.location.href = pendingActionUrl;
+        } else {
+            closeConfirmModal();
+        }
+    });
+
+    confirmModalCancel.addEventListener('click', closeConfirmModal);
+    confirmModalClose.addEventListener('click', closeConfirmModal);
+
+    confirmModal.addEventListener('click', function(e) {
+        if (e.target === confirmModal) {
+            closeConfirmModal();
+        }
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && confirmModal.classList.contains('show')) {
+            closeConfirmModal();
+        }
+    });
+
+    const addMedicineBtn = document.getElementById('add-medicine');
+    if (addMedicineBtn) {
+        addMedicineBtn.addEventListener('click', function() {
+            const tableBody = document.getElementById('medicine-body');
+            const newRow = document.createElement('tr');
+
+            newRow.innerHTML = `
+                <td>
+                    <select name="medicine_id[]" class="form-control">
+                        <option value="">Select Medicine</option>
+                        {% for medicine in medicines %}
+                            <option value="{{ medicine.id }}">{{ medicine }}</option>
+                        {% endfor %}
+                    </select>
+                </td>
+                <td><input type="text" name="dosage[]" class="form-control" placeholder="e.g. 500mg"></td>
+                <td><input type="number" name="quantity[]" class="form-control" value="1" min="1"></td>
+                <td><input type="text" name="frequency[]" class="form-control" placeholder="e.g. 2 times a day"></td>
+                <td><input type="text" name="duration[]" class="form-control" placeholder="e.g. 5 days"></td>
+                <td><input type="text" name="instruction[]" class="form-control" placeholder="e.g. After meal"></td>
+                <td><button type="button" class="btn btn-danger remove-row">Remove</button></td>
+            `;
+
+            tableBody.appendChild(newRow);
+            newRow.style.opacity = '0';
+            setTimeout(() => {
+                newRow.style.transition = 'opacity 0.3s';
+                newRow.style.opacity = '1';
+            }, 10);
+        });
+    }
+
     document.addEventListener('click', function(e) {
         if (e.target.classList.contains('remove-row')) {
-            let rows = document.querySelectorAll('#medicine-body tr');
+            const rows = document.querySelectorAll('#medicine-body tr');
             if (rows.length > 1) {
                 e.target.closest('tr').remove();
             } else {
-                alert('At least one medicine row is required. Leave medicine field empty if no medicine needed.');
+                openConfirmModal(
+                    'Medicine Row',
+                    'At least one medicine row is required. Leave medicine field empty if no medicine is needed.',
+                    'OK',
+                    'btn-primary',
+                    null,
+                    true
+                );
             }
         }
     });
 
-    // Set minimum date for follow-up
-    var dateInput = document.getElementById('appointment_date');
-    if (dateInput) {
-        var today = new Date();
-        var tomorrow = new Date(today);
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        dateInput.min = tomorrow.toISOString().split('T')[0];
+    const appointmentDateInput = document.getElementById('appointment_date');
+    if (appointmentDateInput) {
+        const today = new Date();
+        const tomorrow = new Date(
+            today.getFullYear(),
+            today.getMonth(),
+            today.getDate() + 1
+        );
+
+        const year = tomorrow.getFullYear();
+        const month = String(tomorrow.getMonth() + 1).padStart(2, '0');
+        const day = String(tomorrow.getDate()).padStart(2, '0');
+        const minDate = `${year}-${month}-${day}`;
+
+        appointmentDateInput.min = minDate;
+        appointmentDateInput.setAttribute('min', minDate);
+
+        if (appointmentDateInput.value && appointmentDateInput.value < minDate) {
+            appointmentDateInput.value = '';
+        }
     }
 
-    // Form validation for follow-up
-    var followupForm = document.querySelector('.section-card form');
-    if (followupForm && followupForm.action.includes('create_followup_appointment')) {
+    const followUpDateInput = document.getElementById('follow_up_date');
+    if (followUpDateInput) {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        const minDate = `${year}-${month}-${day}`;
+
+        followUpDateInput.min = minDate;
+        followUpDateInput.setAttribute('min', minDate);
+
+        if (followUpDateInput.value && followUpDateInput.value < minDate) {
+            followUpDateInput.value = '';
+        }
+    }
+
+    const followupForm = document.querySelector('form[action*="create_followup_appointment"]');
+    if (followupForm) {
         followupForm.addEventListener('submit', function(e) {
-            var dateInput = document.getElementById('appointment_date');
-            var slotSelect = document.getElementById('time_slot_id');
-            
+            const dateInput = document.getElementById('appointment_date');
+            const slotSelect = document.getElementById('time_slot_id');
+
             if (!dateInput.value) {
                 e.preventDefault();
-                alert('Please select a follow-up date');
+                openConfirmModal(
+                    'Follow-up Date Required',
+                    'Please select a follow-up date.',
+                    'OK',
+                    'btn-primary',
+                    null,
+                    true
+                );
                 return false;
             }
-            
+
+            const selectedDate = new Date(dateInput.value + 'T00:00:00');
+            const today = new Date();
+            const tomorrow = new Date(
+                today.getFullYear(),
+                today.getMonth(),
+                today.getDate() + 1
+            );
+
+            if (selectedDate < tomorrow) {
+                e.preventDefault();
+                openConfirmModal(
+                    'Invalid Follow-up Date',
+                    'Please select tomorrow or a future date.',
+                    'OK',
+                    'btn-primary',
+                    null,
+                    true
+                );
+                return false;
+            }
+
             if (!slotSelect.value) {
                 e.preventDefault();
-                alert('Please select a time slot');
+                openConfirmModal(
+                    'Time Slot Required',
+                    'Please select a time slot.',
+                    'OK',
+                    'btn-primary',
+                    null,
+                    true
+                );
                 return false;
+            }
+        });
+    }
+
+    const remarkForm = document.getElementById('remark-form');
+    if (remarkForm) {
+        remarkForm.addEventListener('submit', function(e) {
+            const remarkDateInput = document.getElementById('follow_up_date');
+
+            if (remarkDateInput && remarkDateInput.value) {
+                const selectedDate = new Date(remarkDateInput.value + 'T00:00:00');
+                const today = new Date();
+                const todayOnly = new Date(
+                    today.getFullYear(),
+                    today.getMonth(),
+                    today.getDate()
+                );
+
+                if (selectedDate < todayOnly) {
+                    e.preventDefault();
+                    openConfirmModal(
+                        'Invalid Follow Up Date',
+                        'Follow-up date cannot be in the past.',
+                        'OK',
+                        'btn-primary',
+                        null,
+                        true
+                    );
+                    return false;
+                }
             }
         });
     }

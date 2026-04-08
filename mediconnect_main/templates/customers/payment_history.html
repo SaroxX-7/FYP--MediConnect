@@ -1,0 +1,246 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+
+<style>
+    :root {
+        --primary: #2563eb;
+        --primary-dark: #1e40af;
+        --success: #10b981;
+        --danger: #ef4444;
+        --warning: #f59e0b;
+        --gray-50: #f9fafb;
+        --gray-100: #f1f5f9;
+        --gray-200: #e2e8f0;
+        --gray-500: #64748b;
+        --gray-700: #334155;
+        --gray-800: #1e293b;
+        --gray-900: #0f172a;
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        --radius-lg: 1rem;
+        --radius-xl: 1.5rem;
+    }
+
+    .content {
+        padding: 2.5rem 0;
+        background: linear-gradient(135deg, #f0f9ff 0%, #f8fafc 100%);
+        min-height: calc(100vh - 200px);
+    }
+
+    .container-fluid {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+
+    .payment-card {
+        border: none;
+        border-radius: var(--radius-xl);
+        box-shadow: var(--shadow-md);
+        transition: all 0.3s ease;
+        overflow: hidden;
+        background: #ffffff;
+    }
+
+    .payment-card:hover {
+        box-shadow: var(--shadow-lg);
+        transform: translateY(-2px);
+    }
+
+    .payment-card .card-header {
+        background: #ffffff;
+        border-bottom: 1px solid var(--gray-200);
+        padding: 1.5rem 2rem;
+    }
+
+    .payment-card .card-header h4 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--gray-800);
+    }
+
+    .payment-card .card-body {
+        padding: 2rem;
+    }
+
+    .table-responsive {
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+    }
+
+    .table {
+        margin-bottom: 0;
+        vertical-align: middle;
+    }
+
+    .table thead th {
+        background: var(--gray-50);
+        color: var(--gray-700);
+        font-weight: 700;
+        font-size: 0.9rem;
+        border-bottom: 1px solid var(--gray-200);
+        padding: 1rem;
+        white-space: nowrap;
+    }
+
+    .table tbody td {
+        padding: 1rem;
+        color: var(--gray-700);
+        border-bottom: 1px solid var(--gray-100);
+        font-size: 0.95rem;
+        white-space: nowrap;
+    }
+
+    .table tbody tr:hover {
+        background: #f8fbff;
+    }
+
+    .amount-strong {
+        font-weight: 700;
+        color: var(--gray-900);
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 0.45rem 0.75rem;
+        border-radius: 999px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .bg-success-light {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .bg-warning-light {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .bg-danger-light {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .bg-secondary-light {
+        background: #e2e8f0;
+        color: #475569;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 2rem 1rem;
+    }
+
+    .empty-state h5 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--gray-700);
+        margin-bottom: 0.5rem;
+    }
+
+    .empty-state p {
+        color: var(--gray-500);
+        margin: 0;
+    }
+
+    @media (max-width: 991.98px) {
+        .content { padding: 1.5rem 0; }
+        .payment-card .card-header,
+        .payment-card .card-body { padding: 1.5rem; }
+    }
+
+    @media (max-width: 768px) {
+        .container-fluid { padding: 0 1rem; }
+        .payment-card .card-header,
+        .payment-card .card-body { padding: 1.25rem; }
+        .table thead th,
+        .table tbody td { padding: 0.85rem; font-size: 0.875rem; }
+    }
+</style>
+
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+
+            {% include 'includes/c_sidebar.html' %}
+
+            <div class="col-md-7 col-lg-8 col-xl-9">
+                <div class="card payment-card">
+                    <div class="card-header">
+                        <h4>Payment History</h4>
+                    </div>
+
+                    <div class="card-body">
+                        {% if payments %}
+                            <div class="table-responsive">
+                                <table class="table table-hover table-center mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>S.N</th>
+                                            <th>Doctor</th>
+                                            <th>Appointment Date</th>
+                                            <th>Payment Method</th>
+                                            <th>Status</th>
+                                            <th>Doctor Fee</th>
+                                            <th>Total Amount</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for payment in payments %}
+                                        <tr>
+                                            <td>{{ forloop.counter }}</td>
+                                            <td>
+                                                {% if payment.doctor and payment.doctor.user %}
+                                                    Dr. {{ payment.doctor.user.first_name }} {{ payment.doctor.user.last_name }}
+                                                {% else %}
+                                                    N/A
+                                                {% endif %}
+                                             </td>
+                                            <td>
+                                                {% if payment.appointment and payment.appointment.appointment_date %}
+                                                    {{ payment.appointment.appointment_date|date:"F j, Y" }}
+                                                {% else %}
+                                                    N/A
+                                                {% endif %}
+                                             </td>
+                                            <td>{{ payment.payment_method|default:"N/A"|title }}</td>
+                                            <td>
+                                                {% if payment.payment_status == 'paid' %}
+                                                    <span class="badge bg-success-light">Paid</span>
+                                                {% elif payment.payment_status == 'pending' %}
+                                                    <span class="badge bg-warning-light">Pending</span>
+                                                {% elif payment.payment_status == 'failed' %}
+                                                    <span class="badge bg-danger-light">Failed</span>
+                                                {% elif payment.payment_status == 'cancelled' %}
+                                                    <span class="badge bg-secondary-light">Cancelled</span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary-light">
+                                                        {{ payment.payment_status|default:"Unknown"|title }}
+                                                    </span>
+                                                {% endif %}
+                                             </td>
+                                            <td>Rs. {{ payment.doctor_fee }}</td>
+                                            <td><span class="amount-strong">Rs. {{ payment.total_amount }}</span></td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="empty-state">
+                                <h5>No payment history found.</h5>
+                                <p>Your payment records will appear here.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

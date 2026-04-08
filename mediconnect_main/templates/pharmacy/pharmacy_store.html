@@ -41,7 +41,7 @@
                     
                     <div class="price-stock">
                         <div class="price">
-                            ₹{{ medicine.unit_price }}<small>/unit</small>
+                            Rs. {{ medicine.unit_price }}<small>/unit</small>
                         </div>
                         <div class="stock-badge {% if medicine.stock_qty > 0 %}in-stock{% else %}out-stock{% endif %}">
                             <i class="bi bi-box-seam"></i> 
@@ -103,7 +103,7 @@
 </div>
 
 <style>
-    /* ========== BLUE THEME CSS ========== */
+    /* ========== BLUE THEME CSS - NEPALI RUPEES (Rs) ========== */
     :root {
         --primary-dark: #1a3a5c;
         --primary: #2c5f8a;
