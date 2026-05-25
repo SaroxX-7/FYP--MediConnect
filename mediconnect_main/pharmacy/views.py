@@ -61,6 +61,15 @@ def pharmacist_dashboard(request):
 
 @login_required(login_url='login')
 @user_passes_test(check_role_pharmacist)
+def pharmacist_profile(request):
+    context = {
+        'user': request.user,
+    }
+    return render(request, 'pharmacy/pharmacist_profile.html', context)
+
+
+@login_required(login_url='login')
+@user_passes_test(check_role_pharmacist)
 def medicine_create(request):
     if request.method == 'POST':
         form = MedicineForm(request.POST, request.FILES)

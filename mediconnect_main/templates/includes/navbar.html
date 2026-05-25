@@ -79,20 +79,26 @@
             transition: all 0.2s ease;
         }
         
-        .navbar-brand {
-            font-size: 1.75rem;
-            font-weight: 800;
-            text-decoration: none;
-            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            letter-spacing: -0.5px;
-        }
-        
-        .navbar-brand:hover {
-            opacity: 0.8;
-        }
+        .navbar-brand.logo {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    background: none;
+    padding: 0;
+    margin: 0;
+}
+
+.main-logo-img {
+    height: 48px;
+    width: auto;
+    max-width: 210px;
+    object-fit: contain;
+    display: block;
+}
+
+.navbar-brand.logo:hover {
+    opacity: 0.9;
+}
         
         /* Main Menu Wrapper */
         .main-menu-wrapper {
@@ -111,14 +117,18 @@
         }
         
         .menu-logo {
-            font-size: 1.5rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            text-decoration: none;
-        }
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+}
+
+.mobile-logo-img {
+    height: 42px;
+    width: auto;
+    max-width: 180px;
+    object-fit: contain;
+    display: block;
+}
         
         .menu-close {
             font-size: 1.25rem;
@@ -469,6 +479,10 @@
                 width: 35px;
                 height: 35px;
             }
+            .main-logo-img {
+    height: 40px;
+    max-width: 170px;
+}
         }
         
         @media (max-width: 480px) {
@@ -546,15 +560,15 @@
                 </a>
                 
                 <a href="{% url 'home' %}" class="navbar-brand logo">
-                    MediConnect
-                </a>
+    <img src="{% static 'img/mediconnect-logo.png' %}" alt="MediConnect Logo" class="main-logo-img">
+</a>
             </div>
 
             <div class="main-menu-wrapper" id="mainMenuWrapper">
                 <div class="menu-header">
                     <a href="{% url 'home' %}" class="menu-logo">
-                        MediConnect
-                    </a>
+    <img src="{% static 'img/mediconnect-logo.png' %}" alt="MediConnect Logo" class="mobile-logo-img">
+</a>
                     <a id="menu_close" class="menu-close" href="javascript:void(0);">
                         <i class="fas fa-times"></i>
                     </a>

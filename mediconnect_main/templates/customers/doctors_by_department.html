@@ -1,177 +1,496 @@
 {% extends 'base.html' %}
+{% load static %}
+
 {% block content %}
-    {% load static %}
 
-<!-- Breadcrumb -->
-			<!-- <div class="breadcrumb-bar">
-				<div class="container-fluid">
-					<div class="row align-items-center">
-						<div class="col-md-8 col-12">
-							<nav aria-label="breadcrumb" class="page-breadcrumb">
-								<ol class="breadcrumb">
-									<li class="breadcrumb-item"><a href="index-2.html">Home</a></li>
-									<li class="breadcrumb-item active" aria-current="page">Search</li>
-								</ol>
-							</nav>
-							<h2 class="breadcrumb-title">{{ object_list|length }} matches found for :{{ query }}</h2>
-						</div>
-						<div class="col-md-4 col-12 d-md-block d-none">
-							<div class="sort-by">
-								<span class="sort-title">Sort by</span>
-								<span class="sortby-fliter">
-									<select class="select">
-										<option>Select</option>
-										<option class="sorting">Rating</option>
-										<option class="sorting">Popular</option>
-										<option class="sorting">Latest</option>
-										<option class="sorting">Free</option>
-									</select>
-								</span>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div> -->
-			<!-- /Breadcrumb -->
+<style>
+    .doctor-list-page {
+        background: #f4f8fb;
+        padding: 35px 0 55px;
+        min-height: 80vh;
+    }
 
-			<!-- Page Content -->
-			<div class="content">
-				<div class="container-fluid">
+    .doctor-list-container {
+        max-width: 1180px;
+        margin: 0 auto;
+    }
 
-					<div class="row">
-						<div class="col-md-12 col-lg-4 col-xl-3 theiaStickySidebar">
+    .doctor-list-header {
+        background: linear-gradient(135deg, #0de0fe 0%, #0d6efd 100%);
+        border-radius: 22px;
+        padding: 34px 36px;
+        color: #ffffff;
+        margin-bottom: 28px;
+        box-shadow: 0 14px 35px rgba(13, 110, 253, 0.20);
+    }
 
-							<!-- Search Filter
-							<div class="card search-filter">
-								<div class="card-header">
-									<h4 class="card-title mb-0">Search Filter</h4>
-								</div>
-								<div class="card-body">
-								<div class="filter-widget">
-									<div class="cal-icon">
-										<input type="text" class="form-control datetimepicker" placeholder="Select Date">
-									</div>
-								</div>
-								<div class="filter-widget">
-									<h4>Gender</h4>
-									<div>
-										<label class="custom_check">
-											<input type="checkbox" name="gender_type" checked>
-											<span class="checkmark"></span> Male Doctor
-										</label>
-									</div>
-									<div>
-										<label class="custom_check">
-											<input type="checkbox" name="gender_type">
-											<span class="checkmark"></span> Female Doctor
-										</label>
-									</div>
-								</div>
-								<div class="filter-widget">
-									<h4>Select Specialist</h4>
-									<div>
-										<label class="custom_check">
-											<input type="checkbox" name="select_specialist" checked>
-											<span class="checkmark"></span> Urology
-										</label>
-									</div>
-									<div>
-										<label class="custom_check">
-											<input type="checkbox" name="select_specialist" checked>
-											<span class="checkmark"></span> Neurology
-										</label>
-									</div>
-									<div>
-										<label class="custom_check">
-											<input type="checkbox" name="select_specialist">
-											<span class="checkmark"></span> Dentist
-										</label>
-									</div>
-									<div>
-										<label class="custom_check">
-											<input type="checkbox" name="select_specialist">
-											<span class="checkmark"></span> Orthopedic
-										</label>
-									</div>
-									<div>
-										<label class="custom_check">
-											<input type="checkbox" name="select_specialist">
-											<span class="checkmark"></span> Cardiologist
-										</label>
-									</div>
-									<div>
-										<label class="custom_check">
-											<input type="checkbox" name="select_specialist">
-											<span class="checkmark"></span> Cardiologist
-										</label>
-									</div>
-								</div>
-									<div class="btn-search">
-										<button type="button" class="btn btn-block">Search</button>
-									</div>
-								</div>
-							</div>
-							/Search Filter -->
+    .doctor-list-header h2 {
+        font-size: 30px;
+        font-weight: 800;
+        margin-bottom: 8px;
+        color: #ffffff;
+    }
 
-						</div>
+    .doctor-list-header p {
+        font-size: 15px;
+        margin-bottom: 0;
+        color: rgba(255, 255, 255, 0.92);
+    }
 
-						<div class="col-md-12 col-lg-8 col-xl-12">
-							<!-- Doctor Widget -->
-                        {% for doctor in object_list %}
-							<div class="card">
-								<div class="card-body">
-									<div class="doctor-widget">
-										<div class="doc-info-left">
-											<div class="doctor-img">
-												<a href="doctor-profile.html">
-													<img src="{{ doctor.user.userprofile.profile_picture.url }}" class="img-fluid" alt="User Image">
-												</a>
-											</div>
-											<div class="doc-info-cont">
-												<h4 class="doc-name"><a href="doctor-profile.html">Dr. {{ doctor.user.first_name }} {{ doctor.user.last_name }}</a></h4>
-												<!-- <p class="doc-speciality"></p> -->
-												<h5 class="doc-department"><img src="{{ doctor.department.image.url }}" class="img-fluid" alt="Speciality">{{ department.name }}</h5>
-												<div class="clinic-details">
-													<p class="doc-location"><i class="fas fa-map-marker-alt"></i> {{ doctor.clinic_address }}</p>
-												</div>
-												<div class="clinic-services">
-                                                    {% for disease in doctor.department.disease.all %}
-													    <span>{{ disease }}</span>
-                                                    {% endfor %}
-												</div>
-											</div>
-										</div>
-										<div class="doc-info-right">
-											<div class="clini-infos">
-												<ul>
-													<li><i class="fas fa-map-marker-alt"></i> {{ doctor.clinic_address }}</li>
-												</ul>
-											</div>
-											<div class="clinic-booking">
-												<a class="view-pro-btn" href="{% url 'doctor_detail' doctor.doctor_slug %}">View Profile</a>
-												<a class="apt-btn" href="{% url 'available_appointment' doctor_id=doctor.id %}">Book Appointment</a>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-                        {% empty %}
-                        <li>No doctors found in this department.</li>
-                        {% endfor %}
-							<!-- /Doctor Widget -->
+    .doctor-list-count {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255, 255, 255, 0.18);
+        padding: 8px 15px;
+        border-radius: 30px;
+        font-weight: 700;
+        margin-top: 16px;
+        font-size: 14px;
+    }
 
+    .doctor-list-card {
+        background: #ffffff;
+        border: none;
+        border-radius: 22px;
+        margin-bottom: 22px;
+        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.07);
+        overflow: hidden;
+        transition: 0.3s ease;
+    }
 
+    .doctor-list-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 16px 42px rgba(15, 23, 42, 0.11);
+    }
 
-							<div class="load-more text-center">
-								<a class="btn btn-primary btn-sm" href="javascript:void(0);">Load More</a>
-							</div>
-						</div>
-					</div>
+    .doctor-list-card-body {
+        padding: 24px;
+    }
 
-				</div>
+    .doctor-list-widget {
+        display: flex;
+        justify-content: space-between;
+        gap: 28px;
+        align-items: center;
+    }
 
-			</div>
-			<!-- /Page Content -->
+    .doctor-list-left {
+        display: flex;
+        gap: 22px;
+        align-items: flex-start;
+        flex: 1;
+    }
 
+    .doctor-photo {
+        width: 138px;
+        height: 138px;
+        min-width: 138px;
+        border-radius: 20px;
+        overflow: hidden;
+        background: #eef2f7;
+        border: 5px solid #ffffff;
+        box-shadow: 0 10px 26px rgba(15, 23, 42, 0.12);
+    }
+
+    .doctor-photo img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    .doctor-list-info {
+        flex: 1;
+    }
+
+    .doctor-name {
+        font-size: 23px;
+        font-weight: 800;
+        margin-bottom: 8px;
+        color: #111827;
+    }
+
+    .doctor-name a {
+        color: #111827;
+        text-decoration: none;
+    }
+
+    .doctor-name a:hover {
+        color: #0d6efd;
+    }
+
+    .doctor-department {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: #e7faff;
+        color: #0891b2;
+        padding: 7px 14px;
+        border-radius: 30px;
+        font-size: 14px;
+        font-weight: 700;
+        margin-bottom: 12px;
+    }
+
+    .doctor-department img {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .doctor-address {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        color: #6b7280;
+        font-size: 14px;
+        margin-bottom: 13px;
+        line-height: 1.5;
+    }
+
+    .doctor-address i {
+        color: #0de0fe;
+        margin-top: 3px;
+    }
+
+    .doctor-services {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 10px;
+    }
+
+    .doctor-services span {
+        background: #f1f5f9;
+        color: #374151;
+        border: 1px solid #e5e7eb;
+        padding: 7px 13px;
+        border-radius: 30px;
+        font-size: 13px;
+        font-weight: 600;
+        transition: 0.3s ease;
+    }
+
+    .doctor-services span:hover {
+        background: #e7faff;
+        color: #0891b2;
+        border-color: #bae6fd;
+    }
+
+    .doctor-list-right {
+        width: 245px;
+        min-width: 245px;
+    }
+
+    .doctor-side-info {
+        background: #f8fafc;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        padding: 15px;
+        margin-bottom: 14px;
+    }
+
+    .doctor-side-info ul {
+        padding: 0;
+        margin: 0;
+        list-style: none;
+    }
+
+    .doctor-side-info li {
+        display: flex;
+        gap: 9px;
+        align-items: flex-start;
+        color: #4b5563;
+        font-size: 13px;
+        font-weight: 600;
+        line-height: 1.5;
+    }
+
+    .doctor-side-info li i {
+        color: #0d6efd;
+        margin-top: 3px;
+    }
+
+    .doctor-action-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .doctor-view-btn,
+    .doctor-book-btn {
+        display: block;
+        width: 100%;
+        text-align: center;
+        border-radius: 12px;
+        padding: 12px 16px;
+        font-size: 14px;
+        font-weight: 700;
+        text-decoration: none;
+        transition: 0.3s ease;
+    }
+
+    .doctor-view-btn {
+        background: #ffffff;
+        color: #0d6efd;
+        border: 1px solid #0d6efd;
+    }
+
+    .doctor-view-btn:hover {
+        background: #0d6efd;
+        color: #ffffff;
+    }
+
+    .doctor-book-btn {
+        background: linear-gradient(135deg, #0de0fe, #0d6efd);
+        color: #ffffff;
+        border: 1px solid transparent;
+        box-shadow: 0 8px 20px rgba(13, 110, 253, 0.20);
+    }
+
+    .doctor-book-btn:hover {
+        color: #ffffff;
+        transform: translateY(-2px);
+        box-shadow: 0 12px 26px rgba(13, 110, 253, 0.30);
+    }
+
+    .empty-doctor-box {
+        background: #ffffff;
+        padding: 55px 25px;
+        border-radius: 22px;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.07);
+    }
+
+    .empty-doctor-icon {
+        width: 76px;
+        height: 76px;
+        border-radius: 50%;
+        background: #e7faff;
+        color: #0891b2;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 30px;
+        margin-bottom: 18px;
+    }
+
+    .empty-doctor-box h4 {
+        font-size: 24px;
+        font-weight: 800;
+        color: #111827;
+        margin-bottom: 8px;
+    }
+
+    .empty-doctor-box p {
+        color: #6b7280;
+        margin-bottom: 0;
+    }
+
+    @media (max-width: 991px) {
+        .doctor-list-widget {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .doctor-list-right {
+            width: 100%;
+            min-width: 100%;
+        }
+
+        .doctor-action-buttons {
+            flex-direction: row;
+        }
+
+        .doctor-view-btn,
+        .doctor-book-btn {
+            width: 50%;
+        }
+    }
+
+    @media (max-width: 575px) {
+        .doctor-list-page {
+            padding: 22px 0 40px;
+        }
+
+        .doctor-list-header {
+            padding: 25px 22px;
+            border-radius: 18px;
+        }
+
+        .doctor-list-header h2 {
+            font-size: 24px;
+        }
+
+        .doctor-list-card-body {
+            padding: 20px;
+        }
+
+        .doctor-list-left {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .doctor-photo {
+            width: 150px;
+            height: 150px;
+            min-width: 150px;
+        }
+
+        .doctor-address {
+            justify-content: center;
+        }
+
+        .doctor-services {
+            justify-content: center;
+        }
+
+        .doctor-action-buttons {
+            flex-direction: column;
+        }
+
+        .doctor-view-btn,
+        .doctor-book-btn {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="content doctor-list-page">
+    <div class="container-fluid">
+        <div class="doctor-list-container">
+
+            <!-- Header -->
+            <div class="doctor-list-header">
+                <h2>Available Doctors</h2>
+
+                <p>
+                    Find the right doctor and book your appointment easily.
+                    {% if department.name %}
+                        Showing doctors for {{ department.name }}.
+                    {% elif query %}
+                        Showing results for "{{ query }}".
+                    {% endif %}
+                </p>
+
+                <div class="doctor-list-count">
+                    <i class="fas fa-user-md"></i>
+                    {{ object_list|length }} doctor{% if object_list|length != 1 %}s{% endif %} found
+                </div>
+            </div>
+            <!-- /Header -->
+
+            {% for doctor in object_list %}
+
+                <!-- Doctor Card -->
+                <div class="doctor-list-card">
+                    <div class="doctor-list-card-body">
+
+                        <div class="doctor-list-widget">
+
+                            <!-- Left Info -->
+                            <div class="doctor-list-left">
+
+                                <div class="doctor-photo">
+                                    <a href="{% url 'doctor_detail' doctor.doctor_slug %}">
+                                        {% if doctor.user.userprofile.profile_picture %}
+                                            <img src="{{ doctor.user.userprofile.profile_picture.url }}"
+                                                 alt="Dr. {{ doctor.user.first_name }} {{ doctor.user.last_name }}">
+                                        {% else %}
+                                            <img src="{% static 'img/doctors/doctor-thumb-01.jpg' %}"
+                                                 alt="Doctor Image">
+                                        {% endif %}
+                                    </a>
+                                </div>
+
+                                <div class="doctor-list-info">
+
+                                    <h4 class="doctor-name">
+                                        <a href="{% url 'doctor_detail' doctor.doctor_slug %}">
+                                            Dr. {{ doctor.user.first_name }} {{ doctor.user.last_name }}
+                                        </a>
+                                    </h4>
+
+                                    <div class="doctor-department">
+                                        {% if doctor.department.image %}
+                                            <img src="{{ doctor.department.image.url }}" alt="Department">
+                                        {% endif %}
+
+                                        {% if department.name %}
+                                            {{ department.name }}
+                                        {% else %}
+                                            {{ doctor.department.name }}
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="doctor-address">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        <span>{{ doctor.clinic_address|default:"Clinic address not available" }}</span>
+                                    </div>
+
+                                    <div class="doctor-services">
+                                        {% for disease in doctor.department.disease.all %}
+                                            <span>{{ disease }}</span>
+                                        {% empty %}
+                                            <span>General Consultation</span>
+                                            <span>Health Checkup</span>
+                                        {% endfor %}
+                                    </div>
+
+                                </div>
+                            </div>
+                            <!-- /Left Info -->
+
+                            <!-- Right Info -->
+                            <div class="doctor-list-right">
+
+                                <div class="doctor-side-info">
+                                    <ul>
+                                        <li>
+                                            <i class="fas fa-hospital"></i>
+                                            <span>{{ doctor.clinic_address|default:"Clinic address not available" }}</span>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <div class="doctor-action-buttons">
+                                    <a class="doctor-view-btn"
+                                       href="{% url 'doctor_detail' doctor.doctor_slug %}">
+                                        View Profile
+                                    </a>
+
+                                    <a class="doctor-book-btn"
+                                       href="{% url 'available_appointment' doctor_id=doctor.id %}">
+                                        Book Appointment
+                                    </a>
+                                </div>
+
+                            </div>
+                            <!-- /Right Info -->
+
+                        </div>
+
+                    </div>
+                </div>
+                <!-- /Doctor Card -->
+
+            {% empty %}
+
+                <div class="empty-doctor-box">
+                    <div class="empty-doctor-icon">
+                        <i class="fas fa-user-md"></i>
+                    </div>
+                    <h4>No doctors found</h4>
+                    <p>Please try searching another department or keyword.</p>
+                </div>
+
+            {% endfor %}
+
+        </div>
+    </div>
+</div>
 
 {% endblock %}

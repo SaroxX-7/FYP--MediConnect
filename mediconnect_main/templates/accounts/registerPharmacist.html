@@ -693,7 +693,7 @@
               <!-- Display Django messages if any -->
               {% if messages %}
                 {% for message in messages %}
-                  <div class="{% if message.tags == 'error' %}error-message{% else %}success-message{% endif %}">
+                  <div class="{% if 'error' in message.tags or 'danger' in message.tags %}error-message{% else %}success-message{% endif %}">
                     {% if message.tags == 'error' %}
                       <span>⚠️</span>
                     {% else %}
@@ -704,20 +704,20 @@
                 {% endfor %}
               {% endif %}
 
-              <form action="{% url 'registerPharmacist' %}" method="post" id="registerForm">
+              <form action="{% url 'registerPharmacist' %}" method="post" id="registerForm" novalidate>
                 {% csrf_token %}
 
                 <div class="row form-row">
                   <div class="col-6">
                     <div class="form-group form-focus">
-                      <input type="text" class="form-control floating" name="first_name" id="id_first_name" placeholder=" " {% if form.first_name.value %} value="{{ form.first_name.value }}" {% endif %}>
+                      <input type="text" class="form-control floating" name="first_name" id="id_first_name" placeholder=" " autocomplete="given-name" required minlength="2" maxlength="50" pattern="[A-Za-z][A-Za-z\s\'.-]*" {% if form.first_name.value %} value="{{ form.first_name.value }}" {% endif %}>
                       <label class="focus-label">First Name</label>
                       {% if form.first_name.errors %}<div class="error">{{ form.first_name.errors.as_text }}</div>{% endif %}
                     </div>
                   </div>
                   <div class="col-6">
                     <div class="form-group form-focus">
-                      <input type="text" class="form-control floating" name="last_name" id="id_last_name" placeholder=" " {% if form.last_name.value %} value="{{ form.last_name.value }}" {% endif %}>
+                      <input type="text" class="form-control floating" name="last_name" id="id_last_name" placeholder=" " autocomplete="family-name" required minlength="2" maxlength="50" pattern="[A-Za-z][A-Za-z\s\'.-]*" {% if form.last_name.value %} value="{{ form.last_name.value }}" {% endif %}>
                       <label class="focus-label">Last Name</label>
                       {% if form.last_name.errors %}<div class="error">{{ form.last_name.errors.as_text }}</div>{% endif %}
                     </div>
@@ -725,7 +725,7 @@
                 </div>
 
                 <div class="form-group form-focus">
-                  <input type="email" class="form-control floating" name="email" id="id_email" placeholder=" " {% if form.email.value %} value="{{ form.email.value }}" {% endif %}>
+                  <input type="email" class="form-control floating" name="email" id="id_email" placeholder=" " autocomplete="email" required maxlength="100" {% if form.email.value %} value="{{ form.email.value }}" {% endif %}>
                   <label class="focus-label">Email</label>
                   {% if form.email.errors %}<div class="error">{{ form.email.errors.as_text }}</div>{% endif %}
                 </div>
@@ -733,14 +733,14 @@
                 <div class="row form-row">
                   <div class="col-6">
                     <div class="form-group form-focus">
-                      <input type="text" class="form-control floating" name="username" id="id_username" placeholder=" " {% if form.username.value %} value="{{ form.username.value }}" {% endif %}>
+                      <input type="text" class="form-control floating" name="username" id="id_username" placeholder=" " autocomplete="username" required minlength="4" maxlength="50" pattern="[A-Za-z0-9_]+" {% if form.username.value %} value="{{ form.username.value }}" {% endif %}>
                       <label class="focus-label">Username</label>
                       {% if form.username.errors %}<div class="error">{{ form.username.errors.as_text }}</div>{% endif %}
                     </div>
                   </div>
                   <div class="col-6">
                     <div class="form-group form-focus">
-                      <input type="tel" class="form-control floating" name="phone_number" id="id_phone_number" placeholder=" " {% if form.phone_number.value %} value="{{ form.phone_number.value }}" {% endif %}>
+                      <input type="tel" class="form-control floating" name="phone_number" id="id_phone_number" placeholder=" " autocomplete="tel" required minlength="7" maxlength="12" pattern="[0-9]{7,12}" {% if form.phone_number.value %} value="{{ form.phone_number.value }}" {% endif %}>
                       <label class="focus-label">Phone Number</label>
                       {% if form.phone_number.errors %}<div class="error">{{ form.phone_number.errors.as_text }}</div>{% endif %}
                     </div>
@@ -750,7 +750,7 @@
                 <div class="row form-row">
                   <div class="col-6">
                     <div class="form-group form-focus">
-                      <input type="password" class="form-control floating" name="password" id="id_password" placeholder=" ">
+                      <input type="password" class="form-control floating" name="password" id="id_password" placeholder=" " autocomplete="new-password" required minlength="8">
                       <label class="focus-label">Password</label>
                       {% if form.password.errors %}<div class="error">{{ form.password.errors.as_text }}</div>{% endif %}
                     </div>
@@ -764,7 +764,7 @@
                   </div>
                   <div class="col-6">
                     <div class="form-group form-focus">
-                      <input type="password" class="form-control floating" name="confirm_password" id="id_confirm_password" placeholder=" ">
+                      <input type="password" class="form-control floating" name="confirm_password" id="id_confirm_password" placeholder=" " autocomplete="new-password" required minlength="8">
                       <label class="focus-label">Confirm Password</label>
                       {% if form.confirm_password.errors %}<div class="error">{{ form.confirm_password.errors.as_text }}</div>{% endif %}
                     </div>
@@ -958,5 +958,6 @@
     }
   });
 </script>
+<script src="{% static 'js/auth-validation.js' %}"></script>
 
 {% endblock %}

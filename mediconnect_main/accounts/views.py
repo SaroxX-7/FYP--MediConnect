@@ -11,7 +11,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import message
 
 from doctor.models import Doctor
-from .forms import UserForm
+from .forms import LoginForm, UserForm
 from .models import User, UserProfile
 from django.contrib import messages, auth
 from .utils import detectUser, send_verification_email
@@ -53,6 +53,7 @@ def registerUser(request):
             username = form.cleaned_data['username']
             email = form.cleaned_data['email']
             password = form.cleaned_data['password']
+            phone_number = form.cleaned_data['phone_number']
             user = User.objects.create_user(
                 first_name=first_name,
                 last_name=last_name,
@@ -60,6 +61,7 @@ def registerUser(request):
                 email=email,
                 password=password
             )
+            user.phone_number = phone_number
             user.role = User.CUSTOMER
             user.save()
 
@@ -87,12 +89,13 @@ def registerDoctor(request):
     elif request.method == 'POST':
         form = UserForm(request.POST)
         v_form = DoctorForm(request.POST, request.FILES)
-        if form.is_valid() and v_form.is_valid:
+        if form.is_valid() and v_form.is_valid():
             first_name = form.cleaned_data['first_name']
             last_name = form.cleaned_data['last_name']
             username = form.cleaned_data['username']
             email = form.cleaned_data['email']
             password = form.cleaned_data['password']
+            phone_number = form.cleaned_data['phone_number']
             user = User.objects.create_user(
                 first_name=first_name,
                 last_name=last_name,
@@ -100,6 +103,7 @@ def registerDoctor(request):
                 email=email,
                 password=password
             )
+            user.phone_number = phone_number
             user.role = User.DOCTOR
             user.is_admin = True
             user.save()
@@ -143,6 +147,7 @@ def registerPharmacist(request):
             username = form.cleaned_data['username']
             email = form.cleaned_data['email']
             password = form.cleaned_data['password']
+            phone_number = form.cleaned_data['phone_number']
             user = User.objects.create_user(
                 first_name=first_name,
                 last_name=last_name,
@@ -150,6 +155,7 @@ def registerPharmacist(request):
                 email=email,
                 password=password
             )
+            user.phone_number = phone_number
             user.role = User.PHARMACIST
             user.save()
 
@@ -196,13 +202,12 @@ def login(request):
     if request.user.is_authenticated:
         messages.warning(request, 'You are already logged in!')
         return redirect('myAccount')
-    elif request.method == 'POST':
-        email = request.POST['email']
-        password = request.POST['password']
 
-        user = authenticate(email=email, password=password)
+    form = LoginForm(request.POST or None)
 
-        if user is not None:
+    if request.method == 'POST':
+        if form.is_valid():
+            user = form.cleaned_data['user']
             auth_login(request, user)
             messages.success(request, 'You are now logged in.')
 
@@ -217,10 +222,10 @@ def login(request):
                     return redirect('customer')
 
             return redirect('myAccount')
-        else:
-            messages.error(request, 'Invalid login credentials')
-            return redirect('login')
-    return render(request, 'accounts/login.html')
+
+        messages.error(request, 'Please correct the highlighted errors.')
+
+    return render(request, 'accounts/login.html', {'form': form})
 
 
 def logout(request):

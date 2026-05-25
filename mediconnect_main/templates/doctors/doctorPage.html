@@ -1,662 +1,530 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block extra_css %}
+{% block content %}
+
 <style>
-    /* ============================================
-       DOCTOR PROFILE PAGE - PREMIUM DESIGN
-       Modern, elegant, professional with smooth animations
-    ============================================ */
-    
-    :root {
-        --primary: #2563eb;
-        --primary-dark: #1d4ed8;
-        --primary-light: #3b82f6;
-        --primary-soft: #eff6ff;
-        --primary-gradient: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-        --success: #10b981;
-        --warning: #f59e0b;
-        --danger: #ef4444;
-        --info: #06b6d4;
-        --gray-50: #f9fafb;
-        --gray-100: #f3f4f6;
-        --gray-200: #e5e7eb;
-        --gray-300: #d1d5db;
-        --gray-400: #9ca3af;
-        --gray-500: #6b7280;
-        --gray-600: #4b5563;
-        --gray-700: #374151;
-        --gray-800: #1f2937;
-        --gray-900: #111827;
-        --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
-        --card-shadow-hover: 0 20px 40px -12px rgba(0, 0, 0, 0.15);
-        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    .doctor-profile-page {
+        background: #f4f7fb;
+        padding: 35px 0 55px;
+        min-height: 100vh;
     }
 
-    /* Content Area */
-    .content {
-        padding: 2.5rem 0;
-        background: linear-gradient(135deg, #f1f5f9 0%, #e9eef5 100%);
-        min-height: calc(100vh - 80px);
+    .doctor-profile-container {
+        max-width: 1180px;
+        margin: 0 auto;
     }
 
-    /* Container */
-    .container {
-        max-width: 1280px;
-    }
-
-    /* Cards */
-    .card {
+    .doctor-hero-card {
+        background: #ffffff;
+        border-radius: 22px;
+        overflow: hidden;
         border: none;
-        border-radius: 1.5rem;
-        box-shadow: var(--card-shadow);
-        transition: var(--transition);
-        margin-bottom: 2rem;
-        overflow: hidden;
-        background: white;
+        box-shadow: 0 12px 35px rgba(15, 23, 42, 0.08);
+        margin-bottom: 25px;
+    }
+
+    .doctor-hero-top {
+        background: linear-gradient(135deg, #0de0fe 0%, #0d6efd 100%);
+        min-height: 150px;
         position: relative;
     }
-    
-    .card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: var(--primary-gradient);
-    }
-    
-    .card:hover {
-        transform: translateY(-6px);
-        box-shadow: var(--card-shadow-hover);
+
+    .doctor-hero-body {
+        padding: 0 32px 32px;
+        position: relative;
     }
 
-    .card-body {
-        padding: 2rem;
-    }
-
-    /* Doctor Widget */
-    .doctor-widget {
+    .doctor-main-flex {
         display: flex;
-        flex-wrap: wrap;
         justify-content: space-between;
-        align-items: center;
-        gap: 2rem;
+        gap: 30px;
+        align-items: flex-end;
+        margin-top: -75px;
     }
 
-    .doc-info-left {
+    .doctor-left-info {
         display: flex;
-        gap: 2rem;
-        flex: 2;
-        min-width: 300px;
-    }
-
-    .doctor-img {
-        flex-shrink: 0;
-        width: 160px;
-        height: 160px;
-        border-radius: 1.5rem;
-        overflow: hidden;
-        background: linear-gradient(135deg, var(--gray-100) 0%, var(--gray-200) 100%);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-        transition: var(--transition);
-        position: relative;
-    }
-    
-    .doctor-img::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(135deg, rgba(37, 99, 235, 0.2) 0%, rgba(29, 78, 216, 0.2) 100%);
-        opacity: 0;
-        transition: var(--transition);
-    }
-    
-    .doctor-img:hover::after {
-        opacity: 1;
-    }
-    
-    .doctor-img:hover {
-        transform: scale(1.02);
-    }
-    
-    .doctor-img img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
-    .doc-info-cont {
+        gap: 24px;
+        align-items: flex-end;
         flex: 1;
     }
 
-    .doc-name {
-        font-size: 1.75rem;
-        font-weight: 800;
-        margin-bottom: 0.5rem;
-        color: var(--gray-900);
-        letter-spacing: -0.02em;
-        background: linear-gradient(135deg, var(--gray-900) 0%, var(--gray-700) 100%);
-        -webkit-background-clip: text;
-        background-clip: text;
-        color: transparent;
+    .doctor-photo-box {
+        width: 155px;
+        height: 155px;
+        min-width: 155px;
+        border-radius: 24px;
+        padding: 6px;
+        background: #ffffff;
+        box-shadow: 0 12px 30px rgba(15, 23, 42, 0.16);
     }
 
-    .doc-speciality {
-        font-size: 0.875rem;
-        font-weight: 600;
-        color: var(--primary);
-        background: var(--primary-soft);
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.35rem 1.25rem;
-        border-radius: 2rem;
-        margin-bottom: 1rem;
-        letter-spacing: 0.3px;
-    }
-    
-    .doc-speciality::before {
-        content: '🏥';
-        font-size: 0.875rem;
-    }
-
-    .clinic-details {
-        margin: 1rem 0;
-    }
-    
-    .doc-location {
-        font-size: 0.875rem;
-        color: var(--gray-600);
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        margin-bottom: 0.5rem;
-    }
-    
-    .doc-location i {
-        width: 1.25rem;
-        color: var(--primary);
-        font-size: 1rem;
-    }
-
-    .clinic-services {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.75rem;
-        margin-top: 1rem;
-    }
-    
-    .clinic-services span {
-        background: linear-gradient(135deg, var(--gray-100) 0%, #f8fafc 100%);
-        padding: 0.35rem 1rem;
-        border-radius: 2rem;
-        font-size: 0.75rem;
-        font-weight: 600;
-        color: var(--gray-700);
-        transition: var(--transition);
-        border: 1px solid var(--gray-200);
-    }
-    
-    .clinic-services span:hover {
-        background: var(--primary-soft);
-        color: var(--primary);
-        border-color: var(--primary-light);
-        transform: translateY(-2px);
-    }
-
-    /* Right Side */
-    .doc-info-right {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-        gap: 1.25rem;
-        min-width: 240px;
-    }
-
-    .clini-infos {
-        background: linear-gradient(135deg, var(--gray-50) 0%, white 100%);
-        padding: 1rem 1.5rem;
-        border-radius: 1rem;
-        border: 1px solid var(--gray-200);
-        width: 100%;
-    }
-    
-    .clini-infos ul {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
-    
-    .clini-infos li {
-        font-size: 0.875rem;
-        color: var(--gray-700);
-        margin-bottom: 0.75rem;
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        font-weight: 500;
-    }
-    
-    .clini-infos li:last-child {
-        margin-bottom: 0;
-    }
-    
-    .clini-infos li i {
-        width: 1.25rem;
-        color: var(--primary);
-        font-size: 1rem;
-    }
-
-    .clinic-booking {
-        display: flex;
-        gap: 0.75rem;
-        flex-wrap: wrap;
-        justify-content: flex-end;
-        width: 100%;
-    }
-
-    .apt-btn {
-        padding: 0.75rem 2rem;
-        border-radius: 3rem;
-        font-size: 0.875rem;
-        font-weight: 700;
-        text-decoration: none;
-        transition: var(--transition);
-        display: inline-flex;
-        align-items: center;
-        gap: 0.75rem;
-        background: var(--primary-gradient);
-        color: white;
-        border: none;
-        cursor: pointer;
-        position: relative;
-        overflow: hidden;
-        letter-spacing: 0.3px;
-    }
-    
-    .apt-btn::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
+    .doctor-photo-box img {
         width: 100%;
         height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-        transition: left 0.5s;
-    }
-    
-    .apt-btn:hover::before {
-        left: 100%;
-    }
-    
-    .apt-btn:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 25px -8px rgba(37, 99, 235, 0.5);
-        color: white;
-    }
-    
-    .apt-btn:active {
-        transform: translateY(0);
+        border-radius: 19px;
+        object-fit: cover;
+        display: block;
     }
 
-    /* Tabs */
-    .user-tabs {
-        margin-bottom: 2rem;
-        margin-top: 0.5rem;
-    }
-    
-    .nav-tabs {
-        border-bottom: 2px solid var(--gray-200);
-        display: flex;
-        gap: 0.5rem;
-        background: transparent;
-    }
-    
-    .nav-tabs .nav-item {
-        margin-bottom: -2px;
-    }
-    
-    .nav-tabs .nav-link {
-        border: none;
-        font-size: 0.9375rem;
-        font-weight: 700;
-        padding: 0.875rem 2rem;
-        color: var(--gray-500);
-        transition: var(--transition);
-        background: transparent;
-        border-radius: 0;
-        position: relative;
-        letter-spacing: 0.3px;
-    }
-    
-    .nav-tabs .nav-link:hover {
-        color: var(--primary);
-        background: transparent;
-    }
-    
-    .nav-tabs .nav-link.active {
-        color: var(--primary);
-        background: transparent;
-        border-bottom: 3px solid var(--primary);
-    }
-    
-    .nav-tabs .nav-link.active::after {
-        content: '';
-        position: absolute;
-        bottom: -2px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 60%;
-        height: 3px;
-        background: var(--primary-gradient);
-        border-radius: 3px 3px 0 0;
+    .doctor-basic-info {
+        padding-bottom: 10px;
     }
 
-    /* Tab Content */
-    .tab-content {
-        padding-top: 1.5rem;
-    }
-
-    .widget-title {
-        font-size: 1.25rem;
+    .doctor-name {
+        font-size: 30px;
         font-weight: 800;
-        color: var(--gray-800);
-        margin-bottom: 1.25rem;
-        padding-bottom: 0.75rem;
-        border-bottom: 3px solid var(--primary);
-        display: inline-block;
-        letter-spacing: -0.3px;
+        color: #111827;
+        margin-bottom: 8px;
     }
 
-    .about-widget p {
-        font-size: 0.9375rem;
-        line-height: 1.7;
-        color: var(--gray-600);
-        margin-bottom: 1.5rem;
-    }
-
-    .service-list {
-        margin-top: 1.5rem;
-    }
-    
-    .service-list h4 {
-        font-size: 1.125rem;
+    .doctor-speciality-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: #e7faff;
+        color: #0891b2;
+        padding: 8px 16px;
+        border-radius: 40px;
+        font-size: 14px;
         font-weight: 700;
-        color: var(--gray-800);
-        margin-bottom: 1rem;
+        margin-bottom: 12px;
     }
-    
-    .service-list ul {
-        list-style: none;
-        padding: 0;
+
+    .doctor-location {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #6b7280;
+        font-size: 15px;
+        margin: 0;
+    }
+
+    .doctor-location i {
+        color: #0de0fe;
+    }
+
+    .doctor-action-box {
+        min-width: 260px;
+        background: #f8fafc;
+        border: 1px solid #e5e7eb;
+        border-radius: 18px;
+        padding: 18px;
+    }
+
+    .doctor-action-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 14px;
+        color: #374151;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .doctor-action-item i {
+        width: 34px;
+        height: 34px;
+        background: #e7faff;
+        color: #0891b2;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .doctor-book-btn {
+        display: block;
+        width: 100%;
+        text-align: center;
+        background: linear-gradient(135deg, #0de0fe, #0d6efd);
+        color: #ffffff;
+        border-radius: 12px;
+        padding: 13px 18px;
+        font-weight: 700;
+        text-decoration: none;
+        transition: 0.3s ease;
+        box-shadow: 0 8px 20px rgba(13, 110, 253, 0.22);
+    }
+
+    .doctor-book-btn:hover {
+        color: #ffffff;
+        transform: translateY(-3px);
+        box-shadow: 0 12px 26px rgba(13, 110, 253, 0.32);
+    }
+
+    .doctor-content-grid {
+        display: grid;
+        grid-template-columns: 1fr 340px;
+        gap: 25px;
+        align-items: start;
+    }
+
+    .doctor-info-card {
+        background: #ffffff;
+        border-radius: 20px;
+        border: none;
+        box-shadow: 0 10px 28px rgba(15, 23, 42, 0.07);
+        margin-bottom: 25px;
+        overflow: hidden;
+    }
+
+    .doctor-info-card-body {
+        padding: 28px;
+    }
+
+    .section-title {
+        font-size: 22px;
+        font-weight: 800;
+        color: #111827;
+        margin-bottom: 18px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .section-title i {
+        width: 38px;
+        height: 38px;
+        border-radius: 12px;
+        background: #e7faff;
+        color: #0891b2;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+    }
+
+    .about-text {
+        font-size: 15px;
+        line-height: 1.8;
+        color: #4b5563;
+        margin-bottom: 0;
+    }
+
+    .specialization-list {
         display: flex;
         flex-wrap: wrap;
-        gap: 0.875rem;
+        gap: 10px;
+        padding: 0;
+        margin: 0;
+        list-style: none;
     }
-    
-    .service-list ul li {
-        background: linear-gradient(135deg, var(--gray-100) 0%, #f8fafc 100%);
-        padding: 0.5rem 1.25rem;
-        border-radius: 2rem;
-        font-size: 0.8125rem;
+
+    .specialization-list li {
+        background: #f1f5f9;
+        color: #374151;
+        border: 1px solid #e5e7eb;
+        padding: 9px 15px;
+        border-radius: 40px;
+        font-size: 14px;
         font-weight: 600;
-        color: var(--gray-700);
-        transition: var(--transition);
-        border: 1px solid var(--gray-200);
+        transition: 0.3s ease;
     }
-    
-    .service-list ul li:hover {
-        background: var(--primary-soft);
-        color: var(--primary);
-        border-color: var(--primary-light);
+
+    .specialization-list li:hover {
+        background: #e7faff;
+        color: #0891b2;
+        border-color: #bae6fd;
         transform: translateY(-2px);
     }
 
-    /* Responsive */
-    @media (max-width: 992px) {
-        .doctor-widget {
+    .doctor-side-card {
+        background: #ffffff;
+        border-radius: 20px;
+        box-shadow: 0 10px 28px rgba(15, 23, 42, 0.07);
+        overflow: hidden;
+        position: sticky;
+        top: 90px;
+    }
+
+    .doctor-side-header {
+        background: linear-gradient(135deg, #0de0fe, #0d6efd);
+        padding: 22px;
+        color: #ffffff;
+    }
+
+    .doctor-side-header h4 {
+        font-size: 20px;
+        font-weight: 800;
+        margin: 0;
+        color: #ffffff;
+    }
+
+    .doctor-side-body {
+        padding: 22px;
+    }
+
+    .side-info-row {
+        display: flex;
+        gap: 12px;
+        padding: 15px 0;
+        border-bottom: 1px solid #edf2f7;
+    }
+
+    .side-info-row:last-child {
+        border-bottom: none;
+    }
+
+    .side-info-icon {
+        width: 38px;
+        height: 38px;
+        min-width: 38px;
+        border-radius: 12px;
+        background: #f1f5f9;
+        color: #0d6efd;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .side-info-content span {
+        display: block;
+        color: #9ca3af;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        margin-bottom: 3px;
+    }
+
+    .side-info-content p {
+        color: #374151;
+        font-size: 14px;
+        font-weight: 600;
+        margin: 0;
+        line-height: 1.5;
+    }
+
+    .mobile-booking-box {
+        display: none;
+    }
+
+    @media (max-width: 991px) {
+        .doctor-main-flex {
             flex-direction: column;
             align-items: stretch;
         }
-        
-        .doc-info-left {
+
+        .doctor-left-info {
+            align-items: center;
+        }
+
+        .doctor-action-box {
+            min-width: 100%;
+        }
+
+        .doctor-content-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .doctor-side-card {
+            position: static;
+        }
+    }
+
+    @media (max-width: 575px) {
+        .doctor-profile-page {
+            padding: 20px 0 40px;
+        }
+
+        .doctor-hero-body {
+            padding: 0 18px 24px;
+        }
+
+        .doctor-left-info {
             flex-direction: column;
-            align-items: center;
             text-align: center;
+            gap: 14px;
         }
-        
-        .doc-info-right {
-            align-items: center;
-        }
-        
-        .clinic-booking {
-            justify-content: center;
-        }
-        
-        .doc-location {
-            justify-content: center;
-        }
-        
-        .clinic-services {
-            justify-content: center;
-        }
-        
-        .clini-infos ul {
-            text-align: center;
-        }
-        
-        .clini-infos li {
-            justify-content: center;
-        }
-        
-        .nav-tabs .nav-link {
-            padding: 0.75rem 1.25rem;
-            font-size: 0.875rem;
-        }
-    }
 
-    @media (max-width: 768px) {
-        .content {
-            padding: 1.5rem 0;
+        .doctor-photo-box {
+            width: 135px;
+            height: 135px;
+            min-width: 135px;
         }
-        
-        .card-body {
-            padding: 1.5rem;
-        }
-        
-        .doc-name {
-            font-size: 1.5rem;
-        }
-        
-        .doctor-img {
-            width: 120px;
-            height: 120px;
-        }
-        
-        .nav-tabs {
-            flex-wrap: wrap;
-        }
-        
-        .nav-tabs .nav-link {
-            padding: 0.5rem 1rem;
-            font-size: 0.8125rem;
-        }
-        
-        .apt-btn {
-            padding: 0.6rem 1.5rem;
-            font-size: 0.8125rem;
-        }
-    }
 
-    /* Animations */
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(30px);
+        .doctor-name {
+            font-size: 24px;
         }
-        to {
-            opacity: 1;
-            transform: translateY(0);
+
+        .doctor-location {
+            justify-content: center;
+            font-size: 14px;
         }
-    }
-    
-    @keyframes slideInLeft {
-        from {
-            opacity: 0;
-            transform: translateX(-30px);
+
+        .doctor-action-box {
+            padding: 15px;
         }
-        to {
-            opacity: 1;
-            transform: translateX(0);
+
+        .doctor-info-card-body {
+            padding: 22px;
         }
-    }
-    
-    @keyframes slideInRight {
-        from {
-            opacity: 0;
-            transform: translateX(30px);
+
+        .section-title {
+            font-size: 19px;
         }
-        to {
-            opacity: 1;
-            transform: translateX(0);
-        }
-    }
-    
-    .card:first-child {
-        animation: fadeInUp 0.5s ease backwards;
-    }
-    
-    .card:first-child .doc-info-left {
-        animation: slideInLeft 0.5s ease 0.2s backwards;
-    }
-    
-    .card:first-child .doc-info-right {
-        animation: slideInRight 0.5s ease 0.3s backwards;
-    }
-    
-    .card:last-child {
-        animation: fadeInUp 0.5s ease 0.1s backwards;
-    }
-    
-    /* Loading Skeleton (Optional) */
-    .skeleton {
-        background: linear-gradient(90deg, var(--gray-200) 25%, var(--gray-100) 50%, var(--gray-200) 75%);
-        background-size: 200% 100%;
-        animation: loading 1.5s infinite;
-    }
-    
-    @keyframes loading {
-        0% { background-position: 200% 0; }
-        100% { background-position: -200% 0; }
     }
 </style>
-{% endblock %}
 
-{% block content %}
-    <!-- Page Content -->
-    <div class="content">
-        <div class="container">
-            <!-- Doctor Widget -->
-            <div class="card">
-                <div class="card-body">
-                    <div class="doctor-widget">
-                        <div class="doc-info-left">
-                            <div class="doctor-img">
-                                <img src="{% if doctor.user.userprofile.profile_picture %}{{ doctor.user.userprofile.profile_picture.url }}{% else %}{% static 'images/default-doctor.jpg' %}{% endif %}" class="img-fluid" alt="Dr. {{ doctor.user.first_name }} {{ doctor.user.last_name }}">
-                            </div>
-                            <div class="doc-info-cont">
-                                <h4 class="doc-name">Dr. {{ doctor.user.first_name }} {{ doctor.user.last_name }}</h4>
-                                <p class="doc-speciality">{{ doctor.department.name }}</p>
-                                <div class="clinic-details">
-                                    <p class="doc-location">
-                                        <i class="fas fa-map-marker-alt"></i> {{ doctor.user.userprofile.address }}
-                                    </p>
-                                </div>
-                                <div class="clinic-services">
-                                    {% for disease in doctor.department.disease.all %}
-                                        <span>{{ disease }}</span>
-                                    {% endfor %}
-                                </div>
-                            </div>
+<div class="content doctor-profile-page">
+    <div class="container doctor-profile-container">
+
+        <!-- Doctor Hero Section -->
+        <div class="doctor-hero-card">
+            <div class="doctor-hero-top"></div>
+
+            <div class="doctor-hero-body">
+                <div class="doctor-main-flex">
+
+                    <div class="doctor-left-info">
+                        <div class="doctor-photo-box">
+                            <img src="{% if doctor.user.userprofile.profile_picture %}{{ doctor.user.userprofile.profile_picture.url }}{% else %}{% static 'images/default-doctor.jpg' %}{% endif %}"
+                                 alt="Dr. {{ doctor.user.first_name }} {{ doctor.user.last_name }}">
                         </div>
-                        <div class="doc-info-right">
-                            <div class="clini-infos">
-                                <ul>
-                                    <li><i class="fas fa-thumbs-up"></i> 99% Patient Satisfaction</li>
-                                    <li><i class="fas fa-comment-dots"></i> 35+ Verified Feedback</li>
-                                    <li><i class="fas fa-map-pin"></i> {{ doctor.user.userprofile.address|truncatechars:30 }}</li>
-                                    <li><i class="fas fa-calendar-alt"></i> Available: Mon - Sat</li>
-                                </ul>
+
+                        <div class="doctor-basic-info">
+                            <h1 class="doctor-name">
+                                Dr. {{ doctor.user.first_name }} {{ doctor.user.last_name }}
+                            </h1>
+
+                            <div class="doctor-speciality-badge">
+                                <i class="fas fa-user-md"></i>
+                                {{ doctor.department.name }}
                             </div>
-                            <div class="clinic-booking">
-                                <a class="apt-btn" href="{% url 'available_appointment' doctor_id=doctor.id %}">
-                                    <i class="fas fa-calendar-check"></i> Book Appointment
-                                </a>
-                            </div>
+
+                            <p class="doctor-location">
+                                <i class="fas fa-map-marker-alt"></i>
+                                {{ doctor.user.userprofile.address|default:"Clinic address not available" }}
+                            </p>
                         </div>
                     </div>
-                </div>
-            </div>
-            <!-- /Doctor Widget -->
 
-            <!-- Doctor Details Tab -->
-            <div class="card">
-                <div class="card-body pt-0">
-                    <!-- Tab Menu -->
-                    <nav class="user-tabs mb-4">
-                        <ul class="nav nav-tabs nav-tabs-bottom nav-justified">
-                            <li class="nav-item">
-                                <a class="nav-link active" href="#doc_overview" data-toggle="tab">Overview</a>
-                            </li>
-                        </ul>
-                    </nav>
-                    <!-- /Tab Menu -->
-
-                    <!-- Tab Content -->
-                    <div class="tab-content pt-0">
-                        <!-- Overview Content -->
-                        <div role="tabpanel" id="doc_overview" class="tab-pane fade show active">
-                            <div class="row">
-                                <div class="col-md-12 col-lg-12">
-                                    <!-- About Details -->
-                                    <div class="widget about-widget">
-                                        <h4 class="widget-title">About Me</h4>
-                                        <p>{{ doctor.biography|default:"Experienced healthcare professional dedicated to providing exceptional patient care with a compassionate approach." }}</p>
-                                    </div>
-                                    <!-- /About Details -->
-
-                                    <!-- Specializations List -->
-                                    <div class="service-list">
-                                        <h4>Specializations & Expertise</h4>
-                                        <ul class="clearfix">
-                                            {% for disease in doctor.department.disease.all %}
-                                                <li>{{ disease }}</li>
-                                            {% empty %}
-                                                <li>General Medicine</li>
-                                                <li>Primary Care</li>
-                                                <li>Health Consultation</li>
-                                            {% endfor %}
-                                        </ul>
-                                    </div>
-                                    <!-- /Specializations List -->
-                                </div>
-                            </div>
+                    <div class="doctor-action-box">
+                        <div class="doctor-action-item">
+                            <i class="fas fa-calendar-check"></i>
+                            <span>Available for appointment</span>
                         </div>
-                        <!-- /Overview Content -->
+
+                        <div class="doctor-action-item">
+                            <i class="fas fa-hospital"></i>
+                            <span>{{ doctor.department.name }}</span>
+                        </div>
+
+                        <a class="doctor-book-btn" href="{% url 'available_appointment' doctor_id=doctor.id %}">
+                            <i class="fas fa-calendar-plus"></i>
+                            Book Appointment
+                        </a>
                     </div>
-                    <!-- /Tab Content -->
+
                 </div>
             </div>
-            <!-- /Doctor Details Tab -->
         </div>
+        <!-- /Doctor Hero Section -->
+
+        <div class="doctor-content-grid">
+
+            <!-- Left Content -->
+            <div>
+
+                <!-- About Doctor -->
+                <div class="doctor-info-card">
+                    <div class="doctor-info-card-body">
+                        <h3 class="section-title">
+                            <i class="fas fa-info-circle"></i>
+                            About Doctor
+                        </h3>
+
+                        <p class="about-text">
+                            {{ doctor.biography|default:"This doctor is a qualified healthcare professional providing patient-focused medical consultation and treatment services." }}
+                        </p>
+                    </div>
+                </div>
+                <!-- /About Doctor -->
+
+                <!-- Specializations -->
+                <div class="doctor-info-card">
+                    <div class="doctor-info-card-body">
+                        <h3 class="section-title">
+                            <i class="fas fa-stethoscope"></i>
+                            Specializations & Services
+                        </h3>
+
+                        <ul class="specialization-list">
+                            {% for disease in doctor.department.disease.all %}
+                                <li>{{ disease }}</li>
+                            {% empty %}
+                                <li>General Consultation</li>
+                                <li>Primary Care</li>
+                                <li>Health Checkup</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                <!-- /Specializations -->
+
+            </div>
+            <!-- /Left Content -->
+
+            <!-- Right Sidebar -->
+            <div class="doctor-side-card">
+                <div class="doctor-side-header">
+                    <h4>Doctor Information</h4>
+                </div>
+
+                <div class="doctor-side-body">
+
+                    <div class="side-info-row">
+                        <div class="side-info-icon">
+                            <i class="fas fa-user-md"></i>
+                        </div>
+                        <div class="side-info-content">
+                            <span>Doctor Name</span>
+                            <p>Dr. {{ doctor.user.first_name }} {{ doctor.user.last_name }}</p>
+                        </div>
+                    </div>
+
+                    <div class="side-info-row">
+                        <div class="side-info-icon">
+                            <i class="fas fa-briefcase-medical"></i>
+                        </div>
+                        <div class="side-info-content">
+                            <span>Department</span>
+                            <p>{{ doctor.department.name }}</p>
+                        </div>
+                    </div>
+
+                    <div class="side-info-row">
+                        <div class="side-info-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div class="side-info-content">
+                            <span>Address</span>
+                            <p>{{ doctor.user.userprofile.address|default:"Not available" }}</p>
+                        </div>
+                    </div>
+
+                    <div class="side-info-row">
+                        <div class="side-info-icon">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <div class="side-info-content">
+                            <span>Appointment</span>
+                            <p>Book available appointment slot</p>
+                        </div>
+                    </div>
+
+                    <a class="doctor-book-btn mt-3" href="{% url 'available_appointment' doctor_id=doctor.id %}">
+                        Book Appointment
+                    </a>
+
+                </div>
+            </div>
+            <!-- /Right Sidebar -->
+
+        </div>
+
     </div>
-    <!-- /Page Content -->
+</div>
+
 {% endblock %}

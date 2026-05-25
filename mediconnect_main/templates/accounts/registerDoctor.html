@@ -28,7 +28,6 @@
         --transition-smooth: all 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1);
     }
 
-    /* Page background - clean white */
     .content {
         min-height: calc(100vh - 200px);
         display: flex;
@@ -38,7 +37,6 @@
         background: #ffffff;
     }
 
-    /* Subtle decorative elements */
     .content::before,
     .content::after {
         content: "";
@@ -83,7 +81,6 @@
         z-index: 2;
     }
 
-    /* Left image side */
     .login-left {
         text-align: center;
         animation: fadeLeft 0.7s ease-out;
@@ -104,7 +101,6 @@
         filter: drop-shadow(0 25px 40px rgba(0, 0, 0, 0.12));
     }
 
-    /* Right card - clean white card */
     .login-right {
         position: relative;
         z-index: 2;
@@ -123,7 +119,6 @@
         box-shadow: var(--shadow-xl);
     }
 
-    /* Subtle top border accent */
     .login-right::before {
         content: "";
         position: absolute;
@@ -135,7 +130,6 @@
         border-radius: 4px 4px 0 0;
     }
 
-    /* Header section */
     .login-header {
         text-align: center;
         margin-bottom: 32px;
@@ -181,7 +175,6 @@
         to { width: 70px; opacity: 1; }
     }
 
-    /* Alert messages styling */
     .alert {
         padding: 14px 18px;
         border-radius: 20px;
@@ -232,7 +225,6 @@
         }
     }
 
-    /* Form group - floating labels */
     .form-group {
         margin-bottom: 24px;
         position: relative;
@@ -267,7 +259,6 @@
         outline: none;
     }
 
-    /* File input styling */
     .form-focus input[type="file"] {
         padding: 18px 16px;
         height: auto;
@@ -294,7 +285,6 @@
         transition: var(--transition-smooth);
     }
 
-    /* Special handling for file input label */
     .form-focus input[type="file"] ~ .focus-label {
         top: 50%;
         transform: translateY(-50%);
@@ -331,7 +321,6 @@
         color: transparent;
     }
 
-    /* Invalid feedback styling */
     .is-invalid {
         border-color: #dc2626 !important;
     }
@@ -351,7 +340,6 @@
         margin-left: 16px;
     }
 
-    /* Row form styling */
     .form-row {
         display: flex;
         gap: 16px;
@@ -371,7 +359,6 @@
         display: none;
     }
 
-    /* Adjust spacing for row forms */
     .row.form-row {
         margin: 0 -8px;
     }
@@ -380,7 +367,6 @@
         padding: 0 8px;
     }
 
-    /* Forgot link styling */
     .text-right {
         text-align: right;
         margin-top: -6px;
@@ -431,7 +417,6 @@
         width: 100%;
     }
 
-    /* Signup button */
     .login-btn {
         width: 100%;
         border: none;
@@ -466,7 +451,6 @@
         box-shadow: 0 0 0 4px rgba(15, 111, 255, 0.15), 0 10px 25px rgba(15, 111, 255, 0.25);
     }
 
-    /* Shine effect on button */
     .login-btn::before {
         content: "";
         position: absolute;
@@ -483,7 +467,6 @@
         left: 150%;
     }
 
-    /* Ripple effect */
     .login-btn .ripple {
         position: absolute;
         border-radius: 50%;
@@ -500,7 +483,6 @@
         }
     }
 
-    /* Password strength indicator */
     .password-strength {
         margin-top: 8px;
         font-size: 0.75rem;
@@ -530,7 +512,6 @@
         font-weight: 500;
     }
 
-    /* Password match indicator */
     .password-match {
         margin-top: 8px;
         font-size: 0.75rem;
@@ -547,7 +528,6 @@
         color: #dc2626;
     }
 
-    /* Keyframe animations */
     @keyframes fadeLeft {
         from {
             opacity: 0;
@@ -570,7 +550,6 @@
         }
     }
 
-    /* Custom scrollbar */
     ::-webkit-scrollbar {
         width: 8px;
         height: 8px;
@@ -590,7 +569,6 @@
         background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
     }
 
-    /* Responsive design */
     @media (max-width: 991.98px) {
         .content {
             padding: 35px 0;
@@ -738,7 +716,6 @@
         }
     }
 
-    /* Focus visible for accessibility */
     .form-focus .form-control:focus-visible {
         outline: 2px solid var(--primary);
         outline-offset: 2px;
@@ -749,9 +726,71 @@
         outline-offset: 2px;
     }
 
-    /* Additional hover effect */
     .form-group:hover .focus-label:not(.form-control:focus ~ .focus-label) {
         color: var(--primary-light);
+    }
+
+    /* ===== FIX ONLY: OVERLAPPING ISSUE ===== */
+
+    .password-strength,
+    .password-match {
+        margin-top: 8px !important;
+        margin-bottom: 28px !important;
+        padding-left: 6px;
+    }
+
+    #id_doctor_license {
+        margin-top: 4px;
+    }
+
+    .form-focus input[type="file"] ~ .focus-label {
+        top: 0 !important;
+        transform: translateY(-50%) !important;
+        background: #ffffff !important;
+        color: var(--primary) !important;
+        font-size: 0.72rem !important;
+        font-weight: 700 !important;
+        border-radius: 30px !important;
+        padding: 0 8px !important;
+        z-index: 2;
+    }
+
+    .form-text {
+        display: block !important;
+        margin-top: 10px !important;
+        margin-left: 16px !important;
+        margin-bottom: 0 !important;
+        clear: both !important;
+    }
+
+    .text-right {
+        display: block !important;
+        width: 100% !important;
+        text-align: right !important;
+        margin-top: 16px !important;
+        margin-bottom: 28px !important;
+        clear: both !important;
+    }
+
+    .forgot-link::before {
+        display: none !important;
+        content: none !important;
+    }
+
+    @media (max-width: 767.98px) {
+        .password-strength,
+        .password-match {
+            margin-top: 8px !important;
+            margin-bottom: 24px !important;
+        }
+
+        .form-focus input[type="file"] ~ .focus-label {
+            top: 0 !important;
+        }
+
+        .text-right {
+            margin-top: 14px !important;
+        }
     }
 </style>
 
@@ -767,12 +806,12 @@
                         <div class="col-md-7 col-lg-6 login-left">
                             <img src="{% static 'img/login-banner.png' %}" class="img-fluid" alt="Doctor Register">
                         </div>
+
                         <div class="col-md-12 col-lg-6 login-right">
                             <div class="login-header">
                                 <h3>Doctor Register <a href="{% url 'registerUser' %}">Not a Doctor?</a></h3>
                             </div>
 
-                            <!-- Display Django messages if any -->
                             {% if messages %}
                                 {% for message in messages %}
                                     <div class="alert alert-{{ message.tags }}">
@@ -781,11 +820,9 @@
                                 {% endfor %}
                             {% endif %}
 
-                            <!-- Register Form -->
-                            <form action="{% url 'registerDoctor' %}" method="post" enctype="multipart/form-data" id="registerForm">
+                            <form action="{% url 'registerDoctor' %}" method="post" enctype="multipart/form-data" id="registerForm" novalidate>
                                 {% csrf_token %}
-                                
-                                <!-- Display form errors if any -->
+
                                 {% if form.errors %}
                                 <div class="alert alert-danger">
                                     <ul>
@@ -800,13 +837,13 @@
                                     </ul>
                                 </div>
                                 {% endif %}
-                                
+
                                 <div class="row form-row">
                                     <div class="col-6">
                                         <div class="form-group form-focus">
-                                            <input type="text" class="form-control floating {% if form.first_name.errors %}is-invalid{% endif %}" 
-                                                   name="first_name" id="id_first_name" placeholder=" "
-                                                   value="{{ form.first_name.value|default:'' }}" required>
+                                            <input type="text" class="form-control floating {% if form.first_name.errors %}is-invalid{% endif %}"
+                                                   name="first_name" id="id_first_name" placeholder=" " autocomplete="given-name" required minlength="2" maxlength="50" pattern="[A-Za-z][A-Za-z\s\'.-]*"
+                                                   value="{{ form.first_name.value|default:'' }}">
                                             <label class="focus-label">First Name</label>
                                             {% if form.first_name.errors %}
                                                 <div class="invalid-feedback">
@@ -815,11 +852,12 @@
                                             {% endif %}
                                         </div>
                                     </div>
+
                                     <div class="col-6">
                                         <div class="form-group form-focus">
-                                            <input type="text" class="form-control floating {% if form.last_name.errors %}is-invalid{% endif %}" 
-                                                   name="last_name" id="id_last_name" placeholder=" "
-                                                   value="{{ form.last_name.value|default:'' }}" required>
+                                            <input type="text" class="form-control floating {% if form.last_name.errors %}is-invalid{% endif %}"
+                                                   name="last_name" id="id_last_name" placeholder=" " autocomplete="family-name" required minlength="2" maxlength="50" pattern="[A-Za-z][A-Za-z\s\'.-]*"
+                                                   value="{{ form.last_name.value|default:'' }}">
                                             <label class="focus-label">Last Name</label>
                                             {% if form.last_name.errors %}
                                                 <div class="invalid-feedback">
@@ -831,9 +869,9 @@
                                 </div>
 
                                 <div class="form-group form-focus">
-                                    <input type="text" class="form-control floating {% if form.username.errors %}is-invalid{% endif %}" 
-                                           name="username" id="id_username" placeholder=" "
-                                           value="{{ form.username.value|default:'' }}" required>
+                                    <input type="text" class="form-control floating {% if form.username.errors %}is-invalid{% endif %}"
+                                           name="username" id="id_username" placeholder=" " autocomplete="username" required minlength="4" maxlength="50" pattern="[A-Za-z0-9_]+"
+                                           value="{{ form.username.value|default:'' }}">
                                     <label class="focus-label">Username</label>
                                     {% if form.username.errors %}
                                         <div class="invalid-feedback">
@@ -841,11 +879,11 @@
                                         </div>
                                     {% endif %}
                                 </div>
-                                
+
                                 <div class="form-group form-focus">
-                                    <input type="email" class="form-control floating {% if form.email.errors %}is-invalid{% endif %}" 
-                                           name="email" id="id_email" placeholder=" "
-                                           value="{{ form.email.value|default:'' }}" required>
+                                    <input type="email" class="form-control floating {% if form.email.errors %}is-invalid{% endif %}"
+                                           name="email" id="id_email" placeholder=" " autocomplete="email" required maxlength="100"
+                                           value="{{ form.email.value|default:'' }}">
                                     <label class="focus-label">Email</label>
                                     {% if form.email.errors %}
                                         <div class="invalid-feedback">
@@ -853,12 +891,24 @@
                                         </div>
                                     {% endif %}
                                 </div>
-                                
+
+                                <div class="form-group form-focus">
+                                    <input type="tel" class="form-control floating {% if form.phone_number.errors %}is-invalid{% endif %}"
+                                           name="phone_number" id="id_phone_number" placeholder=" " autocomplete="tel" required minlength="7" maxlength="12" pattern="[0-9]{7,12}"
+                                           value="{{ form.phone_number.value|default:'' }}">
+                                    <label class="focus-label">Phone Number</label>
+                                    {% if form.phone_number.errors %}
+                                        <div class="invalid-feedback">
+                                            {{ form.phone_number.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
                                 <div class="row form-row">
                                     <div class="col-6">
                                         <div class="form-group form-focus">
-                                            <input type="password" class="form-control floating {% if form.password.errors %}is-invalid{% endif %}" 
-                                                   name="password" id="id_password" placeholder=" " required>
+                                            <input type="password" class="form-control floating {% if form.password.errors %}is-invalid{% endif %}"
+                                                   name="password" id="id_password" placeholder=" " autocomplete="new-password" required minlength="8">
                                             <label class="focus-label">Password</label>
                                             {% if form.password.errors %}
                                                 <div class="invalid-feedback">
@@ -866,7 +916,7 @@
                                                 </div>
                                             {% endif %}
                                         </div>
-                                        <!-- Password strength indicator -->
+
                                         <div class="password-strength" id="passwordStrength">
                                             <div class="strength-bar">
                                                 <div class="strength-bar-fill" id="strengthFill"></div>
@@ -874,10 +924,11 @@
                                             <span class="strength-text" id="strengthText">Enter password</span>
                                         </div>
                                     </div>
+
                                     <div class="col-6">
                                         <div class="form-group form-focus">
-                                            <input type="password" class="form-control floating {% if form.confirm_password.errors %}is-invalid{% endif %}" 
-                                                   name="confirm_password" id="id_confirm_password" placeholder=" " required>
+                                            <input type="password" class="form-control floating {% if form.confirm_password.errors %}is-invalid{% endif %}"
+                                                   name="confirm_password" id="id_confirm_password" placeholder=" " autocomplete="new-password" required minlength="8">
                                             <label class="focus-label">Confirm Password</label>
                                             {% if form.confirm_password.errors %}
                                                 <div class="invalid-feedback">
@@ -885,42 +936,39 @@
                                                 </div>
                                             {% endif %}
                                         </div>
-                                        <!-- Password match indicator -->
+
                                         <div class="password-match" id="matchIndicator" style="display: none;">
                                             <span id="matchIcon"></span>
                                             <span id="matchText"></span>
                                         </div>
                                     </div>
                                 </div>
-                                
+
                                 {% if password_mismatch_error %}
                                 <div class="alert alert-warning mt-2">
                                     {{ password_mismatch_error }}
                                 </div>
                                 {% endif %}
 
-                                <!-- Doctor license image -->
                                 <div class="form-group form-focus">
-                                    <input type="file" class="form-control floating {% if form.doctor_license.errors %}is-invalid{% endif %}" 
-                                           name="doctor_license" id="id_doctor_license" required 
+                                    <input type="file" class="form-control floating {% if v_form.doctor_license.errors %}is-invalid{% endif %}"
+                                           name="doctor_license" id="id_doctor_license" required
                                            accept="image/*,.pdf" placeholder=" ">
                                     <label class="focus-label">Medical License</label>
-                                    {% if form.doctor_license.errors %}
+                                    {% if v_form.doctor_license.errors %}
                                         <div class="invalid-feedback">
-                                            {{ form.doctor_license.errors.0 }}
+                                            {{ v_form.doctor_license.errors.0 }}
                                         </div>
                                     {% endif %}
                                     <small class="form-text text-muted">Upload your medical license (Image or PDF)</small>
                                 </div>
-                                
+
                                 <div class="text-right">
                                     <a class="forgot-link" href="{% url 'login' %}">Already have an account?</a>
                                 </div>
-                                
+
                                 <button class="btn btn-primary btn-block btn-lg login-btn" type="submit" id="signupBtn">Sign Up</button>
                             </form>
-                            <!-- /Register Form -->
-
                         </div>
                     </div>
                 </div>
@@ -934,14 +982,13 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Handle floating labels on page load
         const floatingInputs = document.querySelectorAll('.form-focus .form-control');
-        
+
         floatingInputs.forEach(input => {
             if (input.value && input.value.trim() !== '') {
                 input.classList.add('filled');
             }
-            
+
             input.addEventListener('input', function() {
                 if (this.value && this.value.trim() !== '') {
                     this.classList.add('filled');
@@ -949,8 +996,7 @@
                     this.classList.remove('filled');
                 }
             });
-            
-            // Special handling for file input
+
             if (input.type === 'file') {
                 input.addEventListener('change', function() {
                     if (this.files && this.files.length > 0) {
@@ -961,8 +1007,7 @@
                 });
             }
         });
-        
-        // Password strength checker
+
         const passwordInput = document.getElementById('id_password');
         const strengthFill = document.getElementById('strengthFill');
         const strengthText = document.getElementById('strengthText');
@@ -971,18 +1016,18 @@
         const matchIcon = document.getElementById('matchIcon');
         const matchText = document.getElementById('matchText');
         const signupBtn = document.getElementById('signupBtn');
-        
+
         function checkPasswordStrength(password) {
             let strength = 0;
-            
+
             if (password.length >= 8) strength++;
             if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength++;
             if (password.match(/[0-9]/)) strength++;
             if (password.match(/[^a-zA-Z0-9]/)) strength++;
-            
+
             let percentage = (strength / 4) * 100;
             let color, text;
-            
+
             if (password.length === 0) {
                 color = '#e2e8f0';
                 text = 'Enter password';
@@ -1000,32 +1045,33 @@
                 color = '#059669';
                 text = 'Strong';
             }
-            
+
             if (strengthFill) {
                 strengthFill.style.width = percentage + '%';
                 strengthFill.style.backgroundColor = color;
             }
+
             if (strengthText) {
                 strengthText.textContent = text;
                 strengthText.style.color = color;
             }
-            
+
             return strength;
         }
-        
+
         function checkPasswordMatch() {
             if (!passwordInput || !confirmInput) return false;
-            
+
             const password = passwordInput.value;
             const confirm = confirmInput.value;
-            
+
             if (confirm.length === 0) {
                 if (matchIndicator) matchIndicator.style.display = 'none';
                 return false;
             }
-            
+
             if (matchIndicator) matchIndicator.style.display = 'flex';
-            
+
             if (password === confirm && password.length > 0) {
                 if (matchIcon) matchIcon.innerHTML = '✓';
                 if (matchText) matchText.innerHTML = 'Passwords match';
@@ -1040,81 +1086,86 @@
                 return false;
             }
         }
-        
+
         if (passwordInput) {
             passwordInput.addEventListener('input', function() {
                 checkPasswordStrength(this.value);
                 checkPasswordMatch();
             });
         }
-        
+
         if (confirmInput) {
             confirmInput.addEventListener('input', function() {
                 checkPasswordMatch();
             });
         }
-        
-        // Form validation before submit
+
         const registerForm = document.getElementById('registerForm');
+
         if (registerForm) {
             registerForm.addEventListener('submit', function(e) {
                 const password = passwordInput ? passwordInput.value : '';
                 const confirm = confirmInput ? confirmInput.value : '';
                 const licenseInput = document.getElementById('id_doctor_license');
-                
+
                 if (password !== confirm) {
                     e.preventDefault();
+
                     if (matchIndicator) matchIndicator.style.display = 'flex';
                     if (matchIcon) matchIcon.innerHTML = '✗';
                     if (matchText) matchText.innerHTML = 'Passwords do not match';
                     if (matchIcon) matchIcon.style.color = '#dc2626';
                     if (matchText) matchText.style.color = '#dc2626';
-                    
+
                     if (confirmInput) {
                         confirmInput.style.borderColor = '#dc2626';
                         setTimeout(() => {
                             confirmInput.style.borderColor = '';
                         }, 2000);
                     }
+
                     return false;
                 }
-                
+
                 if (password.length > 0 && password.length < 6) {
                     e.preventDefault();
+
                     if (passwordInput) {
                         passwordInput.style.borderColor = '#dc2626';
                         setTimeout(() => {
                             passwordInput.style.borderColor = '';
                         }, 2000);
                     }
+
                     return false;
                 }
-                
-                // Check if license file is selected
+
                 if (licenseInput && (!licenseInput.files || licenseInput.files.length === 0)) {
                     e.preventDefault();
+
                     licenseInput.style.borderColor = '#dc2626';
+
                     setTimeout(() => {
                         licenseInput.style.borderColor = '';
                     }, 2000);
+
                     return false;
                 }
             });
         }
-        
-        // Add ripple effect on button click
+
         if (signupBtn) {
             signupBtn.addEventListener('click', function(e) {
                 let ripple = document.createElement('span');
                 ripple.classList.add('ripple');
                 this.appendChild(ripple);
-                
+
                 let x = e.clientX - e.target.offsetLeft;
                 let y = e.clientY - e.target.offsetTop;
-                
+
                 ripple.style.left = `${x}px`;
                 ripple.style.top = `${y}px`;
-                
+
                 setTimeout(() => {
                     ripple.remove();
                 }, 600);
@@ -1122,5 +1173,7 @@
         }
     });
 </script>
+
+<script src="{% static 'js/auth-validation.js' %}"></script>
 
 {% endblock %}
