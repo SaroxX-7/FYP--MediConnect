@@ -110,6 +110,7 @@
                                                                 >
                                                                     <i class="fas fa-chevron-down"></i> View All
                                                                 </button>
+
                                                                 <a href="{% url 'appointment_details' appointment_id=latest_appointment.id %}" class="btn btn-sm bg-info-light">
                                                                     <i class="far fa-eye"></i> Latest
                                                                 </a>
@@ -132,6 +133,7 @@
                                                                                 <th class="text-center">Actions</th>
                                                                             </tr>
                                                                         </thead>
+
                                                                         <tbody>
                                                                             {% for appointment in group.appointments %}
                                                                             <tr>
@@ -450,6 +452,7 @@
         padding: 0.85rem 0.75rem;
     }
 
+    /* Fixed chat launcher badge */
     .chat-launcher {
         position: fixed;
         bottom: 24px;
@@ -457,12 +460,12 @@
         width: 64px;
         height: 64px;
         border-radius: 50%;
-        overflow: hidden;
+        overflow: visible !important;
         border: none;
         padding: 0;
-        background: linear-gradient(135deg, #3b82f6, #7c3aed);
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2), 0 2px 6px rgba(0, 0, 0, 0.05);
-        z-index: 1050;
+        background: transparent;
+        box-shadow: none;
+        z-index: 999999;
         cursor: pointer;
         display: none;
         transition: transform 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1), box-shadow 0.2s;
@@ -470,7 +473,6 @@
 
     .chat-launcher:hover {
         transform: scale(1.06);
-        box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25);
     }
 
     .chat-launcher:active {
@@ -478,9 +480,13 @@
     }
 
     .chat-launcher img {
-        width: 100%;
-        height: 100%;
+        width: 64px;
+        height: 64px;
         object-fit: cover;
+        border-radius: 50%;
+        display: block;
+        background: linear-gradient(135deg, #3b82f6, #7c3aed);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2), 0 2px 6px rgba(0, 0, 0, 0.05);
         transition: transform 0.25s;
     }
 
@@ -490,21 +496,23 @@
 
     .chat-launcher-badge {
         position: absolute;
-        top: -5px;
-        right: -5px;
+        top: -8px;
+        right: -8px;
         min-width: 24px;
         height: 24px;
         padding: 0 7px;
-        border-radius: 40px;
+        border-radius: 999px;
         background: linear-gradient(145deg, #ff4d4f, #f5222d);
         color: #fff;
-        font-size: 11px;
-        font-weight: 700;
+        font-size: 12px;
+        font-weight: 800;
         display: none;
         align-items: center;
         justify-content: center;
         border: 2px solid #ffffff;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+        z-index: 1000000;
+        line-height: 20px;
     }
 
     @keyframes badgePop {
@@ -534,7 +542,7 @@
         border-radius: 28px;
         box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.35), 0 4px 12px rgba(0, 0, 0, 0.08);
         overflow: hidden;
-        z-index: 1051;
+        z-index: 999998;
         display: none;
         flex-direction: column;
         animation: slideUpWidget 0.28s cubic-bezier(0.2, 0.9, 0.4, 1.1);
@@ -770,22 +778,33 @@
             bottom: 80px;
             height: 520px;
         }
+
         .chat-launcher {
             width: 56px;
             height: 56px;
             bottom: 16px;
             right: 16px;
         }
-        .table thead th, .table tbody td {
+
+        .chat-launcher img {
+            width: 56px;
+            height: 56px;
+        }
+
+        .table thead th,
+        .table tbody td {
             padding: 0.8rem 0.5rem;
             font-size: 0.75rem;
         }
+
         .btn-sm {
             padding: 0.25rem 0.7rem;
         }
+
         .table-avatar {
             gap: 0.5rem;
         }
+
         .avatar {
             width: 36px;
             height: 36px;
@@ -795,7 +814,7 @@
 
 <button id="chat-launcher" class="chat-launcher" type="button" aria-label="Open chat">
     <img id="chat-launcher-image" src="{% static 'img/favicon.png' %}" alt="Chat User">
-    <span id="chat-launcher-badge" class="chat-launcher-badge"></span>
+    <span id="chat-launcher-badge" class="chat-launcher-badge">0</span>
 </button>
 
 <div id="chat-widget" class="chat-widget">
@@ -807,11 +826,14 @@
                 <div class="chat-widget-user-subtitle">Appointment chat</div>
             </div>
         </div>
+
         <button id="chat-minimize-btn" class="chat-widget-action-btn" type="button">−</button>
     </div>
+
     <div id="chat-log" class="chat-widget-body">
         <div class="chat-empty">Start a conversation.</div>
     </div>
+
     <div class="chat-widget-footer">
         <div class="chat-input-group">
             <input id="chat-message-input" type="text" placeholder="Type your message...">
@@ -861,11 +883,13 @@
             chatLauncherBadge.style.display = 'flex';
             chatLauncherBadge.textContent = unreadCount > 99 ? '99+' : unreadCount;
             chatLauncherBadge.classList.add('has-notification');
+
             setTimeout(() => {
                 chatLauncherBadge.classList.remove('has-notification');
             }, 600);
         } else {
             chatLauncherBadge.style.display = 'none';
+            chatLauncherBadge.textContent = '0';
             chatLauncherBadge.classList.remove('has-notification');
         }
     }
@@ -888,6 +912,7 @@
 
     function renderMessage(message) {
         const isSelf = parseInt(message.sender_id) === parseInt(currentUserId);
+
         const wrapper = document.createElement('div');
         wrapper.className = 'chat-message-row' + (isSelf ? ' self' : '');
         wrapper.setAttribute('data-message-id', message.id);
@@ -921,7 +946,9 @@
     function markMessagesSeenInUi(messageIds, readAt) {
         messageIds.forEach(function(messageId) {
             const statusEl = document.querySelector(`[data-status-for-message="${messageId}"]`);
-            if (statusEl) statusEl.textContent = formatStatusText(readAt);
+            if (statusEl) {
+                statusEl.textContent = formatStatusText(readAt);
+            }
         });
     }
 
@@ -932,7 +959,11 @@
         unreadCount = 0;
         updateLauncherBadge();
         scrollToBottom();
-        if(messageInput) messageInput.focus();
+
+        if (messageInput) {
+            messageInput.focus();
+        }
+
         if (chatSocket && chatSocket.readyState === WebSocket.OPEN) {
             chatSocket.send(JSON.stringify({ action: 'mark_seen' }));
         }
@@ -947,27 +978,42 @@
     async function loadMessages(conversationId) {
         const response = await fetch(`/chat/conversation/${conversationId}/messages/`);
         const data = await response.json();
+
         clearMessages();
+
         if (!data.messages || !data.messages.length) {
             renderEmpty();
             return;
         }
+
         data.messages.forEach(renderMessage);
         scrollToBottom();
     }
 
     function connectSocket(conversationId) {
-        if (chatSocket) chatSocket.close();
+        if (chatSocket) {
+            chatSocket.close();
+        }
+
         const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
         chatSocket = new WebSocket(protocol + window.location.host + '/ws/chat/' + conversationId + '/');
+
         chatSocket.onopen = function() {
-            chatSocket.send(JSON.stringify({ action: 'mark_seen' }));
+            if (widgetOpen) {
+                chatSocket.send(JSON.stringify({ action: 'mark_seen' }));
+            }
         };
+
         chatSocket.onmessage = function(e) {
             const data = JSON.parse(e.data);
+
             if (data.event_type === 'message') {
                 const empty = chatLog.querySelector('.chat-empty');
-                if (empty) empty.remove();
+
+                if (empty) {
+                    empty.remove();
+                }
+
                 renderMessage({
                     id: data.message_id,
                     text: data.message,
@@ -977,7 +1023,9 @@
                     is_read: data.is_read,
                     read_at: data.read_at,
                 });
+
                 const isFromOtherUser = parseInt(data.sender_id) !== parseInt(currentUserId);
+
                 if (isFromOtherUser) {
                     if (widgetOpen) {
                         chatSocket.send(JSON.stringify({ action: 'mark_seen' }));
@@ -986,22 +1034,39 @@
                         updateLauncherBadge();
                     }
                 }
+
                 scrollToBottom();
             }
+
             if (data.event_type === 'seen_update') {
                 markMessagesSeenInUi(data.message_ids, data.read_at);
             }
+        };
+
+        chatSocket.onclose = function() {
+            console.log('Chat socket disconnected');
+        };
+
+        chatSocket.onerror = function(error) {
+            console.log('WebSocket error:', error);
         };
     }
 
     async function startChat(appointmentId, otherName, otherImage) {
         const response = await fetch(`/chat/start/${appointmentId}/`);
         const data = await response.json();
+
         currentConversationId = data.conversation_id;
+
         chatHeaderName.textContent = data.other_user_name || otherName;
         chatHeaderImage.src = data.other_user_image || otherImage;
         chatLauncherImage.src = data.other_user_image || otherImage;
+
+        unreadCount = 0;
+        updateLauncherBadge();
+
         chatLauncher.style.display = 'block';
+
         await loadMessages(currentConversationId);
         connectSocket(currentConversationId);
         openWidget();
@@ -1009,14 +1074,20 @@
 
     function preloadExistingConversation() {
         const existingButton = document.querySelector('.start-chat-btn[data-has-conversation="1"]');
+
         if (!existingButton) return;
+
         currentConversationId = existingButton.dataset.conversationId;
+
         chatHeaderName.textContent = existingButton.dataset.otherName;
         chatHeaderImage.src = existingButton.dataset.otherImage;
         chatLauncherImage.src = existingButton.dataset.otherImage;
+
         chatLauncher.style.display = 'block';
+
         loadMessages(currentConversationId);
         connectSocket(currentConversationId);
+        updateLauncherBadge();
     }
 
     startChatButtons.forEach(function(button) {
@@ -1025,19 +1096,41 @@
         });
     });
 
-    if(chatLauncher) {
+    if (chatLauncher) {
         chatLauncher.addEventListener('click', function() {
-            if (widgetOpen) closeWidget();
-            else if (currentConversationId) openWidget();
+            if (widgetOpen) {
+                closeWidget();
+            } else if (currentConversationId) {
+                openWidget();
+            }
         });
     }
-    if(chatMinimizeBtn) chatMinimizeBtn.addEventListener('click', function() { closeWidget(); });
-    if(messageInput) messageInput.addEventListener('keyup', function(e) { if (e.key === 'Enter') submitButton.click(); });
-    if(submitButton) {
+
+    if (chatMinimizeBtn) {
+        chatMinimizeBtn.addEventListener('click', function() {
+            closeWidget();
+        });
+    }
+
+    if (messageInput) {
+        messageInput.addEventListener('keyup', function(e) {
+            if (e.key === 'Enter') {
+                submitButton.click();
+            }
+        });
+    }
+
+    if (submitButton) {
         submitButton.addEventListener('click', function() {
             const message = messageInput.value.trim();
+
             if (!message || !chatSocket || chatSocket.readyState !== WebSocket.OPEN) return;
-            chatSocket.send(JSON.stringify({ action: 'message', message: message }));
+
+            chatSocket.send(JSON.stringify({
+                action: 'message',
+                message: message
+            }));
+
             messageInput.value = '';
             messageInput.focus();
         });

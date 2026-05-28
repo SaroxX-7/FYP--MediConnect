@@ -5,7 +5,7 @@
 <style>
     /* ==============================
        MEDICONNECT PHARMACIST REGISTRATION - CLEAN WHITE MODERN UI
-       Fully responsive, elegant design with floating labels
+       Fixed clear error display + form handling
     ============================== */
 
     :root {
@@ -19,16 +19,21 @@
         --text-light: #94a3b8;
         --border-light: #e2e8f0;
         --card-bg: #ffffff;
+        --error: #dc2626;
+        --error-dark: #b91c1c;
+        --error-bg: #fef2f2;
+        --success: #059669;
+        --success-bg: #ecfdf5;
         --shadow-sm: 0 8px 20px rgba(0, 0, 0, 0.04);
         --shadow-md: 0 20px 38px rgba(0, 0, 0, 0.08);
         --shadow-lg: 0 35px 60px rgba(0, 0, 0, 0.1);
+        --shadow-xl: 0 45px 75px rgba(0, 0, 0, 0.13);
         --radius-xl: 36px;
         --radius-lg: 24px;
         --radius-md: 18px;
         --transition-smooth: all 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1);
     }
 
-    /* Page background - clean white */
     .content {
         min-height: calc(100vh - 200px);
         display: flex;
@@ -36,9 +41,9 @@
         padding: 50px 0;
         position: relative;
         background: #ffffff;
+        overflow: hidden;
     }
 
-    /* Subtle decorative elements */
     .content::before,
     .content::after {
         content: "";
@@ -83,7 +88,6 @@
         z-index: 2;
     }
 
-    /* Left image side */
     .login-left {
         text-align: center;
         animation: fadeLeft 0.7s ease-out;
@@ -104,7 +108,6 @@
         filter: drop-shadow(0 25px 40px rgba(0, 0, 0, 0.12));
     }
 
-    /* Right card - clean white card */
     .login-right {
         position: relative;
         z-index: 2;
@@ -113,7 +116,7 @@
         box-shadow: var(--shadow-lg);
         border-radius: var(--radius-xl);
         padding: 44px 36px;
-        overflow: hidden;
+        overflow: visible;
         animation: fadeRight 0.7s ease-out;
         transition: var(--transition-smooth);
     }
@@ -123,7 +126,6 @@
         box-shadow: var(--shadow-xl);
     }
 
-    /* Subtle top border accent */
     .login-right::before {
         content: "";
         position: absolute;
@@ -135,10 +137,9 @@
         border-radius: 4px 4px 0 0;
     }
 
-    /* Header section */
     .login-header {
         text-align: center;
-        margin-bottom: 32px;
+        margin-bottom: 30px;
     }
 
     .login-header h3 {
@@ -166,46 +167,88 @@
         to { width: 70px; opacity: 1; }
     }
 
-    /* Messages styling */
+    /* ========== CLEAR ERROR DISPLAY FIX ========== */
+
+    .alert-stack {
+        display: grid;
+        gap: 12px;
+        margin-bottom: 22px;
+    }
+
+    .error-message,
+    .success-message,
+    .field-error {
+        width: 100%;
+        border-radius: 18px;
+        font-size: 0.86rem;
+        line-height: 1.45;
+        font-weight: 600;
+        word-break: break-word;
+        white-space: normal;
+        position: relative;
+        z-index: 10;
+        animation: slideDown 0.35s ease;
+    }
+
     .error-message,
     .success-message {
         display: flex;
-        align-items: center;
-        gap: 12px;
-        padding: 14px 18px;
-        border-radius: 20px;
-        margin-bottom: 20px;
-        font-size: 0.9rem;
-        font-weight: 600;
-        animation: slideDown 0.4s ease;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 14px 16px;
+        box-shadow: var(--shadow-sm);
     }
 
     .error-message {
-        color: #dc2626;
-        background: #fef2f2;
-        border-left: 4px solid #dc2626;
-        box-shadow: var(--shadow-sm);
+        color: var(--error-dark);
+        background: var(--error-bg);
+        border: 1px solid #fecaca;
+        border-left: 5px solid var(--error);
     }
 
     .success-message {
-        color: #059669;
-        background: #ecfdf5;
-        border-left: 4px solid #059669;
-        box-shadow: var(--shadow-sm);
+        color: var(--success);
+        background: var(--success-bg);
+        border: 1px solid #a7f3d0;
+        border-left: 5px solid var(--success);
     }
 
-    .error {
-        color: #dc2626;
-        font-size: 0.75rem;
-        margin-top: 6px;
-        margin-left: 16px;
+    .field-error {
         display: block;
+        margin-top: 8px;
+        padding: 9px 12px;
+        border-radius: 14px;
+        color: #be123c;
+        background: #fff1f2;
+        border: 1px solid #fecdd3;
+        font-size: 0.76rem;
+    }
+
+    .field-error:empty {
+        display: none;
+    }
+
+    .field-error ul,
+    .error-message ul,
+    .success-message ul {
+        margin: 0;
+        padding-left: 18px;
+    }
+
+    .field-error li,
+    .error-message li,
+    .success-message li {
+        margin: 2px 0;
+    }
+
+    .client-error {
+        display: none;
     }
 
     @keyframes slideDown {
         from {
             opacity: 0;
-            transform: translateY(-15px);
+            transform: translateY(-12px);
         }
         to {
             opacity: 1;
@@ -213,9 +256,10 @@
         }
     }
 
-    /* Form group - floating labels */
+    /* ========== FORM ========== */
+
     .form-group {
-        margin-bottom: 24px;
+        margin-bottom: 22px;
         position: relative;
     }
 
@@ -248,10 +292,17 @@
         outline: none;
     }
 
+    .form-focus.has-error .form-control,
+    .form-focus .form-control.is-invalid {
+        border-color: var(--error);
+        background: #fff7f7;
+        box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.10);
+    }
+
     .form-focus .focus-label {
         position: absolute;
         left: 20px;
-        top: 50%;
+        top: 32px;
         transform: translateY(-50%);
         margin: 0;
         padding: 0 6px;
@@ -261,10 +312,13 @@
         background: transparent;
         pointer-events: none;
         transition: var(--transition-smooth);
+        z-index: 2;
     }
 
     .form-focus .form-control:focus ~ .focus-label,
-    .form-focus .form-control:not(:placeholder-shown) ~ .focus-label {
+    .form-focus .form-control:not(:placeholder-shown) ~ .focus-label,
+    .form-focus .form-control.filled ~ .focus-label,
+    .form-focus .form-control:-webkit-autofill ~ .focus-label {
         top: 0;
         transform: translateY(-50%);
         background: #ffffff;
@@ -276,11 +330,15 @@
         padding: 0 8px;
     }
 
+    .form-focus.has-error .focus-label,
+    .form-focus .form-control.is-invalid ~ .focus-label {
+        color: var(--error);
+    }
+
     .form-control::placeholder {
         color: transparent;
     }
 
-    /* Row form styling */
     .form-row {
         display: flex;
         gap: 16px;
@@ -296,11 +354,6 @@
         width: 100%;
     }
 
-    br {
-        display: none;
-    }
-
-    /* Adjust spacing for row forms */
     .row.form-row {
         margin: 0 -8px;
     }
@@ -309,11 +362,14 @@
         padding: 0 8px;
     }
 
-    /* Forgot link styling */
+    br {
+        display: none;
+    }
+
     .text-right {
         text-align: right;
-        margin-top: -6px;
-        margin-bottom: 28px;
+        margin-top: -4px;
+        margin-bottom: 26px;
     }
 
     .forgot-link {
@@ -332,7 +388,7 @@
         content: "→";
         font-size: 0.9rem;
         opacity: 0.7;
-        transition: opacity 0.2s;
+        transition: opacity 0.2s, transform 0.2s;
     }
 
     .forgot-link:hover::before {
@@ -360,7 +416,6 @@
         width: 100%;
     }
 
-    /* Signup button */
     .login-btn {
         width: 100%;
         border: none;
@@ -395,7 +450,12 @@
         box-shadow: 0 0 0 4px rgba(15, 111, 255, 0.15), 0 10px 25px rgba(15, 111, 255, 0.25);
     }
 
-    /* Shine effect on button */
+    .login-btn:disabled {
+        opacity: 0.75;
+        cursor: not-allowed;
+        transform: none;
+    }
+
     .login-btn::before {
         content: "";
         position: absolute;
@@ -412,7 +472,6 @@
         left: 150%;
     }
 
-    /* Ripple effect */
     .login-btn .ripple {
         position: absolute;
         border-radius: 50%;
@@ -429,9 +488,9 @@
         }
     }
 
-    /* Password strength indicator */
     .password-strength {
-        margin-top: 8px;
+        margin-top: -12px;
+        margin-bottom: 20px;
         font-size: 0.75rem;
         display: flex;
         align-items: center;
@@ -445,6 +504,7 @@
         background: #e2e8f0;
         border-radius: 4px;
         overflow: hidden;
+        min-width: 80px;
     }
 
     .strength-bar-fill {
@@ -456,16 +516,17 @@
 
     .strength-text {
         color: var(--text-muted);
-        font-weight: 500;
+        font-weight: 600;
     }
 
-    /* Password match indicator */
     .password-match {
-        margin-top: 8px;
+        margin-top: -12px;
+        margin-bottom: 20px;
         font-size: 0.75rem;
         display: flex;
         align-items: center;
         gap: 6px;
+        font-weight: 600;
     }
 
     .match-success {
@@ -476,7 +537,6 @@
         color: #dc2626;
     }
 
-    /* Keyframe animations */
     @keyframes fadeLeft {
         from {
             opacity: 0;
@@ -499,7 +559,6 @@
         }
     }
 
-    /* Custom scrollbar */
     ::-webkit-scrollbar {
         width: 8px;
         height: 8px;
@@ -519,7 +578,6 @@
         background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
     }
 
-    /* Responsive design */
     @media (max-width: 991.98px) {
         .content {
             padding: 35px 0;
@@ -568,10 +626,6 @@
 
         .form-row .col-6 {
             width: 100%;
-            margin-bottom: 24px;
-        }
-
-        .form-row .col-6:last-child {
             margin-bottom: 0;
         }
 
@@ -584,6 +638,7 @@
 
         .form-focus .focus-label {
             left: 16px;
+            top: 28px;
             font-size: 0.9rem;
         }
 
@@ -592,8 +647,9 @@
             font-size: 0.96rem;
         }
 
-        br {
-            display: none;
+        .password-strength,
+        .password-match {
+            margin-top: -8px;
         }
     }
 
@@ -633,11 +689,13 @@
 
         .form-focus .focus-label {
             left: 14px;
+            top: 26px;
             font-size: 0.85rem;
         }
 
         .form-focus .form-control:focus ~ .focus-label,
-        .form-focus .form-control:not(:placeholder-shown) ~ .focus-label {
+        .form-focus .form-control:not(:placeholder-shown) ~ .focus-label,
+        .form-focus .form-control.filled ~ .focus-label {
             font-size: 0.65rem;
         }
 
@@ -654,310 +712,683 @@
             font-size: 0.9rem;
         }
 
-        .error {
-            font-size: 0.7rem;
+        .error-message,
+        .success-message,
+        .field-error {
+            font-size: 0.74rem;
         }
     }
 
-    /* Focus visible for accessibility */
-    .form-focus .form-control:focus-visible {
-        outline: 2px solid var(--primary);
-        outline-offset: 2px;
-    }
-
+    .form-focus .form-control:focus-visible,
     .login-btn:focus-visible {
         outline: 2px solid var(--primary);
         outline-offset: 2px;
     }
 
-    /* Additional hover effect */
-    .form-group:hover .focus-label:not(.form-control:focus ~ .focus-label) {
+    .form-group:hover .focus-label {
         color: var(--primary-light);
     }
 </style>
 
 <div class="content">
-  <div class="container-fluid">
-    <div class="row">
-      <div class="col-md-8 offset-md-2">
-        <div class="account-content">
-          <div class="row align-items-center justify-content-center">
-            <div class="col-md-7 col-lg-6 login-left">
-              <img src="{% static 'img/login-banner.png' %}" class="img-fluid" alt="MediConnect Pharmacist Register">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <div class="account-content">
+                    <div class="row align-items-center justify-content-center">
+                        <div class="col-md-7 col-lg-6 login-left">
+                            <img src="{% static 'img/login-banner.png' %}" class="img-fluid" alt="MediConnect Pharmacist Register">
+                        </div>
+
+                        <div class="col-md-12 col-lg-6 login-right">
+                            <div class="login-header">
+                                <h3>Pharmacist Register</h3>
+                            </div>
+
+                            <div class="alert-stack" id="alertStack">
+                                {% if messages %}
+                                    {% for message in messages %}
+                                        <div class="{% if 'error' in message.tags or 'danger' in message.tags %}error-message{% else %}success-message{% endif %}" role="alert">
+                                            {% if 'error' in message.tags or 'danger' in message.tags %}
+                                                <span>⚠️</span>
+                                            {% else %}
+                                                <span>✓</span>
+                                            {% endif %}
+                                            <span>{{ message }}</span>
+                                        </div>
+                                    {% endfor %}
+                                {% endif %}
+
+                                {% if form.non_field_errors %}
+                                    <div class="error-message" role="alert">
+                                        <span>⚠️</span>
+                                        <span>
+                                            {% for error in form.non_field_errors %}
+                                                <div>{{ error }}</div>
+                                            {% endfor %}
+                                        </span>
+                                    </div>
+                                {% endif %}
+
+                                {% if form.errors %}
+                                    {% if not form.non_field_errors %}
+                                        <div class="error-message" role="alert">
+                                            <span>⚠️</span>
+                                            <span>Please check the highlighted fields and try again.</span>
+                                        </div>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+
+                            <form action="{% url 'registerPharmacist' %}" method="post" id="registerForm" novalidate>
+                                {% csrf_token %}
+
+                                <div class="row form-row">
+                                    <div class="col-6">
+                                        <div class="form-group form-focus {% if form.first_name.errors %}has-error{% endif %}">
+                                            <input
+                                                type="text"
+                                                class="form-control floating {% if form.first_name.errors %}is-invalid{% endif %}"
+                                                name="first_name"
+                                                id="id_first_name"
+                                                placeholder=" "
+                                                autocomplete="given-name"
+                                                required
+                                                minlength="2"
+                                                maxlength="50"
+                                                pattern="[A-Za-z][A-Za-z\s'.-]*"
+                                                value="{{ form.first_name.value|default:'' }}"
+                                                aria-invalid="{% if form.first_name.errors %}true{% else %}false{% endif %}"
+                                                aria-describedby="first-name-server-error first-name-client-error"
+                                            >
+                                            <label class="focus-label" for="id_first_name">First Name</label>
+
+                                            {% if form.first_name.errors %}
+                                                <div class="field-error" id="first-name-server-error" role="alert">
+                                                    {% for error in form.first_name.errors %}
+                                                        <div>{{ error }}</div>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+
+                                            <div class="field-error client-error" id="first-name-client-error" role="alert" aria-live="polite"></div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-6">
+                                        <div class="form-group form-focus {% if form.last_name.errors %}has-error{% endif %}">
+                                            <input
+                                                type="text"
+                                                class="form-control floating {% if form.last_name.errors %}is-invalid{% endif %}"
+                                                name="last_name"
+                                                id="id_last_name"
+                                                placeholder=" "
+                                                autocomplete="family-name"
+                                                required
+                                                minlength="2"
+                                                maxlength="50"
+                                                pattern="[A-Za-z][A-Za-z\s'.-]*"
+                                                value="{{ form.last_name.value|default:'' }}"
+                                                aria-invalid="{% if form.last_name.errors %}true{% else %}false{% endif %}"
+                                                aria-describedby="last-name-server-error last-name-client-error"
+                                            >
+                                            <label class="focus-label" for="id_last_name">Last Name</label>
+
+                                            {% if form.last_name.errors %}
+                                                <div class="field-error" id="last-name-server-error" role="alert">
+                                                    {% for error in form.last_name.errors %}
+                                                        <div>{{ error }}</div>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+
+                                            <div class="field-error client-error" id="last-name-client-error" role="alert" aria-live="polite"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group form-focus {% if form.email.errors %}has-error{% endif %}">
+                                    <input
+                                        type="email"
+                                        class="form-control floating {% if form.email.errors %}is-invalid{% endif %}"
+                                        name="email"
+                                        id="id_email"
+                                        placeholder=" "
+                                        autocomplete="email"
+                                        required
+                                        maxlength="100"
+                                        value="{{ form.email.value|default:'' }}"
+                                        aria-invalid="{% if form.email.errors %}true{% else %}false{% endif %}"
+                                        aria-describedby="email-server-error email-client-error"
+                                    >
+                                    <label class="focus-label" for="id_email">Email</label>
+
+                                    {% if form.email.errors %}
+                                        <div class="field-error" id="email-server-error" role="alert">
+                                            {% for error in form.email.errors %}
+                                                <div>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+
+                                    <div class="field-error client-error" id="email-client-error" role="alert" aria-live="polite"></div>
+                                </div>
+
+                                <div class="row form-row">
+                                    <div class="col-6">
+                                        <div class="form-group form-focus {% if form.username.errors %}has-error{% endif %}">
+                                            <input
+                                                type="text"
+                                                class="form-control floating {% if form.username.errors %}is-invalid{% endif %}"
+                                                name="username"
+                                                id="id_username"
+                                                placeholder=" "
+                                                autocomplete="username"
+                                                required
+                                                minlength="4"
+                                                maxlength="50"
+                                                pattern="[A-Za-z0-9_]+"
+                                                value="{{ form.username.value|default:'' }}"
+                                                aria-invalid="{% if form.username.errors %}true{% else %}false{% endif %}"
+                                                aria-describedby="username-server-error username-client-error"
+                                            >
+                                            <label class="focus-label" for="id_username">Username</label>
+
+                                            {% if form.username.errors %}
+                                                <div class="field-error" id="username-server-error" role="alert">
+                                                    {% for error in form.username.errors %}
+                                                        <div>{{ error }}</div>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+
+                                            <div class="field-error client-error" id="username-client-error" role="alert" aria-live="polite"></div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-6">
+                                        <div class="form-group form-focus {% if form.phone_number.errors %}has-error{% endif %}">
+                                            <input
+                                                type="tel"
+                                                class="form-control floating {% if form.phone_number.errors %}is-invalid{% endif %}"
+                                                name="phone_number"
+                                                id="id_phone_number"
+                                                placeholder=" "
+                                                autocomplete="tel"
+                                                required
+                                                minlength="7"
+                                                maxlength="12"
+                                                pattern="[0-9]{7,12}"
+                                                value="{{ form.phone_number.value|default:'' }}"
+                                                aria-invalid="{% if form.phone_number.errors %}true{% else %}false{% endif %}"
+                                                aria-describedby="phone-server-error phone-client-error"
+                                            >
+                                            <label class="focus-label" for="id_phone_number">Phone Number</label>
+
+                                            {% if form.phone_number.errors %}
+                                                <div class="field-error" id="phone-server-error" role="alert">
+                                                    {% for error in form.phone_number.errors %}
+                                                        <div>{{ error }}</div>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+
+                                            <div class="field-error client-error" id="phone-client-error" role="alert" aria-live="polite"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row form-row">
+                                    <div class="col-6">
+                                        <div class="form-group form-focus {% if form.password.errors %}has-error{% endif %}">
+                                            <input
+                                                type="password"
+                                                class="form-control floating {% if form.password.errors %}is-invalid{% endif %}"
+                                                name="password"
+                                                id="id_password"
+                                                placeholder=" "
+                                                autocomplete="new-password"
+                                                required
+                                                minlength="8"
+                                                aria-invalid="{% if form.password.errors %}true{% else %}false{% endif %}"
+                                                aria-describedby="password-server-error password-client-error"
+                                            >
+                                            <label class="focus-label" for="id_password">Password</label>
+
+                                            {% if form.password.errors %}
+                                                <div class="field-error" id="password-server-error" role="alert">
+                                                    {% for error in form.password.errors %}
+                                                        <div>{{ error }}</div>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+
+                                            <div class="field-error client-error" id="password-client-error" role="alert" aria-live="polite"></div>
+                                        </div>
+
+                                        <div class="password-strength" id="passwordStrength">
+                                            <div class="strength-bar">
+                                                <div class="strength-bar-fill" id="strengthFill"></div>
+                                            </div>
+                                            <span class="strength-text" id="strengthText">Enter password</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-6">
+                                        <div class="form-group form-focus {% if form.confirm_password.errors %}has-error{% endif %}">
+                                            <input
+                                                type="password"
+                                                class="form-control floating {% if form.confirm_password.errors %}is-invalid{% endif %}"
+                                                name="confirm_password"
+                                                id="id_confirm_password"
+                                                placeholder=" "
+                                                autocomplete="new-password"
+                                                required
+                                                minlength="8"
+                                                aria-invalid="{% if form.confirm_password.errors %}true{% else %}false{% endif %}"
+                                                aria-describedby="confirm-password-server-error confirm-password-client-error"
+                                            >
+                                            <label class="focus-label" for="id_confirm_password">Confirm Password</label>
+
+                                            {% if form.confirm_password.errors %}
+                                                <div class="field-error" id="confirm-password-server-error" role="alert">
+                                                    {% for error in form.confirm_password.errors %}
+                                                        <div>{{ error }}</div>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+
+                                            <div class="field-error client-error" id="confirm-password-client-error" role="alert" aria-live="polite"></div>
+                                        </div>
+
+                                        <div class="password-match" id="matchIndicator" style="display: none;">
+                                            <span id="matchIcon"></span>
+                                            <span id="matchText"></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="text-right">
+                                    <a class="forgot-link" href="{% url 'login' %}">Already have an account?</a>
+                                </div>
+
+                                <button class="btn btn-primary btn-block btn-lg login-btn" type="submit" id="signupBtn">
+                                    Signup
+                                </button>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="col-md-12 col-lg-6 login-right">
-              <div class="login-header">
-                <h3>Pharmacist Register</h3>
-              </div>
-
-              <!-- Display Django messages if any -->
-              {% if messages %}
-                {% for message in messages %}
-                  <div class="{% if 'error' in message.tags or 'danger' in message.tags %}error-message{% else %}success-message{% endif %}">
-                    {% if message.tags == 'error' %}
-                      <span>⚠️</span>
-                    {% else %}
-                      <span>✓</span>
-                    {% endif %}
-                    {{ message }}
-                  </div>
-                {% endfor %}
-              {% endif %}
-
-              <form action="{% url 'registerPharmacist' %}" method="post" id="registerForm" novalidate>
-                {% csrf_token %}
-
-                <div class="row form-row">
-                  <div class="col-6">
-                    <div class="form-group form-focus">
-                      <input type="text" class="form-control floating" name="first_name" id="id_first_name" placeholder=" " autocomplete="given-name" required minlength="2" maxlength="50" pattern="[A-Za-z][A-Za-z\s\'.-]*" {% if form.first_name.value %} value="{{ form.first_name.value }}" {% endif %}>
-                      <label class="focus-label">First Name</label>
-                      {% if form.first_name.errors %}<div class="error">{{ form.first_name.errors.as_text }}</div>{% endif %}
-                    </div>
-                  </div>
-                  <div class="col-6">
-                    <div class="form-group form-focus">
-                      <input type="text" class="form-control floating" name="last_name" id="id_last_name" placeholder=" " autocomplete="family-name" required minlength="2" maxlength="50" pattern="[A-Za-z][A-Za-z\s\'.-]*" {% if form.last_name.value %} value="{{ form.last_name.value }}" {% endif %}>
-                      <label class="focus-label">Last Name</label>
-                      {% if form.last_name.errors %}<div class="error">{{ form.last_name.errors.as_text }}</div>{% endif %}
-                    </div>
-                  </div>
-                </div>
-
-                <div class="form-group form-focus">
-                  <input type="email" class="form-control floating" name="email" id="id_email" placeholder=" " autocomplete="email" required maxlength="100" {% if form.email.value %} value="{{ form.email.value }}" {% endif %}>
-                  <label class="focus-label">Email</label>
-                  {% if form.email.errors %}<div class="error">{{ form.email.errors.as_text }}</div>{% endif %}
-                </div>
-
-                <div class="row form-row">
-                  <div class="col-6">
-                    <div class="form-group form-focus">
-                      <input type="text" class="form-control floating" name="username" id="id_username" placeholder=" " autocomplete="username" required minlength="4" maxlength="50" pattern="[A-Za-z0-9_]+" {% if form.username.value %} value="{{ form.username.value }}" {% endif %}>
-                      <label class="focus-label">Username</label>
-                      {% if form.username.errors %}<div class="error">{{ form.username.errors.as_text }}</div>{% endif %}
-                    </div>
-                  </div>
-                  <div class="col-6">
-                    <div class="form-group form-focus">
-                      <input type="tel" class="form-control floating" name="phone_number" id="id_phone_number" placeholder=" " autocomplete="tel" required minlength="7" maxlength="12" pattern="[0-9]{7,12}" {% if form.phone_number.value %} value="{{ form.phone_number.value }}" {% endif %}>
-                      <label class="focus-label">Phone Number</label>
-                      {% if form.phone_number.errors %}<div class="error">{{ form.phone_number.errors.as_text }}</div>{% endif %}
-                    </div>
-                  </div>
-                </div>
-
-                <div class="row form-row">
-                  <div class="col-6">
-                    <div class="form-group form-focus">
-                      <input type="password" class="form-control floating" name="password" id="id_password" placeholder=" " autocomplete="new-password" required minlength="8">
-                      <label class="focus-label">Password</label>
-                      {% if form.password.errors %}<div class="error">{{ form.password.errors.as_text }}</div>{% endif %}
-                    </div>
-                    <!-- Password strength indicator -->
-                    <div class="password-strength" id="passwordStrength">
-                      <div class="strength-bar">
-                        <div class="strength-bar-fill" id="strengthFill"></div>
-                      </div>
-                      <span class="strength-text" id="strengthText">Enter password</span>
-                    </div>
-                  </div>
-                  <div class="col-6">
-                    <div class="form-group form-focus">
-                      <input type="password" class="form-control floating" name="confirm_password" id="id_confirm_password" placeholder=" " autocomplete="new-password" required minlength="8">
-                      <label class="focus-label">Confirm Password</label>
-                      {% if form.confirm_password.errors %}<div class="error">{{ form.confirm_password.errors.as_text }}</div>{% endif %}
-                    </div>
-                    <!-- Password match indicator -->
-                    <div class="password-match" id="matchIndicator" style="display: none;">
-                      <span id="matchIcon"></span>
-                      <span id="matchText"></span>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="text-right">
-                  <a class="forgot-link" href="{% url 'login' %}">Already have an account?</a>
-                </div>
-                <button class="btn btn-primary btn-block btn-lg login-btn" type="submit" id="signupBtn">Signup</button>
-              </form>
-
-            </div>
-          </div>
         </div>
-      </div>
     </div>
-  </div>
 </div>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    // Handle floating labels on page load
-    const floatingInputs = document.querySelectorAll('.form-focus .form-control');
-    
-    floatingInputs.forEach(input => {
-      if (input.value && input.value.trim() !== '') {
-        input.classList.add('filled');
-      }
-      
-      input.addEventListener('input', function() {
-        if (this.value && this.value.trim() !== '') {
-          this.classList.add('filled');
-        } else {
-          this.classList.remove('filled');
+    document.addEventListener('DOMContentLoaded', function() {
+        const floatingInputs = document.querySelectorAll('.form-focus .form-control');
+
+        floatingInputs.forEach(input => {
+            if (input.value && input.value.trim() !== '') {
+                input.classList.add('filled');
+            }
+
+            input.addEventListener('input', function() {
+                if (this.value && this.value.trim() !== '') {
+                    this.classList.add('filled');
+                } else {
+                    this.classList.remove('filled');
+                }
+
+                clearClientError(this);
+            });
+
+            input.addEventListener('blur', function() {
+                if (!this.value || this.value.trim() === '') {
+                    this.classList.remove('filled');
+                }
+            });
+        });
+
+        const registerForm = document.getElementById('registerForm');
+        const signupBtn = document.getElementById('signupBtn');
+
+        const firstNameInput = document.getElementById('id_first_name');
+        const lastNameInput = document.getElementById('id_last_name');
+        const emailInput = document.getElementById('id_email');
+        const usernameInput = document.getElementById('id_username');
+        const phoneInput = document.getElementById('id_phone_number');
+        const passwordInput = document.getElementById('id_password');
+        const confirmInput = document.getElementById('id_confirm_password');
+
+        const strengthFill = document.getElementById('strengthFill');
+        const strengthText = document.getElementById('strengthText');
+        const matchIndicator = document.getElementById('matchIndicator');
+        const matchIcon = document.getElementById('matchIcon');
+        const matchText = document.getElementById('matchText');
+
+        function showClientError(input, message) {
+            if (!input) return;
+
+            const group = input.closest('.form-group');
+            const errorId = getClientErrorId(input.id);
+            const errorBox = document.getElementById(errorId);
+
+            input.classList.add('is-invalid');
+            input.setAttribute('aria-invalid', 'true');
+
+            if (group) {
+                group.classList.add('has-error');
+            }
+
+            if (errorBox) {
+                errorBox.textContent = message;
+                errorBox.style.display = 'block';
+            }
         }
-      });
+
+        function clearClientError(input) {
+            if (!input) return;
+
+            const group = input.closest('.form-group');
+            const errorId = getClientErrorId(input.id);
+            const errorBox = document.getElementById(errorId);
+
+            input.classList.remove('is-invalid');
+            input.setAttribute('aria-invalid', 'false');
+
+            if (group && !group.querySelector('[id$="-server-error"]')) {
+                group.classList.remove('has-error');
+            }
+
+            if (errorBox) {
+                errorBox.textContent = '';
+                errorBox.style.display = 'none';
+            }
+        }
+
+        function getClientErrorId(inputId) {
+            const map = {
+                'id_first_name': 'first-name-client-error',
+                'id_last_name': 'last-name-client-error',
+                'id_email': 'email-client-error',
+                'id_username': 'username-client-error',
+                'id_phone_number': 'phone-client-error',
+                'id_password': 'password-client-error',
+                'id_confirm_password': 'confirm-password-client-error'
+            };
+
+            return map[inputId];
+        }
+
+        function isValidEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+
+        function isValidName(name) {
+            return /^[A-Za-z][A-Za-z\s'.-]*$/.test(name);
+        }
+
+        function isValidUsername(username) {
+            return /^[A-Za-z0-9_]+$/.test(username);
+        }
+
+        function isValidPhone(phone) {
+            return /^[0-9]{7,12}$/.test(phone);
+        }
+
+        function checkPasswordStrength(password) {
+            let strength = 0;
+
+            if (password.length >= 8) strength++;
+            if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
+            if (/[0-9]/.test(password)) strength++;
+            if (/[^a-zA-Z0-9]/.test(password)) strength++;
+
+            let percentage = (strength / 4) * 100;
+            let color;
+            let text;
+
+            if (password.length === 0) {
+                color = '#e2e8f0';
+                text = 'Enter password';
+                percentage = 0;
+            } else if (strength === 1) {
+                color = '#ef4444';
+                text = 'Weak';
+            } else if (strength === 2) {
+                color = '#f59e0b';
+                text = 'Fair';
+            } else if (strength === 3) {
+                color = '#10b981';
+                text = 'Good';
+            } else {
+                color = '#059669';
+                text = 'Strong';
+            }
+
+            if (strengthFill) {
+                strengthFill.style.width = percentage + '%';
+                strengthFill.style.backgroundColor = color;
+            }
+
+            if (strengthText) {
+                strengthText.textContent = text;
+                strengthText.style.color = color;
+            }
+
+            return strength;
+        }
+
+        function checkPasswordMatch(showError = false) {
+            if (!passwordInput || !confirmInput) return false;
+
+            const password = passwordInput.value;
+            const confirm = confirmInput.value;
+
+            if (confirm.length === 0) {
+                if (matchIndicator) matchIndicator.style.display = 'none';
+                return false;
+            }
+
+            if (matchIndicator) matchIndicator.style.display = 'flex';
+
+            if (password === confirm && password.length > 0) {
+                if (matchIcon) matchIcon.innerHTML = '✓';
+                if (matchText) matchText.innerHTML = 'Passwords match';
+                if (matchIcon) matchIcon.style.color = '#059669';
+                if (matchText) matchText.style.color = '#059669';
+                clearClientError(confirmInput);
+                return true;
+            }
+
+            if (matchIcon) matchIcon.innerHTML = '✗';
+            if (matchText) matchText.innerHTML = 'Passwords do not match';
+            if (matchIcon) matchIcon.style.color = '#dc2626';
+            if (matchText) matchText.style.color = '#dc2626';
+
+            if (showError) {
+                showClientError(confirmInput, 'Passwords do not match.');
+            }
+
+            return false;
+        }
+
+        if (passwordInput) {
+            passwordInput.addEventListener('input', function() {
+                checkPasswordStrength(this.value);
+                checkPasswordMatch(false);
+            });
+        }
+
+        if (confirmInput) {
+            confirmInput.addEventListener('input', function() {
+                checkPasswordMatch(false);
+            });
+        }
+
+        if (registerForm) {
+            registerForm.addEventListener('submit', function(e) {
+                let isValid = true;
+                let firstInvalid = null;
+
+                const fields = [
+                    firstNameInput,
+                    lastNameInput,
+                    emailInput,
+                    usernameInput,
+                    phoneInput,
+                    passwordInput,
+                    confirmInput
+                ];
+
+                fields.forEach(field => clearClientError(field));
+
+                const firstName = firstNameInput ? firstNameInput.value.trim() : '';
+                const lastName = lastNameInput ? lastNameInput.value.trim() : '';
+                const email = emailInput ? emailInput.value.trim() : '';
+                const username = usernameInput ? usernameInput.value.trim() : '';
+                const phone = phoneInput ? phoneInput.value.trim() : '';
+                const password = passwordInput ? passwordInput.value : '';
+                const confirm = confirmInput ? confirmInput.value : '';
+
+                if (firstName === '') {
+                    showClientError(firstNameInput, 'First name is required.');
+                    isValid = false;
+                    firstInvalid = firstInvalid || firstNameInput;
+                } else if (firstName.length < 2) {
+                    showClientError(firstNameInput, 'First name must be at least 2 characters.');
+                    isValid = false;
+                    firstInvalid = firstInvalid || firstNameInput;
+                } else if (!isValidName(firstName)) {
+                    showClientError(firstNameInput, 'First name can contain only letters, spaces, apostrophe, dot, or hyphen.');
+                    isValid = false;
+                    firstInvalid = firstInvalid || firstNameInput;
+                }
+
+                if (lastName === '') {
+                    showClientError(lastNameInput, 'Last name is required.');
+                    isValid = false;
+                    firstInvalid = firstInvalid || lastNameInput;
+                } else if (lastName.length < 2) {
+                    showClientError(lastNameInput, 'Last name must be at least 2 characters.');
+                    isValid = false;
+                    firstInvalid = firstInvalid || lastNameInput;
+                } else if (!isValidName(lastName)) {
+                    showClientError(lastNameInput, 'Last name can contain only letters, spaces, apostrophe, dot, or hyphen.');
+                    isValid = false;
+                    firstInvalid = firstInvalid || lastNameInput;
+                }
+
+                if (email === '') {
+                    showClientError(emailInput, 'Email is required.');
+                    isValid = false;
+                    firstInvalid = firstInvalid || emailInput;
+                } else if (!isValidEmail(email)) {
+                    showClientError(emailInput, 'Please enter a valid email address.');
+                    isValid = false;
+                    firstInvalid = firstInvalid || emailInput;
+                }
+
+                if (username === '') {
+                    showClientError(usernameInput, 'Username is required.');
+                    isValid = false;
+                    firstInvalid = firstInvalid || usernameInput;
+                } else if (username.length < 4) {
+                    showClientError(usernameInput, 'Username must be at least 4 characters.');
+                    isValid = false;
+                    firstInvalid = firstInvalid || usernameInput;
+                } else if (!isValidUsername(username)) {
+                    showClientError(usernameInput, 'Username can contain only letters, numbers, and underscore.');
+                    isValid = false;
+                    firstInvalid = firstInvalid || usernameInput;
+                }
+
+                if (phone === '') {
+                    showClientError(phoneInput, 'Phone number is required.');
+                    isValid = false;
+                    firstInvalid = firstInvalid || phoneInput;
+                } else if (!isValidPhone(phone)) {
+                    showClientError(phoneInput, 'Phone number must contain 7 to 12 digits only.');
+                    isValid = false;
+                    firstInvalid = firstInvalid || phoneInput;
+                }
+
+                if (password === '') {
+                    showClientError(passwordInput, 'Password is required.');
+                    isValid = false;
+                    firstInvalid = firstInvalid || passwordInput;
+                } else if (password.length < 8) {
+                    showClientError(passwordInput, 'Password must be at least 8 characters.');
+                    isValid = false;
+                    firstInvalid = firstInvalid || passwordInput;
+                }
+
+                if (confirm === '') {
+                    showClientError(confirmInput, 'Confirm password is required.');
+                    isValid = false;
+                    firstInvalid = firstInvalid || confirmInput;
+                } else if (password !== confirm) {
+                    showClientError(confirmInput, 'Passwords do not match.');
+                    checkPasswordMatch(true);
+                    isValid = false;
+                    firstInvalid = firstInvalid || confirmInput;
+                }
+
+                if (!isValid) {
+                    e.preventDefault();
+
+                    if (firstInvalid) {
+                        firstInvalid.focus();
+                        firstInvalid.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center'
+                        });
+                    }
+
+                    return false;
+                }
+
+                if (signupBtn) {
+                    signupBtn.disabled = true;
+                    signupBtn.textContent = 'Creating account...';
+                }
+            });
+        }
+
+        const firstVisibleError = document.querySelector('.error-message, .form-focus.has-error .field-error');
+        if (firstVisibleError) {
+            setTimeout(() => {
+                firstVisibleError.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }, 150);
+        }
+
+        if (signupBtn) {
+            signupBtn.addEventListener('click', function(e) {
+                const ripple = document.createElement('span');
+                ripple.classList.add('ripple');
+                this.appendChild(ripple);
+
+                const rect = this.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                ripple.style.left = `${x}px`;
+                ripple.style.top = `${y}px`;
+                ripple.style.width = ripple.style.height = '100px';
+
+                setTimeout(() => {
+                    ripple.remove();
+                }, 600);
+            });
+        }
     });
-    
-    // Password strength checker
-    const passwordInput = document.getElementById('id_password');
-    const strengthFill = document.getElementById('strengthFill');
-    const strengthText = document.getElementById('strengthText');
-    const confirmInput = document.getElementById('id_confirm_password');
-    const matchIndicator = document.getElementById('matchIndicator');
-    const matchIcon = document.getElementById('matchIcon');
-    const matchText = document.getElementById('matchText');
-    const signupBtn = document.getElementById('signupBtn');
-    
-    function checkPasswordStrength(password) {
-      let strength = 0;
-      
-      if (password.length >= 8) strength++;
-      if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength++;
-      if (password.match(/[0-9]/)) strength++;
-      if (password.match(/[^a-zA-Z0-9]/)) strength++;
-      
-      let percentage = (strength / 4) * 100;
-      let color, text;
-      
-      if (password.length === 0) {
-        color = '#e2e8f0';
-        text = 'Enter password';
-        percentage = 0;
-      } else if (strength === 1) {
-        color = '#ef4444';
-        text = 'Weak';
-      } else if (strength === 2) {
-        color = '#f59e0b';
-        text = 'Fair';
-      } else if (strength === 3) {
-        color = '#10b981';
-        text = 'Good';
-      } else {
-        color = '#059669';
-        text = 'Strong';
-      }
-      
-      if (strengthFill) {
-        strengthFill.style.width = percentage + '%';
-        strengthFill.style.backgroundColor = color;
-      }
-      if (strengthText) {
-        strengthText.textContent = text;
-        strengthText.style.color = color;
-      }
-      
-      return strength;
-    }
-    
-    function checkPasswordMatch() {
-      if (!passwordInput || !confirmInput) return false;
-      
-      const password = passwordInput.value;
-      const confirm = confirmInput.value;
-      
-      if (confirm.length === 0) {
-        if (matchIndicator) matchIndicator.style.display = 'none';
-        return false;
-      }
-      
-      if (matchIndicator) matchIndicator.style.display = 'flex';
-      
-      if (password === confirm && password.length > 0) {
-        if (matchIcon) matchIcon.innerHTML = '✓';
-        if (matchText) matchText.innerHTML = 'Passwords match';
-        if (matchIcon) matchIcon.style.color = '#059669';
-        if (matchText) matchText.style.color = '#059669';
-        return true;
-      } else {
-        if (matchIcon) matchIcon.innerHTML = '✗';
-        if (matchText) matchText.innerHTML = 'Passwords do not match';
-        if (matchIcon) matchIcon.style.color = '#dc2626';
-        if (matchText) matchText.style.color = '#dc2626';
-        return false;
-      }
-    }
-    
-    if (passwordInput) {
-      passwordInput.addEventListener('input', function() {
-        checkPasswordStrength(this.value);
-        checkPasswordMatch();
-      });
-    }
-    
-    if (confirmInput) {
-      confirmInput.addEventListener('input', function() {
-        checkPasswordMatch();
-      });
-    }
-    
-    // Form validation before submit
-    const registerForm = document.getElementById('registerForm');
-    if (registerForm) {
-      registerForm.addEventListener('submit', function(e) {
-        const password = passwordInput ? passwordInput.value : '';
-        const confirm = confirmInput ? confirmInput.value : '';
-        
-        if (password !== confirm) {
-          e.preventDefault();
-          if (matchIndicator) matchIndicator.style.display = 'flex';
-          if (matchIcon) matchIcon.innerHTML = '✗';
-          if (matchText) matchText.innerHTML = 'Passwords do not match';
-          if (matchIcon) matchIcon.style.color = '#dc2626';
-          if (matchText) matchText.style.color = '#dc2626';
-          
-          if (confirmInput) {
-            confirmInput.style.borderColor = '#dc2626';
-            setTimeout(() => {
-              confirmInput.style.borderColor = '';
-            }, 2000);
-          }
-          return false;
-        }
-        
-        if (password.length > 0 && password.length < 6) {
-          e.preventDefault();
-          if (passwordInput) {
-            passwordInput.style.borderColor = '#dc2626';
-            setTimeout(() => {
-              passwordInput.style.borderColor = '';
-            }, 2000);
-          }
-          return false;
-        }
-      });
-    }
-    
-    // Add ripple effect on button click
-    if (signupBtn) {
-      signupBtn.addEventListener('click', function(e) {
-        let ripple = document.createElement('span');
-        ripple.classList.add('ripple');
-        this.appendChild(ripple);
-        
-        let x = e.clientX - e.target.offsetLeft;
-        let y = e.clientY - e.target.offsetTop;
-        
-        ripple.style.left = `${x}px`;
-        ripple.style.top = `${y}px`;
-        
-        setTimeout(() => {
-          ripple.remove();
-        }, 600);
-      });
-    }
-  });
 </script>
+
 <script src="{% static 'js/auth-validation.js' %}"></script>
 
 {% endblock %}

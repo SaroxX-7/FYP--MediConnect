@@ -3,33 +3,39 @@
 {% block content %}
 
 <style>
-    /* ========== LOGIN PAGE - FULL BACKGROUND SLIDESHOW DESIGN ========== */
+    /* ========== MEDICONNECT LOGIN PAGE - OVERLAP FIXED VERSION ========== */
 
-    .content {
-        min-height: calc(100vh - 80px);
+    .mediconnect-login-page,
+    .mediconnect-login-page * {
+        box-sizing: border-box;
+    }
+
+    .mediconnect-login-page {
+        min-height: calc(100vh - 110px);
         position: relative;
-        overflow: hidden;
+        overflow-x: hidden;
+        overflow-y: auto;
         background-image: url("{% static 'img/doctors/doctor-01.jpg' %}");
         background-size: cover;
         background-position: center center;
         background-repeat: no-repeat;
         transition: background-image 1s ease-in-out;
-        padding: 0;
-        margin: 0;
+        isolation: isolate;
     }
 
-    .content::before {
-        content: '';
+    .mediconnect-login-page::before {
+        content: "";
         position: absolute;
         inset: 0;
         background:
-            linear-gradient(rgba(15, 23, 42, 0.42), rgba(15, 23, 42, 0.42)),
-            linear-gradient(135deg, rgba(59, 130, 246, 0.14), rgba(139, 92, 246, 0.14));
+            linear-gradient(rgba(15, 23, 42, 0.48), rgba(15, 23, 42, 0.48)),
+            linear-gradient(135deg, rgba(59, 130, 246, 0.12), rgba(139, 92, 246, 0.12));
         z-index: 1;
+        pointer-events: none;
     }
 
-    .content::after {
-        content: '';
+    .mediconnect-login-page::after {
+        content: "";
         position: absolute;
         inset: 0;
         background:
@@ -39,510 +45,626 @@
         pointer-events: none;
     }
 
-    .login-stage {
-        min-height: calc(100vh - 80px);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 2rem 0;
+    .mc-login-stage {
+        min-height: calc(100vh - 110px);
         position: relative;
         z-index: 2;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 34px 16px 70px;
     }
 
-    .account-content {
-        background: transparent;
-        padding: 0;
-        position: relative;
-        z-index: 2;
+    .mc-login-card {
         width: 100%;
-    }
-
-    .login-wrapper {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-
-    .login-right {
+        max-width: 650px;
         background: rgba(255, 255, 255, 0.97);
+        border-radius: 38px;
+        padding: 2.2rem 2.6rem;
+        box-shadow:
+            0 30px 70px -24px rgba(0, 0, 0, 0.45),
+            0 0 0 1px rgba(255, 255, 255, 0.4) inset;
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
-        border-radius: 42px;
-        padding: 2.8rem 2.5rem;
-        box-shadow:
-            0 30px 60px -20px rgba(0, 0, 0, 0.35),
-            0 0 0 1px rgba(255, 255, 255, 0.35) inset;
-        animation: slideUpFade 0.7s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        animation: mcSlideUp 0.55s ease;
     }
 
-    .login-right:hover {
-        transform: translateY(-4px);
-        box-shadow:
-            0 40px 70px -20px rgba(0, 0, 0, 0.4),
-            0 0 0 1px rgba(255, 255, 255, 0.45) inset;
-    }
-
-    .login-header {
+    .mc-login-header {
         text-align: center;
-        margin-bottom: 2.5rem;
+        margin-bottom: 1.45rem;
     }
 
-    .login-header h3 {
-        font-size: 2.25rem;
-        font-weight: 800;
+    .mc-login-header h3 {
         margin: 0;
-        letter-spacing: -0.02em;
-        background: linear-gradient(135deg, #0f2b3d 0%, #1e3a5f 100%);
+        font-size: 2rem;
+        font-weight: 800;
+        line-height: 1.18;
+        letter-spacing: -0.03em;
+        color: #102a43;
+    }
+
+    .mc-login-header h3 span {
+        background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
         -webkit-background-clip: text;
         background-clip: text;
         color: transparent;
-        line-height: 1.2;
     }
 
-    .login-header h3 span {
-        background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-        -webkit-background-clip: text;
-        background-clip: text;
-        color: transparent;
-        display: inline-block;
+    .mc-alert-stack {
+        display: grid;
+        gap: 0.65rem;
+        margin-bottom: 1.15rem;
     }
 
-    .form-group {
-        margin-bottom: 1.75rem;
+    .mc-alert {
+        width: 100%;
+        padding: 0.78rem 1rem;
+        border-radius: 16px;
+        font-size: 0.86rem;
+        line-height: 1.45;
+        font-weight: 700;
+        word-break: break-word;
+    }
+
+    .mc-alert-error {
+        background: #fff1f2;
+        color: #b91c1c;
+        border: 1px solid #fecaca;
+        border-left: 5px solid #ef4444;
+    }
+
+    .mc-alert-success {
+        background: #ecfdf5;
+        color: #047857;
+        border: 1px solid #a7f3d0;
+        border-left: 5px solid #10b981;
+    }
+
+    .mc-form {
+        display: grid;
+        gap: 1rem;
+    }
+
+    .mc-field {
         position: relative;
+        width: 100%;
     }
 
-    .form-focus {
+    .mc-input-wrap {
         position: relative;
+        width: 100%;
     }
 
-    .form-focus .form-control {
-        height: 62px;
-        padding: 1.2rem 1.2rem 0.5rem;
-        font-size: 1rem;
+    .mc-input {
+        display: block;
+        width: 100%;
+        height: 58px;
         border: 2px solid #e8eefc;
         border-radius: 24px;
-        transition: all 0.25s ease;
-        background: rgba(255, 255, 255, 0.96);
-        width: 100%;
-        font-family: 'Inter', system-ui, -apple-system, sans-serif;
-        font-weight: 500;
-        color: #1e293b;
-    }
-
-    .form-focus .form-control:focus {
-        border-color: #3b82f6;
-        outline: none;
-        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
         background: #ffffff;
-    }
-
-    .form-focus .focus-label {
-        position: absolute;
-        left: 1.2rem;
-        top: 50%;
-        transform: translateY(-50%);
-        font-size: 0.95rem;
-        color: #94a3b8;
-        transition: all 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-        pointer-events: none;
-        background: transparent;
-        padding: 0 0.3rem;
-        margin: 0;
-        font-weight: 500;
-        letter-spacing: -0.01em;
-    }
-
-    .form-focus .form-control:focus ~ .focus-label,
-    .form-focus .form-control:not(:placeholder-shown) ~ .focus-label {
-        top: 0;
-        font-size: 0.7rem;
-        transform: translateY(-50%);
-        background: white;
-        color: #3b82f6;
-        font-weight: 600;
-        letter-spacing: 0;
-    }
-
-    .text-right {
-        text-align: right;
-        margin-bottom: 1.75rem;
-    }
-
-    .forgot-link {
-        color: #2563eb;
-        text-decoration: none;
-        font-size: 0.85rem;
-        font-weight: 600;
-        transition: all 0.2s ease;
-        position: relative;
-        padding-bottom: 2px;
-    }
-
-    .forgot-link::after {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 0;
-        height: 1.5px;
-        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-        transition: width 0.25s ease;
-    }
-
-    .forgot-link:hover::after {
-        width: 100%;
-    }
-
-    .forgot-link:hover {
-        color: #1e40af;
-    }
-
-    .login-btn {
-        background: linear-gradient(105deg, #2563eb 0%, #1e3a8a 50%, #2563eb 100%);
-        background-size: 200% auto;
-        color: white;
-        border: none;
-        padding: 1rem 1.5rem;
+        color: #1e293b;
         font-size: 1rem;
-        font-weight: 700;
-        border-radius: 40px;
-        width: 100%;
-        cursor: pointer;
-        transition: all 0.4s ease;
-        margin-bottom: 1.25rem;
-        position: relative;
-        overflow: hidden;
-        letter-spacing: 0.3px;
+        font-weight: 500;
+        padding: 1.15rem 1.25rem 0.45rem;
+        outline: none;
+        box-shadow: none;
+        transition: border-color 0.22s ease, box-shadow 0.22s ease;
     }
 
-    .login-btn::before {
-        content: '';
+    .mc-input:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.14);
+    }
+
+    .mc-field.mc-error .mc-input,
+    .mc-input.mc-invalid {
+        border-color: #ef4444;
+    }
+
+    .mc-field.mc-error .mc-input:focus,
+    .mc-input.mc-invalid:focus {
+        box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.13);
+    }
+
+    .mc-label {
         position: absolute;
+        left: 1.15rem;
+        top: 29px;
+        transform: translateY(-50%);
+        padding: 0 0.35rem;
+        background: transparent;
+        color: #94a3b8;
+        font-size: 0.95rem;
+        font-weight: 500;
+        line-height: 1;
+        pointer-events: none;
+        transition: all 0.2s ease;
+        z-index: 2;
+    }
+
+    .mc-input:focus + .mc-label,
+    .mc-input:not(:placeholder-shown) + .mc-label,
+    .mc-input.mc-filled + .mc-label {
         top: 0;
-        left: -100%;
+        background: #ffffff;
+        color: #2563eb;
+        font-size: 0.75rem;
+        font-weight: 800;
+    }
+
+    .mc-field.mc-error .mc-label,
+    .mc-input.mc-invalid + .mc-label {
+        color: #ef4444;
+    }
+
+    .mc-field-error {
+        display: block;
         width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-        transition: left 0.5s ease;
+        margin: 0.42rem 0 0 0.85rem;
+        padding: 0;
+        background: transparent;
+        border: 0;
+        color: #dc2626;
+        font-size: 0.82rem;
+        font-weight: 800;
+        line-height: 1.35;
+        position: static !important;
+        clear: both;
     }
 
-    .login-btn:hover::before {
-        left: 100%;
+    .mc-field-error:empty {
+        display: none !important;
     }
 
-    .login-btn:hover {
+    .mc-client-error {
+        display: none;
+    }
+
+    .mc-forgot-row {
+        text-align: right;
+        margin-top: -0.2rem;
+    }
+
+    .mc-forgot-link {
+        color: #2563eb;
+        font-size: 0.87rem;
+        font-weight: 800;
+        text-decoration: none;
+    }
+
+    .mc-forgot-link:hover {
+        color: #1e40af;
+        text-decoration: underline;
+    }
+
+    .mc-login-btn {
+        width: 100%;
+        min-height: 56px;
+        border: 0;
+        border-radius: 999px;
+        background: linear-gradient(105deg, #2563eb 0%, #1e3a8a 55%, #2563eb 100%);
+        background-size: 200% auto;
+        color: #ffffff;
+        font-size: 1rem;
+        font-weight: 800;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 0.1rem;
+    }
+
+    .mc-login-btn:hover {
         background-position: right center;
         transform: translateY(-2px);
-        box-shadow: 0 15px 25px -10px rgba(37, 99, 235, 0.4);
+        box-shadow: 0 16px 28px -12px rgba(37, 99, 235, 0.55);
     }
 
-    .login-btn:active {
-        transform: translateY(1px);
+    .mc-login-btn:disabled {
+        opacity: 0.72;
+        cursor: not-allowed;
+        transform: none;
     }
 
-    .dont-have {
-        text-align: center;
-        font-size: 0.85rem;
-        color: #64748b;
-        margin-top: 1.5rem;
-        padding-top: 1.25rem;
+    .mc-register-row {
+        margin-top: 1.2rem;
+        padding-top: 1rem;
         border-top: 2px solid #f1f5f9;
         display: flex;
         justify-content: center;
-        gap: 0.5rem;
+        align-items: center;
         flex-wrap: wrap;
+        gap: 0.48rem;
+        color: #64748b;
+        font-size: 0.86rem;
+        line-height: 1.7;
     }
 
-    .dont-have a {
-        color: #3b82f6;
+    .mc-register-row a {
+        color: #2563eb;
+        background: rgba(37, 99, 235, 0.07);
+        border-radius: 999px;
+        padding: 0.22rem 0.78rem;
+        font-size: 0.8rem;
+        font-weight: 800;
         text-decoration: none;
-        font-weight: 700;
-        transition: all 0.2s ease;
-        padding: 0.25rem 0.75rem;
-        border-radius: 40px;
-        background: rgba(59, 130, 246, 0.05);
-        font-size: 0.8rem;
+        white-space: nowrap;
     }
 
-    .dont-have a:hover {
-        background: rgba(59, 130, 246, 0.15);
+    .mc-register-row a:hover {
+        background: rgba(37, 99, 235, 0.15);
         color: #1e40af;
-        transform: translateY(-1px);
     }
 
-    .dont-have span {
+    .mc-dot {
         color: #cbd5e1;
-        font-weight: 300;
     }
 
-    .error-message {
-        background: #fef2f2;
-        color: #dc2626;
-        padding: 0.85rem 1.2rem;
-        border-radius: 20px;
-        font-size: 0.8rem;
-        margin-bottom: 1.5rem;
-        border-left: 4px solid #dc2626;
-        font-weight: 500;
-        animation: shake 0.4s ease;
-    }
-
-    .success-message {
-        background: #ecfdf5;
-        color: #10b981;
-        padding: 0.85rem 1.2rem;
-        border-radius: 20px;
-        font-size: 0.8rem;
-        margin-bottom: 1.5rem;
-        border-left: 4px solid #10b981;
-        font-weight: 500;
-        animation: fadeSlideDown 0.4s ease;
-    }
-
-    @keyframes shake {
-        0%, 100% { transform: translateX(0); }
-        25% { transform: translateX(-5px); }
-        75% { transform: translateX(5px); }
-    }
-
-    @keyframes fadeSlideDown {
+    @keyframes mcSlideUp {
         from {
             opacity: 0;
-            transform: translateY(-10px);
+            transform: translateY(28px);
         }
+
         to {
             opacity: 1;
             transform: translateY(0);
-        }
-    }
-
-    @keyframes slideUpFade {
-        from {
-            opacity: 0;
-            transform: translateY(40px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    @media (max-width: 991.98px) {
-        .login-stage {
-            min-height: calc(100vh - 80px);
-            padding: 1.75rem 0;
-        }
-
-        .login-right {
-            padding: 2.2rem;
-            border-radius: 36px;
-        }
-
-        .login-header h3 {
-            font-size: 1.9rem;
         }
     }
 
     @media (max-width: 768px) {
-        .content {
-            min-height: calc(100vh - 70px);
-            background-position: center center;
+        .mc-login-stage {
+            padding: 24px 14px 50px;
         }
 
-        .login-stage {
-            min-height: calc(100vh - 70px);
-            padding: 1.2rem 0;
-        }
-
-        .login-right {
+        .mc-login-card {
+            max-width: 94%;
             padding: 1.8rem;
             border-radius: 30px;
         }
 
-        .login-header h3 {
-            font-size: 1.7rem;
+        .mc-login-header h3 {
+            font-size: 1.65rem;
         }
 
-        .form-focus .form-control {
+        .mc-input {
             height: 54px;
-            font-size: 0.9rem;
             border-radius: 20px;
+            font-size: 0.92rem;
         }
 
-        .login-btn {
-            padding: 0.85rem 1.25rem;
-            font-size: 0.9rem;
-        }
-
-        .dont-have {
-            font-size: 0.75rem;
-            gap: 0.3rem;
-        }
-
-        .dont-have a {
-            font-size: 0.75rem;
-            padding: 0.2rem 0.6rem;
+        .mc-label {
+            top: 27px;
         }
     }
 
     @media (max-width: 480px) {
-        .login-right {
-            padding: 1.5rem;
+        .mc-login-card {
+            padding: 1.45rem;
             border-radius: 26px;
         }
 
-        .login-header h3 {
-            font-size: 1.5rem;
+        .mc-login-header h3 {
+            font-size: 1.45rem;
         }
 
-        .form-focus .form-control {
-            height: 50px;
-            border-radius: 18px;
+        .mc-alert {
+            font-size: 0.78rem;
+            padding: 0.65rem 0.85rem;
         }
 
-        .form-focus .focus-label {
-            font-size: 0.85rem;
-            left: 1rem;
+        .mc-field-error {
+            font-size: 0.76rem;
+            margin-left: 0.65rem;
         }
 
-        .login-btn {
-            border-radius: 32px;
+        .mc-register-row {
+            font-size: 0.76rem;
+            gap: 0.3rem;
+        }
+
+        .mc-register-row a {
+            font-size: 0.74rem;
+            padding: 0.2rem 0.58rem;
         }
     }
 
-    .form-control::placeholder {
-        color: transparent;
-    }
+    @media (max-height: 850px) {
+        .mc-login-stage {
+            padding-top: 18px;
+            padding-bottom: 38px;
+        }
 
-    .form-control:focus::placeholder {
-        color: #cbd5e1;
-    }
+        .mc-login-card {
+            padding: 1.45rem 2.2rem;
+            border-radius: 34px;
+        }
 
-    input[type="number"]::-webkit-inner-spin-button,
-    input[type="number"]::-webkit-outer-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-    }
+        .mc-login-header {
+            margin-bottom: 1rem;
+        }
 
-    input:focus {
-        outline: none;
-    }
+        .mc-login-header h3 {
+            font-size: 1.75rem;
+        }
 
-    html {
-        scroll-behavior: smooth;
+        .mc-alert-stack {
+            gap: 0.5rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .mc-alert {
+            padding: 0.62rem 0.9rem;
+            font-size: 0.78rem;
+        }
+
+        .mc-form {
+            gap: 0.78rem;
+        }
+
+        .mc-input {
+            height: 52px;
+        }
+
+        .mc-label {
+            top: 26px;
+        }
+
+        .mc-field-error {
+            font-size: 0.76rem;
+            margin-top: 0.3rem;
+        }
+
+        .mc-login-btn {
+            min-height: 50px;
+        }
+
+        .mc-register-row {
+            margin-top: 0.8rem;
+            padding-top: 0.7rem;
+        }
     }
 </style>
 
-<div class="content" id="loginBackground">
-    <div class="login-stage">
-        <div class="container-fluid">
-            <div class="row justify-content-center">
-                <div class="col-md-10 col-lg-6 col-xl-5">
-                    <div class="account-content">
-                        <div class="login-wrapper">
-                            <div class="login-right">
-                                <div class="login-header">
-                                    <h3>Welcome back to <span>MediConnect</span></h3>
-                                </div>
-
-                                {% if messages %}
-                                    {% for message in messages %}
-                                        <div class="{% if 'error' in message.tags or 'danger' in message.tags %}error-message{% else %}success-message{% endif %}">
-                                            {{ message }}
-                                        </div>
-                                    {% endfor %}
-                                {% endif %}
-
-                                <form action="{% url 'login' %}" method="post" id="loginForm" novalidate>
-                                    {% csrf_token %}
-
-                                    <div class="form-group form-focus">
-                                        <input type="email" name="email" id="email" class="form-control floating" placeholder=" ">
-                                        <label class="focus-label" for="email">Email address</label>
-                                    </div>
-
-                                    <div class="form-group form-focus">
-                                        <input type="password" name="password" id="password" class="form-control floating" placeholder=" ">
-                                        <label class="focus-label" for="password">Password</label>
-                                    </div>
-
-                                    {% if form.non_field_errors %}
-                                        <div class="error-message">{{ form.non_field_errors.0 }}</div>
-                                    {% endif %}
-
-                                    <div class="text-right">
-                                        <a class="forgot-link" href="{% url 'forgot_password' %}">Forgot Password?</a>
-                                    </div>
-
-                                    <button class="btn btn-primary btn-block btn-lg login-btn" type="submit">Sign In</button>
-
-                                    <div class="text-center dont-have">
-                                        <span>New to MediConnect?</span>
-                                        <a href="{% url 'registerUser' %}">Patient</a>
-                                        <span>•</span>
-                                        <a href="{% url 'registerDoctor' %}">Doctor</a>
-                                        <span>•</span>
-                                        <a href="{% url 'registerPharmacist' %}">Pharmacist</a>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- /Login Tab Content -->
-                </div>
+<div class="mediconnect-login-page" id="mcLoginBackground">
+    <div class="mc-login-stage">
+        <div class="mc-login-card">
+            <div class="mc-login-header">
+                <h3>Welcome back to <span>MediConnect</span></h3>
             </div>
+
+            <div class="mc-alert-stack" id="mcAlertStack">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="mc-alert {% if 'error' in message.tags or 'danger' in message.tags %}mc-alert-error{% else %}mc-alert-success{% endif %}" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                {% if form.non_field_errors %}
+                    <div class="mc-alert mc-alert-error" role="alert">
+                        {% for error in form.non_field_errors %}
+                            <div>{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                {% if form.errors and not form.non_field_errors %}
+                    <div class="mc-alert mc-alert-error" role="alert">
+                        Please correct the highlighted errors.
+                    </div>
+                {% endif %}
+            </div>
+
+            <form action="{% url 'login' %}" method="post" id="mcLoginForm" class="mc-form" novalidate>
+                {% csrf_token %}
+
+                <div class="mc-field {% if form.email.errors %}mc-error{% endif %}">
+                    <div class="mc-input-wrap">
+                        <input
+                            type="email"
+                            name="email"
+                            id="mc-email"
+                            class="mc-input {% if form.email.errors %}mc-invalid{% endif %}"
+                            placeholder=" "
+                            value="{{ request.POST.email|default:'' }}"
+                            autocomplete="email"
+                            aria-invalid="{% if form.email.errors %}true{% else %}false{% endif %}"
+                            required
+                        >
+                        <label class="mc-label" for="mc-email">Email address</label>
+                    </div>
+
+                    {% if form.email.errors %}
+                        <div class="mc-field-error mc-server-error" id="mc-email-server-error" role="alert">
+                            {% for error in form.email.errors %}
+                                <div>{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <div class="mc-field-error mc-client-error" id="mc-email-client-error" role="alert" aria-live="polite"></div>
+                </div>
+
+                <div class="mc-field {% if form.password.errors %}mc-error{% endif %}">
+                    <div class="mc-input-wrap">
+                        <input
+                            type="password"
+                            name="password"
+                            id="mc-password"
+                            class="mc-input {% if form.password.errors %}mc-invalid{% endif %}"
+                            placeholder=" "
+                            autocomplete="current-password"
+                            aria-invalid="{% if form.password.errors %}true{% else %}false{% endif %}"
+                            required
+                        >
+                        <label class="mc-label" for="mc-password">Password</label>
+                    </div>
+
+                    {% if form.password.errors %}
+                        <div class="mc-field-error mc-server-error" id="mc-password-server-error" role="alert">
+                            {% for error in form.password.errors %}
+                                <div>{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <div class="mc-field-error mc-client-error" id="mc-password-client-error" role="alert" aria-live="polite"></div>
+                </div>
+
+                <div class="mc-forgot-row">
+                    <a class="mc-forgot-link" href="{% url 'forgot_password' %}">Forgot Password?</a>
+                </div>
+
+                <button class="mc-login-btn" type="submit" id="mcLoginSubmitBtn">
+                    Sign In
+                </button>
+
+                <div class="mc-register-row">
+                    <span>New to MediConnect?</span>
+                    <a href="{% url 'registerUser' %}">Patient</a>
+                    <span class="mc-dot">•</span>
+                    <a href="{% url 'registerDoctor' %}">Doctor</a>
+                    <span class="mc-dot">•</span>
+                    <a href="{% url 'registerPharmacist' %}">Pharmacist</a>
+                </div>
+            </form>
         </div>
     </div>
 </div>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const floatingInputs = document.querySelectorAll('.form-focus .form-control');
+        const loginPage = document.getElementById('mcLoginBackground');
 
-        floatingInputs.forEach(input => {
+        if (!loginPage) {
+            return;
+        }
+
+        const inputs = loginPage.querySelectorAll('.mc-input');
+
+        inputs.forEach(function(input) {
             if (input.value.trim() !== '') {
-                input.classList.add('filled');
-                input.dispatchEvent(new Event('input'));
+                input.classList.add('mc-filled');
             }
 
             input.addEventListener('input', function() {
                 if (this.value.trim() !== '') {
-                    this.classList.add('filled');
+                    this.classList.add('mc-filled');
                 } else {
-                    this.classList.remove('filled');
+                    this.classList.remove('mc-filled');
                 }
+
+                clearClientError(this);
+                hideServerError(this);
             });
 
             input.addEventListener('blur', function() {
                 if (this.value.trim() === '') {
-                    this.classList.remove('filled');
+                    this.classList.remove('mc-filled');
                 }
             });
         });
 
-        const loginBtn = document.querySelector('.login-btn');
-        if (loginBtn) {
-            loginBtn.addEventListener('mouseenter', function(e) {
-                const ripple = document.createElement('span');
-                ripple.classList.add('ripple-effect');
-                ripple.style.position = 'absolute';
-                ripple.style.borderRadius = '50%';
-                ripple.style.backgroundColor = 'rgba(255,255,255,0.3)';
-                ripple.style.pointerEvents = 'none';
-                ripple.style.transform = 'scale(0)';
-                ripple.style.animation = 'ripple 0.6s linear';
+        const form = loginPage.querySelector('#mcLoginForm');
+        const emailInput = loginPage.querySelector('#mc-email');
+        const passwordInput = loginPage.querySelector('#mc-password');
+        const submitBtn = loginPage.querySelector('#mcLoginSubmitBtn');
 
-                const rect = this.getBoundingClientRect();
-                ripple.style.left = `${e.clientX - rect.left}px`;
-                ripple.style.top = `${e.clientY - rect.top}px`;
-                ripple.style.width = ripple.style.height = '100px';
-                this.style.position = 'relative';
-                this.style.overflow = 'hidden';
-                this.appendChild(ripple);
+        function hideServerError(input) {
+            const group = input.closest('.mc-field');
 
-                setTimeout(() => ripple.remove(), 600);
+            if (!group) {
+                return;
+            }
+
+            const serverError = group.querySelector('.mc-server-error');
+
+            if (serverError) {
+                serverError.style.display = 'none';
+            }
+        }
+
+        function showClientError(input, message) {
+            const group = input.closest('.mc-field');
+            const errorBox = loginPage.querySelector('#' + input.id + '-client-error');
+
+            hideServerError(input);
+
+            input.classList.add('mc-invalid');
+            input.setAttribute('aria-invalid', 'true');
+
+            if (group) {
+                group.classList.add('mc-error');
+            }
+
+            if (errorBox) {
+                errorBox.textContent = message;
+                errorBox.style.display = 'block';
+            }
+        }
+
+        function clearClientError(input) {
+            const group = input.closest('.mc-field');
+            const errorBox = loginPage.querySelector('#' + input.id + '-client-error');
+
+            input.classList.remove('mc-invalid');
+            input.setAttribute('aria-invalid', 'false');
+
+            if (group && !group.querySelector('.mc-server-error')) {
+                group.classList.remove('mc-error');
+            }
+
+            if (errorBox) {
+                errorBox.textContent = '';
+                errorBox.style.display = 'none';
+            }
+        }
+
+        function isValidEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+
+        if (form && emailInput && passwordInput) {
+            form.addEventListener('submit', function(e) {
+                let isValid = true;
+                let firstInvalid = null;
+
+                clearClientError(emailInput);
+                clearClientError(passwordInput);
+
+                const emailValue = emailInput.value.trim();
+                const passwordValue = passwordInput.value.trim();
+
+                if (emailValue === '') {
+                    showClientError(emailInput, 'Email address is required.');
+                    isValid = false;
+                    firstInvalid = firstInvalid || emailInput;
+                } else if (!isValidEmail(emailValue)) {
+                    showClientError(emailInput, 'Enter a valid email address.');
+                    isValid = false;
+                    firstInvalid = firstInvalid || emailInput;
+                }
+
+                if (passwordValue === '') {
+                    showClientError(passwordInput, 'Password is required.');
+                    isValid = false;
+                    firstInvalid = firstInvalid || passwordInput;
+                }
+
+                if (!isValid) {
+                    e.preventDefault();
+
+                    if (firstInvalid) {
+                        firstInvalid.focus();
+                    }
+
+                    return false;
+                }
+
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Signing in...';
+                }
             });
         }
 
@@ -561,36 +683,20 @@
             "{% static 'img/doctors/doctor-12.jpg' %}"
         ];
 
-        const background = document.getElementById('loginBackground');
+        let currentIndex = Math.floor(Math.random() * doctorImages.length);
+        loginPage.style.backgroundImage = `url('${doctorImages[currentIndex]}')`;
 
-        if (background) {
-            let currentIndex = Math.floor(Math.random() * doctorImages.length);
-            background.style.backgroundImage = `url('${doctorImages[currentIndex]}')`;
+        setInterval(function() {
+            let nextIndex;
 
-            setInterval(() => {
-                let nextIndex;
-                do {
-                    nextIndex = Math.floor(Math.random() * doctorImages.length);
-                } while (nextIndex === currentIndex && doctorImages.length > 1);
+            do {
+                nextIndex = Math.floor(Math.random() * doctorImages.length);
+            } while (nextIndex === currentIndex && doctorImages.length > 1);
 
-                background.style.backgroundImage = `url('${doctorImages[nextIndex]}')`;
-                currentIndex = nextIndex;
-            }, 3000);
-        }
+            loginPage.style.backgroundImage = `url('${doctorImages[nextIndex]}')`;
+            currentIndex = nextIndex;
+        }, 3000);
     });
-
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes ripple {
-            to {
-                transform: scale(4);
-                opacity: 0;
-            }
-        }
-    `;
-    document.head.appendChild(style);
 </script>
-
-<script src="{% static 'js/auth-validation.js' %}"></script>
 
 {% endblock %}

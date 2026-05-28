@@ -22,13 +22,13 @@
         --shadow-sm: 0 8px 20px rgba(0, 0, 0, 0.04);
         --shadow-md: 0 20px 38px rgba(0, 0, 0, 0.08);
         --shadow-lg: 0 35px 60px rgba(0, 0, 0, 0.1);
+        --shadow-xl: 0 42px 75px rgba(0, 0, 0, 0.12);
         --radius-xl: 36px;
         --radius-lg: 24px;
         --radius-md: 18px;
         --transition-smooth: all 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1);
     }
 
-    /* Page background - clean white */
     .content {
         min-height: calc(100vh - 200px);
         display: flex;
@@ -38,7 +38,6 @@
         background: #ffffff;
     }
 
-    /* Subtle decorative elements */
     .content::before,
     .content::after {
         content: "";
@@ -69,13 +68,21 @@
     }
 
     @keyframes floatOne {
-        0%, 100% { transform: translate(0, 0) scale(1); }
-        50% { transform: translate(40px, 25px) scale(1.1); }
+        0%, 100% {
+            transform: translate(0, 0) scale(1);
+        }
+        50% {
+            transform: translate(40px, 25px) scale(1.1);
+        }
     }
 
     @keyframes floatTwo {
-        0%, 100% { transform: translate(0, 0) scale(1); }
-        50% { transform: translate(-35px, -20px) scale(1.08); }
+        0%, 100% {
+            transform: translate(0, 0) scale(1);
+        }
+        50% {
+            transform: translate(-35px, -20px) scale(1.08);
+        }
     }
 
     .account-content {
@@ -83,7 +90,6 @@
         z-index: 2;
     }
 
-    /* Left image side */
     .login-left {
         text-align: center;
         animation: fadeLeft 0.7s ease-out;
@@ -104,7 +110,6 @@
         filter: drop-shadow(0 25px 40px rgba(0, 0, 0, 0.12));
     }
 
-    /* Right card - clean white card */
     .login-right {
         position: relative;
         z-index: 2;
@@ -113,7 +118,7 @@
         box-shadow: var(--shadow-lg);
         border-radius: var(--radius-xl);
         padding: 44px 36px;
-        overflow: hidden;
+        overflow: visible;
         animation: fadeRight 0.7s ease-out;
         transition: var(--transition-smooth);
     }
@@ -123,7 +128,6 @@
         box-shadow: var(--shadow-xl);
     }
 
-    /* Subtle top border accent */
     .login-right::before {
         content: "";
         position: absolute;
@@ -135,7 +139,6 @@
         border-radius: 4px 4px 0 0;
     }
 
-    /* Header section */
     .login-header {
         text-align: center;
         margin-bottom: 32px;
@@ -177,11 +180,16 @@
     }
 
     @keyframes expandWidth {
-        from { width: 0; opacity: 0; }
-        to { width: 70px; opacity: 1; }
+        from {
+            width: 0;
+            opacity: 0;
+        }
+        to {
+            width: 70px;
+            opacity: 1;
+        }
     }
 
-    /* Messages styling */
     .error-message,
     .success-message {
         display: flex;
@@ -210,11 +218,18 @@
     }
 
     .error {
-        color: #dc2626;
-        font-size: 0.75rem;
-        margin-top: 6px;
-        margin-left: 16px;
         display: block;
+        width: 100%;
+        color: #dc2626;
+        font-size: 0.78rem;
+        font-weight: 600;
+        line-height: 1.25;
+        margin: 7px 0 0 16px;
+        padding: 0;
+        position: static !important;
+        white-space: normal;
+        word-break: break-word;
+        z-index: 5;
     }
 
     @keyframes slideDown {
@@ -228,14 +243,21 @@
         }
     }
 
-    /* Form group - floating labels */
     .form-group {
         margin-bottom: 24px;
         position: relative;
     }
 
+    .form-group.form-focus {
+        height: auto !important;
+        min-height: 86px;
+        overflow: visible !important;
+        margin-bottom: 12px;
+    }
+
     .form-focus {
         position: relative;
+        overflow: visible !important;
     }
 
     .form-focus .form-control {
@@ -266,7 +288,7 @@
     .form-focus .focus-label {
         position: absolute;
         left: 20px;
-        top: 50%;
+        top: 32px;
         transform: translateY(-50%);
         margin: 0;
         padding: 0 6px;
@@ -295,7 +317,6 @@
         color: transparent;
     }
 
-    /* Row form styling */
     .form-row {
         display: flex;
         gap: 16px;
@@ -315,16 +336,15 @@
         display: none;
     }
 
-    /* Adjust spacing for row forms */
     .row.form-row {
         margin: 0 -8px;
+        row-gap: 10px;
     }
 
     .row.form-row > [class*="col-"] {
         padding: 0 8px;
     }
 
-    /* Forgot link styling */
     .text-right {
         text-align: right;
         margin-top: -6px;
@@ -375,7 +395,6 @@
         width: 100%;
     }
 
-    /* Signup button */
     .login-btn {
         width: 100%;
         border: none;
@@ -410,7 +429,6 @@
         box-shadow: 0 0 0 4px rgba(15, 111, 255, 0.15), 0 10px 25px rgba(15, 111, 255, 0.25);
     }
 
-    /* Shine effect on button */
     .login-btn::before {
         content: "";
         position: absolute;
@@ -427,7 +445,6 @@
         left: 150%;
     }
 
-    /* Ripple effect */
     .login-btn .ripple {
         position: absolute;
         border-radius: 50%;
@@ -444,7 +461,6 @@
         }
     }
 
-    /* Password strength indicator */
     .password-strength {
         margin-top: 8px;
         font-size: 0.75rem;
@@ -474,7 +490,6 @@
         font-weight: 500;
     }
 
-    /* Password match indicator */
     .password-match {
         margin-top: 8px;
         font-size: 0.75rem;
@@ -491,7 +506,6 @@
         color: #dc2626;
     }
 
-    /* Keyframe animations */
     @keyframes fadeLeft {
         from {
             opacity: 0;
@@ -514,7 +528,6 @@
         }
     }
 
-    /* Custom scrollbar */
     ::-webkit-scrollbar {
         width: 8px;
         height: 8px;
@@ -534,7 +547,6 @@
         background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
     }
 
-    /* Responsive design */
     @media (max-width: 991.98px) {
         .content {
             padding: 35px 0;
@@ -590,7 +602,7 @@
 
         .form-row .col-6 {
             width: 100%;
-            margin-bottom: 24px;
+            margin-bottom: 10px;
         }
 
         .form-row .col-6:last-child {
@@ -606,6 +618,7 @@
 
         .form-focus .focus-label {
             left: 16px;
+            top: 28px;
             font-size: 0.9rem;
         }
 
@@ -647,6 +660,10 @@
             margin-bottom: 18px;
         }
 
+        .form-group.form-focus {
+            min-height: 78px;
+        }
+
         .form-focus .form-control {
             height: 52px;
             padding: 18px 14px 6px;
@@ -655,6 +672,7 @@
 
         .form-focus .focus-label {
             left: 14px;
+            top: 26px;
             font-size: 0.85rem;
         }
 
@@ -678,10 +696,10 @@
 
         .error {
             font-size: 0.7rem;
+            margin-left: 12px;
         }
     }
 
-    /* Focus visible for accessibility */
     .form-focus .form-control:focus-visible {
         outline: 2px solid var(--primary);
         outline-offset: 2px;
@@ -692,8 +710,7 @@
         outline-offset: 2px;
     }
 
-    /* Additional hover effect */
-    .form-group:hover .focus-label:not(.form-control:focus ~ .focus-label) {
+    .form-group:hover .focus-label {
         color: var(--primary-light);
     }
 </style>
@@ -703,22 +720,28 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-8 offset-md-2">
+
                 <!-- Register Content -->
                 <div class="account-content">
                     <div class="row align-items-center justify-content-center">
+
                         <div class="col-md-7 col-lg-6 login-left">
                             <img src="{% static 'img/login-banner.png' %}" class="img-fluid" alt="MediConnect Register">
                         </div>
+
                         <div class="col-md-12 col-lg-6 login-right">
                             <div class="login-header">
-                                <h3>Patient Register <a href="{% url 'registerDoctor' %}">Are you a Doctor?</a></h3>
+                                <h3>
+                                    Patient Register
+                                    <a href="{% url 'registerDoctor' %}">Are you a Doctor?</a>
+                                </h3>
                             </div>
 
                             <!-- Display Django messages if any -->
                             {% if messages %}
                                 {% for message in messages %}
                                     <div class="{% if 'error' in message.tags or 'danger' in message.tags %}error-message{% else %}success-message{% endif %}">
-                                        {% if message.tags == 'error' %}
+                                        {% if 'error' in message.tags or 'danger' in message.tags %}
                                             <span>⚠️</span>
                                         {% else %}
                                             <span>✓</span>
@@ -731,53 +754,118 @@
                             <!-- Register Form -->
                             <form action="{% url 'registerUser' %}" method="post" id="registerForm" novalidate>
                                 {% csrf_token %}
-                                
+
                                 <div class="row form-row">
                                     <div class="col-6">
                                         <div class="form-group form-focus">
-                                            <input type="text" class="form-control floating" name="first_name" id="id_first_name" placeholder=" " autocomplete="given-name" required minlength="2" maxlength="50" pattern="[A-Za-z][A-Za-z\s\'.-]*" {% if form.first_name.value %}value="{{ form.first_name.value }}"{% endif %}>
+                                            <input
+                                                type="text"
+                                                class="form-control floating"
+                                                name="first_name"
+                                                id="id_first_name"
+                                                placeholder=" "
+                                                autocomplete="given-name"
+                                                required
+                                                minlength="2"
+                                                maxlength="50"
+                                                pattern="[A-Za-z][A-Za-z\s\'.-]*"
+                                                {% if form.first_name.value %}value="{{ form.first_name.value }}"{% endif %}
+                                            >
                                             <label class="focus-label">First Name</label>
-                                            {% if form.first_name.errors %}
-                                                <div class="error">{{ form.first_name.errors.as_text }}</div>
-                                            {% endif %}
+
+                                            {% for error in form.first_name.errors %}
+                                                <div class="error">{{ error }}</div>
+                                            {% endfor %}
                                         </div>
                                     </div>
+
                                     <div class="col-6">
                                         <div class="form-group form-focus">
-                                            <input type="text" class="form-control floating" name="last_name" id="id_last_name" placeholder=" " autocomplete="family-name" required minlength="2" maxlength="50" pattern="[A-Za-z][A-Za-z\s\'.-]*" {% if form.last_name.value %}value="{{ form.last_name.value }}"{% endif %}>
+                                            <input
+                                                type="text"
+                                                class="form-control floating"
+                                                name="last_name"
+                                                id="id_last_name"
+                                                placeholder=" "
+                                                autocomplete="family-name"
+                                                required
+                                                minlength="2"
+                                                maxlength="50"
+                                                pattern="[A-Za-z][A-Za-z\s\'.-]*"
+                                                {% if form.last_name.value %}value="{{ form.last_name.value }}"{% endif %}
+                                            >
                                             <label class="focus-label">Last Name</label>
-                                            {% if form.last_name.errors %}
-                                                <div class="error">{{ form.last_name.errors.as_text }}</div>
-                                            {% endif %}
+
+                                            {% for error in form.last_name.errors %}
+                                                <div class="error">{{ error }}</div>
+                                            {% endfor %}
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="form-group form-focus">
-                                    <input type="email" class="form-control floating" name="email" id="id_email" placeholder=" " autocomplete="email" required maxlength="100" {% if form.email.value %}value="{{ form.email.value }}"{% endif %}>
+                                    <input
+                                        type="email"
+                                        class="form-control floating"
+                                        name="email"
+                                        id="id_email"
+                                        placeholder=" "
+                                        autocomplete="email"
+                                        required
+                                        maxlength="100"
+                                        {% if form.email.value %}value="{{ form.email.value }}"{% endif %}
+                                    >
                                     <label class="focus-label">Email</label>
-                                    {% if form.email.errors %}
-                                        <div class="error">{{ form.email.errors.as_text }}</div>
-                                    {% endif %}
+
+                                    {% for error in form.email.errors %}
+                                        <div class="error">{{ error }}</div>
+                                    {% endfor %}
                                 </div>
 
                                 <div class="row form-row">
                                     <div class="col-6">
                                         <div class="form-group form-focus">
-                                            <input type="text" class="form-control floating" name="username" id="id_username" placeholder=" " autocomplete="username" required minlength="4" maxlength="50" pattern="[A-Za-z0-9_]+" {% if form.username.value %}value="{{ form.username.value }}"{% endif %}>
+                                            <input
+                                                type="text"
+                                                class="form-control floating"
+                                                name="username"
+                                                id="id_username"
+                                                placeholder=" "
+                                                autocomplete="username"
+                                                required
+                                                minlength="4"
+                                                maxlength="50"
+                                                pattern="[A-Za-z0-9_]+"
+                                                {% if form.username.value %}value="{{ form.username.value }}"{% endif %}
+                                            >
                                             <label class="focus-label">Username</label>
-                                            {% if form.username.errors %}
-                                                <div class="error">{{ form.username.errors.as_text }}</div>
-                                            {% endif %}
+
+                                            {% for error in form.username.errors %}
+                                                <div class="error">{{ error }}</div>
+                                            {% endfor %}
                                         </div>
                                     </div>
+
                                     <div class="col-6">
                                         <div class="form-group form-focus">
-                                            <input type="tel" class="form-control floating" name="phone_number" id="id_phone_number" placeholder=" " autocomplete="tel" required minlength="7" maxlength="12" pattern="[0-9]{7,12}" {% if form.phone_number.value %}value="{{ form.phone_number.value }}"{% endif %}>
+                                            <input
+                                                type="tel"
+                                                class="form-control floating"
+                                                name="phone_number"
+                                                id="id_phone_number"
+                                                placeholder=" "
+                                                autocomplete="tel"
+                                                required
+                                                minlength="7"
+                                                maxlength="12"
+                                                pattern="[0-9]{7,12}"
+                                                {% if form.phone_number.value %}value="{{ form.phone_number.value }}"{% endif %}
+                                            >
                                             <label class="focus-label">Phone Number</label>
-                                            {% if form.phone_number.errors %}
-                                                <div class="error">{{ form.phone_number.errors.as_text }}</div>
-                                            {% endif %}
+
+                                            {% for error in form.phone_number.errors %}
+                                                <div class="error">{{ error }}</div>
+                                            {% endfor %}
                                         </div>
                                     </div>
                                 </div>
@@ -785,13 +873,23 @@
                                 <div class="row form-row">
                                     <div class="col-6">
                                         <div class="form-group form-focus">
-                                            <input type="password" class="form-control floating" name="password" id="id_password" placeholder=" " autocomplete="new-password" required minlength="8">
+                                            <input
+                                                type="password"
+                                                class="form-control floating"
+                                                name="password"
+                                                id="id_password"
+                                                placeholder=" "
+                                                autocomplete="new-password"
+                                                required
+                                                minlength="8"
+                                            >
                                             <label class="focus-label">Password</label>
-                                            {% if form.password.errors %}
-                                                <div class="error">{{ form.password.errors.as_text }}</div>
-                                            {% endif %}
+
+                                            {% for error in form.password.errors %}
+                                                <div class="error">{{ error }}</div>
+                                            {% endfor %}
                                         </div>
-                                        <!-- Password strength indicator -->
+
                                         <div class="password-strength" id="passwordStrength">
                                             <div class="strength-bar">
                                                 <div class="strength-bar-fill" id="strengthFill"></div>
@@ -799,15 +897,26 @@
                                             <span class="strength-text" id="strengthText">Enter password</span>
                                         </div>
                                     </div>
+
                                     <div class="col-6">
                                         <div class="form-group form-focus">
-                                            <input type="password" class="form-control floating" name="confirm_password" id="id_confirm_password" placeholder=" " autocomplete="new-password" required minlength="8">
+                                            <input
+                                                type="password"
+                                                class="form-control floating"
+                                                name="confirm_password"
+                                                id="id_confirm_password"
+                                                placeholder=" "
+                                                autocomplete="new-password"
+                                                required
+                                                minlength="8"
+                                            >
                                             <label class="focus-label">Confirm Password</label>
-                                            {% if form.confirm_password.errors %}
-                                                <div class="error">{{ form.confirm_password.errors.as_text }}</div>
-                                            {% endif %}
+
+                                            {% for error in form.confirm_password.errors %}
+                                                <div class="error">{{ error }}</div>
+                                            {% endfor %}
                                         </div>
-                                        <!-- Password match indicator -->
+
                                         <div class="password-match" id="matchIndicator" style="display: none;">
                                             <span id="matchIcon"></span>
                                             <span id="matchText"></span>
@@ -818,13 +927,18 @@
                                 <div class="text-right">
                                     <a class="forgot-link" href="{% url 'login' %}">Already have an account?</a>
                                 </div>
-                                <button class="btn btn-primary btn-block btn-lg login-btn" type="submit" id="signupBtn">Signup</button>
+
+                                <button class="btn btn-primary btn-block btn-lg login-btn" type="submit" id="signupBtn">
+                                    Signup
+                                </button>
                             </form>
                             <!-- /Register Form -->
+
                         </div>
                     </div>
                 </div>
                 <!-- /Register Content -->
+
             </div>
         </div>
     </div>
@@ -832,14 +946,13 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Handle floating labels on page load
         const floatingInputs = document.querySelectorAll('.form-focus .form-control');
-        
+
         floatingInputs.forEach(input => {
             if (input.value.trim() !== '') {
                 input.classList.add('filled');
             }
-            
+
             input.addEventListener('input', function() {
                 if (this.value.trim() !== '') {
                     this.classList.add('filled');
@@ -848,8 +961,7 @@
                 }
             });
         });
-        
-        // Password strength checker
+
         const passwordInput = document.getElementById('id_password');
         const strengthFill = document.getElementById('strengthFill');
         const strengthText = document.getElementById('strengthText');
@@ -858,18 +970,18 @@
         const matchIcon = document.getElementById('matchIcon');
         const matchText = document.getElementById('matchText');
         const signupBtn = document.getElementById('signupBtn');
-        
+
         function checkPasswordStrength(password) {
             let strength = 0;
-            
+
             if (password.length >= 8) strength++;
             if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength++;
             if (password.match(/[0-9]/)) strength++;
             if (password.match(/[^a-zA-Z0-9]/)) strength++;
-            
+
             let percentage = (strength / 4) * 100;
             let color, text;
-            
+
             if (password.length === 0) {
                 color = '#e2e8f0';
                 text = 'Enter password';
@@ -887,26 +999,35 @@
                 color = '#059669';
                 text = 'Strong';
             }
-            
-            strengthFill.style.width = percentage + '%';
-            strengthFill.style.backgroundColor = color;
-            strengthText.textContent = text;
-            strengthText.style.color = color;
-            
+
+            if (strengthFill) {
+                strengthFill.style.width = percentage + '%';
+                strengthFill.style.backgroundColor = color;
+            }
+
+            if (strengthText) {
+                strengthText.textContent = text;
+                strengthText.style.color = color;
+            }
+
             return strength;
         }
-        
+
         function checkPasswordMatch() {
+            if (!passwordInput || !confirmInput || !matchIndicator || !matchIcon || !matchText) {
+                return false;
+            }
+
             const password = passwordInput.value;
             const confirm = confirmInput.value;
-            
+
             if (confirm.length === 0) {
                 matchIndicator.style.display = 'none';
                 return false;
             }
-            
+
             matchIndicator.style.display = 'flex';
-            
+
             if (password === confirm && password.length > 0) {
                 matchIcon.innerHTML = '✓';
                 matchText.innerHTML = 'Passwords match';
@@ -921,70 +1042,76 @@
                 return false;
             }
         }
-        
+
         if (passwordInput) {
             passwordInput.addEventListener('input', function() {
                 checkPasswordStrength(this.value);
                 checkPasswordMatch();
             });
         }
-        
+
         if (confirmInput) {
             confirmInput.addEventListener('input', function() {
                 checkPasswordMatch();
             });
         }
-        
-        // Form validation before submit
+
         const registerForm = document.getElementById('registerForm');
+
         if (registerForm) {
             registerForm.addEventListener('submit', function(e) {
                 const password = passwordInput ? passwordInput.value : '';
                 const confirm = confirmInput ? confirmInput.value : '';
-                
+
                 if (password !== confirm) {
                     e.preventDefault();
-                    matchIndicator.style.display = 'flex';
-                    matchIcon.innerHTML = '✗';
-                    matchText.innerHTML = 'Passwords do not match';
-                    matchIcon.style.color = '#dc2626';
-                    matchText.style.color = '#dc2626';
-                    
+
+                    if (matchIndicator && matchIcon && matchText) {
+                        matchIndicator.style.display = 'flex';
+                        matchIcon.innerHTML = '✗';
+                        matchText.innerHTML = 'Passwords do not match';
+                        matchIcon.style.color = '#dc2626';
+                        matchText.style.color = '#dc2626';
+                    }
+
                     if (confirmInput) {
                         confirmInput.style.borderColor = '#dc2626';
                         setTimeout(() => {
                             confirmInput.style.borderColor = '';
                         }, 2000);
                     }
+
                     return false;
                 }
-                
-                if (password.length > 0 && password.length < 6) {
+
+                if (password.length > 0 && password.length < 8) {
                     e.preventDefault();
+
                     if (passwordInput) {
                         passwordInput.style.borderColor = '#dc2626';
                         setTimeout(() => {
                             passwordInput.style.borderColor = '';
                         }, 2000);
                     }
+
                     return false;
                 }
             });
         }
-        
-        // Add ripple effect on button click
+
         if (signupBtn) {
             signupBtn.addEventListener('click', function(e) {
                 let ripple = document.createElement('span');
                 ripple.classList.add('ripple');
                 this.appendChild(ripple);
-                
-                let x = e.clientX - e.target.offsetLeft;
-                let y = e.clientY - e.target.offsetTop;
-                
+
+                let rect = this.getBoundingClientRect();
+                let x = e.clientX - rect.left;
+                let y = e.clientY - rect.top;
+
                 ripple.style.left = `${x}px`;
                 ripple.style.top = `${y}px`;
-                
+
                 setTimeout(() => {
                     ripple.remove();
                 }, 600);
@@ -992,9 +1119,7 @@
         }
     });
 </script>
-<script src="{% static 'js/auth-validation.js' %}"></script>
 
-<br>
-<!-- /Page Content -->
+<script src="{% static 'js/auth-validation.js' %}"></script>
 
 {% endblock %}

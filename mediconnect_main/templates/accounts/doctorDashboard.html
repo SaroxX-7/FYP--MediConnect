@@ -66,7 +66,9 @@
     justify-content: center;
 }
 
-.circle-bar1, .circle-bar2, .circle-bar3 {
+.circle-bar1,
+.circle-bar2,
+.circle-bar3 {
     background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
     border-radius: 50%;
     width: 70px;
@@ -344,6 +346,7 @@ h4.mb-4::before {
     padding: 0.85rem 0.75rem;
 }
 
+/* Floating chat launcher */
 .chat-launcher {
     position: fixed;
     bottom: 24px;
@@ -354,10 +357,10 @@ h4.mb-4::before {
     padding: 0;
     background: transparent;
     box-shadow: none;
-    z-index: 1050;
+    z-index: 999999;
     cursor: pointer;
     display: none;
-    overflow: visible;
+    overflow: visible !important;
 }
 
 .chat-launcher-image-wrap {
@@ -368,7 +371,6 @@ h4.mb-4::before {
     display: block;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    position: relative;
 }
 
 .chat-launcher img {
@@ -379,20 +381,23 @@ h4.mb-4::before {
 
 .chat-launcher-badge {
     position: absolute;
-    top: -5px;
-    right: -5px;
-    min-width: 22px;
-    height: 22px;
+    top: -8px;
+    right: -8px;
+    min-width: 24px;
+    height: 24px;
     padding: 0 6px;
     border-radius: 999px;
     background: #ef4444;
     color: #fff;
-    font-size: 11px;
-    font-weight: 700;
+    font-size: 12px;
+    font-weight: 800;
     display: none;
     align-items: center;
     justify-content: center;
     border: 2px solid #fff;
+    z-index: 1000000;
+    line-height: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
 }
 
 .chat-widget {
@@ -406,7 +411,7 @@ h4.mb-4::before {
     border-radius: 20px;
     box-shadow: 0 20px 40px rgba(0,0,0,0.15);
     overflow: hidden;
-    z-index: 1051;
+    z-index: 999998;
     display: none;
     flex-direction: column;
 }
@@ -587,6 +592,18 @@ h4.mb-4::before {
     .table-action {
         flex-direction: column;
     }
+
+    .chat-launcher {
+        right: 14px;
+        bottom: 14px;
+    }
+
+    .chat-widget {
+        right: 12px;
+        bottom: 88px;
+        width: calc(100vw - 24px);
+        height: 70vh;
+    }
 }
 </style>
 
@@ -671,10 +688,12 @@ h4.mb-4::before {
                                                 <th class="text-center">Actions</th>
                                             </tr>
                                         </thead>
+
                                         <tbody>
                                             {% for group in grouped_appointments %}
                                             {% with patient=group.patient latest_appointment=group.appointments.0 %}
                                             {% with appointment_date=latest_appointment.appointment_date|date:"Y-m-d" %}
+
                                             <tr class="group-summary-row {% if latest_appointment.appointment_status == 'pending' and appointment_date < now|date:'Y-m-d' %}missed{% endif %}">
                                                 <td>
                                                     <h2 class="table-avatar">
@@ -727,8 +746,7 @@ h4.mb-4::before {
                                                         <button
                                                             class="btn btn-sm bg-primary-light dropdown-toggle-btn"
                                                             type="button"
-                                                            data-toggle-target="appointments-{{ patient.id }}"
-                                                        >
+                                                            data-toggle-target="appointments-{{ patient.id }}">
                                                             <i class="fas fa-chevron-down"></i> View All
                                                         </button>
 
@@ -758,9 +776,11 @@ h4.mb-4::before {
                                                                         <th class="text-center">Actions</th>
                                                                     </tr>
                                                                 </thead>
+
                                                                 <tbody>
                                                                     {% for appointment in group.appointments %}
                                                                     {% with nested_date=appointment.appointment_date|date:"Y-m-d" %}
+
                                                                     <tr {% if appointment.appointment_status == "pending" and nested_date < now|date:"Y-m-d" %}class="missed"{% endif %}>
                                                                         <td>{{ forloop.counter }}</td>
 
@@ -819,6 +839,7 @@ h4.mb-4::before {
                                                                             </div>
                                                                         </td>
                                                                     </tr>
+
                                                                     {% endwith %}
                                                                     {% endfor %}
                                                                 </tbody>
@@ -827,19 +848,22 @@ h4.mb-4::before {
                                                     </div>
                                                 </td>
                                             </tr>
-                                            {% endwith %}
-                                            {% endwith %}
 
+                                            {% endwith %}
+                                            {% endwith %}
                                             {% empty %}
+
                                             <tr>
                                                 <td colspan="6" class="text-center">No appointments available</td>
                                             </tr>
+
                                             {% endfor %}
                                         </tbody>
                                     </table>
                                 </div>
                             </div>
                         </div>
+
                     </div>
                 </div>
             </div>
@@ -850,8 +874,9 @@ h4.mb-4::before {
 <button id="chat-launcher" class="chat-launcher" type="button" aria-label="Open chat">
     <div class="chat-launcher-image-wrap">
         <img id="chat-launcher-image" src="{% static 'img/favicon.png' %}" alt="Chat User">
-        <span id="chat-launcher-badge" class="chat-launcher-badge"></span>
     </div>
+
+    <span id="chat-launcher-badge" class="chat-launcher-badge">0</span>
 </button>
 
 <div id="chat-widget" class="chat-widget">
@@ -863,6 +888,7 @@ h4.mb-4::before {
                 <div class="chat-widget-user-subtitle">Appointment chat</div>
             </div>
         </div>
+
         <button id="chat-minimize-btn" class="chat-widget-action-btn" type="button">−</button>
     </div>
 
@@ -920,6 +946,7 @@ h4.mb-4::before {
             chatLauncherBadge.textContent = unreadCount > 99 ? '99+' : unreadCount;
         } else {
             chatLauncherBadge.style.display = 'none';
+            chatLauncherBadge.textContent = '0';
         }
     }
 
@@ -1028,7 +1055,9 @@ h4.mb-4::before {
         chatSocket = new WebSocket(protocol + window.location.host + '/ws/chat/' + conversationId + '/');
 
         chatSocket.onopen = function() {
-            chatSocket.send(JSON.stringify({ action: 'mark_seen' }));
+            if (widgetOpen) {
+                chatSocket.send(JSON.stringify({ action: 'mark_seen' }));
+            }
         };
 
         chatSocket.onmessage = function(e) {
@@ -1036,6 +1065,7 @@ h4.mb-4::before {
 
             if (data.event_type === 'message') {
                 const empty = chatLog.querySelector('.chat-empty');
+
                 if (empty) {
                     empty.remove();
                 }
@@ -1088,6 +1118,9 @@ h4.mb-4::before {
         chatHeaderImage.src = data.other_user_image || otherImage;
         chatLauncherImage.src = data.other_user_image || otherImage;
 
+        unreadCount = 0;
+        updateLauncherBadge();
+
         chatLauncher.style.display = 'block';
 
         await loadMessages(currentConversationId);
@@ -1097,6 +1130,7 @@ h4.mb-4::before {
 
     function preloadExistingConversation() {
         const existingButton = document.querySelector('.start-chat-btn[data-has-conversation="1"]');
+
         if (!existingButton) return;
 
         currentConversationId = existingButton.dataset.conversationId;
@@ -1107,6 +1141,7 @@ h4.mb-4::before {
 
         loadMessages(currentConversationId);
         connectSocket(currentConversationId);
+        updateLauncherBadge();
     }
 
     startChatButtons.forEach(function(button) {
