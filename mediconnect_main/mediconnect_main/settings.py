@@ -134,11 +134,21 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Kathmandu'
 
 USE_I18N = True
 
 USE_TZ = True
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'mediconnect-email-verification-cache',
+    }
+}
+
+EMAIL_VERIFICATION_CODE_TIMEOUT = 600  # 10 minutes
+EMAIL_VERIFICATION_MAX_ATTEMPTS = 5
 
 
 # Static files (CSS, JavaScript, Images)
@@ -278,7 +288,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Internationalization
 LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Kathmandu'
 USE_I18N = True
 USE_TZ = True
 

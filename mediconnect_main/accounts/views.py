@@ -3,8 +3,8 @@ from collections import OrderedDict
 from django.contrib.auth import authenticate
 from django.http.response import HttpResponse
 from django.shortcuts import redirect, render
-from django.utils.http import urlsafe_base64_decode
-
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from django.utils.encoding import force_bytes
 from appointment.models import Appointment
 from doctor.forms import DoctorForm
 from django.contrib.auth.tokens import default_token_generator
@@ -14,9 +14,20 @@ from doctor.models import Doctor
 from .forms import LoginForm, UserForm
 from .models import User, UserProfile
 from django.contrib import messages, auth
-from .utils import detectUser, send_verification_email
-from django.contrib.auth.decorators import login_required, user_passes_test
+from .utils import (
+    detectUser,
+    send_verification_email,
+    send_account_verification_code_email,
+    get_account_verification_cache_keys,
+    delete_account_verification_cache,
+    send_password_reset_code_email,
+    get_password_reset_cache_keys,
+    delete_password_reset_cache,
 
+)
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.conf import settings
+from django.core.cache import cache
 from django.core.exceptions import PermissionDenied
 
 
@@ -65,12 +76,13 @@ def registerUser(request):
             user.role = User.CUSTOMER
             user.save()
 
-            mail_subject = 'Please activate your account'
-            email_template = 'accounts/email/account_verification_email.html'
-            send_verification_email(request, user, mail_subject, email_template)
+            send_account_verification_code_email(request, user)
 
-            messages.success(request, 'Your account has been registered sucessfully!')
-            return redirect('registerUser')
+            uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
+
+            messages.success(request, 'Your account has been registered successfully. Verification code has been sent to your email.')
+            return redirect('verify_email_code', uidb64=uidb64)
+        
         else:
             print('invalid form')
             print(form.errors)
@@ -113,13 +125,12 @@ def registerDoctor(request):
             vendor.user_profile = user_profile
             vendor.save()
 
-            mail_subject = 'Please activate your account'
-            email_template = 'accounts/email/account_verification_email.html'
-            print("sending activation mail")
-            send_verification_email(request, user, mail_subject, email_template)
+            send_account_verification_code_email(request, user)
 
-            messages.success(request, 'Activation mail has been sent. Please activate your account.')
-            return redirect('login')
+            uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
+
+            messages.success(request, 'Verification code has been sent to your email. Please verify your account.')
+            return redirect('verify_email_code', uidb64=uidb64)
         else:
             print('invalid form')
             print(form.errors)
@@ -159,12 +170,12 @@ def registerPharmacist(request):
             user.role = User.PHARMACIST
             user.save()
 
-            mail_subject = 'Please activate your account'
-            email_template = 'accounts/email/account_verification_email.html'
-            send_verification_email(request, user, mail_subject, email_template)
+            send_account_verification_code_email(request, user)
 
-            messages.success(request, 'Activation mail has been sent. Please activate your account.')
-            return redirect('login')
+            uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
+
+            messages.success(request, 'Verification code has been sent to your email. Please verify your account.')
+            return redirect('verify_email_code', uidb64=uidb64)
         else:
             print('invalid form')
             print(form.errors)
@@ -348,24 +359,91 @@ def doctorDashboard(request):
 
     return render(request, 'accounts/doctorDashboard.html', context)
 
-
 def forgot_password(request):
     if request.method == 'POST':
-        email = request.POST['email']
+        email = request.POST.get('email', '').strip()
 
         if User.objects.filter(email=email).exists():
             user = User.objects.get(email__exact=email)
 
-            mail_subject = 'Reset Your Password'
-            email_template = 'accounts/email/reset_password_email.html'
-            send_verification_email(request, user, mail_subject, email_template)
+            send_password_reset_code_email(request, user)
 
-            messages.success(request, 'Password reset link has been sent to your email address.')
-            return redirect('login')
+            uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
+
+            messages.success(request, 'Password reset code has been sent to your email address.')
+            return redirect('verify_forgot_password_code', uidb64=uidb64)
+
         else:
-            messages.error(request, 'Account does not exist')
+            messages.error(request, 'Account does not exist.')
             return redirect('forgot_password')
+
     return render(request, 'accounts/forgot_password.html')
+
+def verify_forgot_password_code(request, uidb64):
+    try:
+        uid = urlsafe_base64_decode(uidb64).decode()
+        user = User._default_manager.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+
+    if user is None:
+        messages.error(request, 'Invalid verification request.')
+        return redirect('forgot_password')
+
+    code_key, attempts_key = get_password_reset_cache_keys(user.pk)
+    cached_code = cache.get(code_key)
+
+    if request.method == 'POST':
+        entered_code = request.POST.get('verification_code', '').strip()
+
+        if not entered_code:
+            messages.error(request, 'Please enter the verification code.')
+            return redirect('verify_forgot_password_code', uidb64=uidb64)
+
+        if not entered_code.isdigit() or len(entered_code) != 6:
+            messages.error(request, 'Verification code must be 6 digits.')
+            return redirect('verify_forgot_password_code', uidb64=uidb64)
+
+        if cached_code is None:
+            messages.error(request, 'Verification code expired. Please request a new code.')
+            return redirect('forgot_password')
+
+        attempts = cache.get(attempts_key, 0)
+        max_attempts = getattr(settings, 'EMAIL_VERIFICATION_MAX_ATTEMPTS', 5)
+        timeout = getattr(settings, 'EMAIL_VERIFICATION_CODE_TIMEOUT', 600)
+
+        if attempts >= max_attempts:
+            delete_password_reset_cache(user.pk)
+            messages.error(request, 'Too many wrong attempts. Please request a new code.')
+            return redirect('forgot_password')
+
+        if entered_code == str(cached_code):
+            request.session['uid'] = str(user.pk)
+
+            delete_password_reset_cache(user.pk)
+
+            messages.success(request, 'Code verified. Please enter your new password.')
+            return redirect('reset_password')
+
+        attempts += 1
+
+        if attempts >= max_attempts:
+            delete_password_reset_cache(user.pk)
+            messages.error(request, 'Too many wrong attempts. Please request a new code.')
+            return redirect('forgot_password')
+
+        cache.set(attempts_key, attempts, timeout)
+        remaining_attempts = max_attempts - attempts
+        messages.error(request, f'Invalid code. You have {remaining_attempts} attempt(s) left.')
+        return redirect('verify_forgot_password_code', uidb64=uidb64)
+
+    context = {
+        'uidb64': uidb64,
+        'user_obj': user,
+        'code_expired': cached_code is None,
+    }
+
+    return render(request, 'accounts/verify_forgot_password_code.html', context)
 
 
 def reset_password_validate(request, uidb64, token):
@@ -438,3 +516,99 @@ def change_password(request):
 
 def change_password_view(request):
     return redirect('change_password')
+
+def verify_email_code(request, uidb64):
+    try:
+        uid = urlsafe_base64_decode(uidb64).decode()
+        user = User._default_manager.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+
+    if user is None:
+        messages.error(request, 'Invalid verification request.')
+        return redirect('login')
+
+    if user.is_active:
+        messages.info(request, 'Your account is already verified. Please login.')
+        return redirect('login')
+
+    code_key, attempts_key = get_account_verification_cache_keys(user.pk)
+    cached_code = cache.get(code_key)
+
+    if request.method == 'POST':
+        entered_code = request.POST.get('verification_code', '').strip()
+
+        if not entered_code:
+            messages.error(request, 'Please enter the verification code.')
+            return redirect('verify_email_code', uidb64=uidb64)
+
+        if not entered_code.isdigit() or len(entered_code) != 6:
+            messages.error(request, 'Verification code must be 6 digits.')
+            return redirect('verify_email_code', uidb64=uidb64)
+
+        if cached_code is None:
+            messages.error(request, 'Verification code expired. Please resend a new code.')
+            return redirect('verify_email_code', uidb64=uidb64)
+
+        attempts = cache.get(attempts_key, 0)
+        max_attempts = getattr(settings, 'EMAIL_VERIFICATION_MAX_ATTEMPTS', 5)
+        timeout = getattr(settings, 'EMAIL_VERIFICATION_CODE_TIMEOUT', 600)
+
+        if attempts >= max_attempts:
+            delete_account_verification_cache(user.pk)
+            messages.error(request, 'Too many wrong attempts. Please resend a new code.')
+            return redirect('verify_email_code', uidb64=uidb64)
+
+        if entered_code == str(cached_code):
+            user.is_active = True
+            user.save(update_fields=['is_active'])
+
+            delete_account_verification_cache(user.pk)
+
+            if user.role == User.CUSTOMER:
+                messages.success(request, 'Congratulations! Your account has been verified. Please login.')
+            else:
+                messages.success(request, 'Congratulations! Your account has been verified. Please wait for admin approval.')
+
+            return redirect('login')
+
+        attempts += 1
+
+        if attempts >= max_attempts:
+            delete_account_verification_cache(user.pk)
+            messages.error(request, 'Too many wrong attempts. Please resend a new code.')
+        else:
+            cache.set(attempts_key, attempts, timeout)
+            remaining_attempts = max_attempts - attempts
+            messages.error(request, f'Invalid code. You have {remaining_attempts} attempt(s) left.')
+
+        return redirect('verify_email_code', uidb64=uidb64)
+
+    context = {
+        'user_obj': user,
+        'uidb64': uidb64,
+        'code_expired': cached_code is None,
+    }
+
+    return render(request, 'accounts/verify_email_code.html', context)
+
+
+def resend_verification_code(request, uidb64):
+    try:
+        uid = urlsafe_base64_decode(uidb64).decode()
+        user = User._default_manager.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+
+    if user is None:
+        messages.error(request, 'Invalid verification request.')
+        return redirect('login')
+
+    if user.is_active:
+        messages.info(request, 'Your account is already verified. Please login.')
+        return redirect('login')
+
+    send_account_verification_code_email(request, user)
+
+    messages.success(request, 'A new verification code has been sent to your email.')
+    return redirect('verify_email_code', uidb64=uidb64)

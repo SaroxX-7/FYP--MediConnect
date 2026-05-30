@@ -75,9 +75,9 @@ def conversation_messages(request, conversation_id):
             'sender_id': message.sender.id,
             'sender_name': f"{message.sender.first_name} {message.sender.last_name}",
             'sender_email': message.sender.email,
-            'created_at': message.created_at.strftime("%d %b %Y, %I:%M %p"),
             'is_read': message.is_read,
-            'read_at': message.read_at.strftime("%d %b %Y, %I:%M %p") if message.read_at else '',
+            'created_at': timezone.localtime(message.created_at).strftime("%d %b %Y, %I:%M %p"),
+            'read_at': timezone.localtime(message.read_at).strftime("%d %b %Y, %I:%M %p") if message.read_at else '',
         })
 
     return JsonResponse({'messages': data}) 

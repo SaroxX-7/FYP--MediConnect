@@ -74,13 +74,23 @@
     }
 
     @keyframes floatOne {
-        0%, 100% { transform: translate(0, 0) scale(1); }
-        50% { transform: translate(40px, 25px) scale(1.1); }
+        0%, 100% {
+            transform: translate(0, 0) scale(1);
+        }
+
+        50% {
+            transform: translate(40px, 25px) scale(1.1);
+        }
     }
 
     @keyframes floatTwo {
-        0%, 100% { transform: translate(0, 0) scale(1); }
-        50% { transform: translate(-35px, -20px) scale(1.08); }
+        0%, 100% {
+            transform: translate(0, 0) scale(1);
+        }
+
+        50% {
+            transform: translate(-35px, -20px) scale(1.08);
+        }
     }
 
     .account-content {
@@ -163,8 +173,15 @@
     }
 
     @keyframes expandWidth {
-        from { width: 0; opacity: 0; }
-        to { width: 70px; opacity: 1; }
+        from {
+            width: 0;
+            opacity: 0;
+        }
+
+        to {
+            width: 70px;
+            opacity: 1;
+        }
     }
 
     /* ========== CLEAR ERROR DISPLAY FIX ========== */
@@ -250,6 +267,7 @@
             opacity: 0;
             transform: translateY(-12px);
         }
+
         to {
             opacity: 1;
             transform: translateY(0);
@@ -368,8 +386,9 @@
 
     .text-right {
         text-align: right;
-        margin-top: -4px;
-        margin-bottom: 26px;
+        margin-top: 12px;
+        margin-bottom: 28px;
+        clear: both;
     }
 
     .forgot-link {
@@ -488,14 +507,28 @@
         }
     }
 
+    /* ========== PASSWORD OVERLAP FIX ========== */
+
+    .password-row {
+        align-items: flex-start;
+        margin-bottom: 18px;
+    }
+
+    .password-row .form-group {
+        margin-bottom: 0;
+    }
+
     .password-strength {
-        margin-top: -12px;
-        margin-bottom: 20px;
+        margin-top: 10px;
+        margin-bottom: 0;
+        min-height: 24px;
         font-size: 0.75rem;
         display: flex;
         align-items: center;
         gap: 8px;
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
+        position: relative;
+        z-index: 1;
     }
 
     .strength-bar {
@@ -504,7 +537,7 @@
         background: #e2e8f0;
         border-radius: 4px;
         overflow: hidden;
-        min-width: 80px;
+        min-width: 90px;
     }
 
     .strength-bar-fill {
@@ -516,17 +549,22 @@
 
     .strength-text {
         color: var(--text-muted);
-        font-weight: 600;
+        font-weight: 700;
+        white-space: nowrap;
     }
 
     .password-match {
-        margin-top: -12px;
-        margin-bottom: 20px;
+        margin-top: 10px;
+        margin-bottom: 0;
+        min-height: 24px;
         font-size: 0.75rem;
         display: flex;
         align-items: center;
         gap: 6px;
-        font-weight: 600;
+        font-weight: 700;
+        position: relative;
+        z-index: 1;
+        white-space: normal;
     }
 
     .match-success {
@@ -542,6 +580,7 @@
             opacity: 0;
             transform: translateX(-40px);
         }
+
         to {
             opacity: 1;
             transform: translateX(0);
@@ -553,6 +592,7 @@
             opacity: 0;
             transform: translateX(40px);
         }
+
         to {
             opacity: 1;
             transform: translateX(0);
@@ -649,7 +689,12 @@
 
         .password-strength,
         .password-match {
-            margin-top: -8px;
+            margin-top: 8px;
+            margin-bottom: 14px;
+        }
+
+        .password-row {
+            margin-bottom: 8px;
         }
     }
 
@@ -681,6 +726,10 @@
             margin-bottom: 18px;
         }
 
+        .password-row .form-group {
+            margin-bottom: 0;
+        }
+
         .form-focus .form-control {
             height: 52px;
             padding: 18px 14px 6px;
@@ -700,6 +749,7 @@
         }
 
         .text-right {
+            margin-top: 8px;
             margin-bottom: 20px;
         }
 
@@ -938,7 +988,7 @@
                                     </div>
                                 </div>
 
-                                <div class="row form-row">
+                                <div class="row form-row password-row">
                                     <div class="col-6">
                                         <div class="form-group form-focus {% if form.password.errors %}has-error{% endif %}">
                                             <input
@@ -1358,6 +1408,7 @@
         }
 
         const firstVisibleError = document.querySelector('.error-message, .form-focus.has-error .field-error');
+
         if (firstVisibleError) {
             setTimeout(() => {
                 firstVisibleError.scrollIntoView({

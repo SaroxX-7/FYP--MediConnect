@@ -47,6 +47,12 @@ class ChatConsumer(WebsocketConsumer):
             self.channel_name
         )
 
+    def format_datetime(self, dt):
+        if not dt:
+            return ""
+
+        return timezone.localtime(dt).strftime("%d %b %Y, %I:%M %p")
+
     def receive(self, text_data):
         if not self.user.is_authenticated:
             return
@@ -74,7 +80,10 @@ class ChatConsumer(WebsocketConsumer):
                     "message": message.text,
                     "sender_email": self.user.email,
                     "sender_id": self.user.id,
-                    "created_at": message.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+
+                    # Uses TIME_ZONE from settings.py
+                    "created_at": self.format_datetime(message.created_at),
+
                     "is_read": message.is_read,
                     "read_at": "",
                 }
@@ -107,7 +116,9 @@ class ChatConsumer(WebsocketConsumer):
                 "type": "seen_update",
                 "message_ids": unread_ids,
                 "seen_by_user_id": self.user.id,
-                "read_at": seen_time.strftime("%Y-%m-%d %H:%M:%S"),
+
+                # Uses TIME_ZONE from settings.py
+                "read_at": self.format_datetime(seen_time),
             }
         )
 

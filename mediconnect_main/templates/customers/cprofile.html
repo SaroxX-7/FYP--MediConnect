@@ -3,342 +3,466 @@
     {% load static %}
 
     <style>
-        /* ========== PROFILE SETTINGS PAGE - MODERN STYLING ========== */
-        
-        /* Breadcrumb Styling */
+        /* =========================================================
+           CUSTOMER PROFILE PAGE
+           Scoped CSS only for this page
+           ========================================================= */
+
+        /* ---------- Design Tokens ---------- */
+        .customer-profile-page {
+            --primary: #2554d8;
+            --primary-dark: #1d3fa9;
+            --primary-soft: rgba(37, 84, 216, 0.12);
+            --accent: #00d4a6;
+            --surface: #ffffff;
+            --page-bg: #f8fafc;
+            --text: #1e293b;
+            --muted-text: #64748b;
+            --input-bg: #ffffff;
+            --readonly-bg: #f1f5f9;
+            --border: #dbe5f0;
+            --border-strong: #cbd5e1;
+            --danger: #ef4444;
+            --success: #10b981;
+            --radius-lg: 26px;
+            --radius-md: 16px;
+            --radius-pill: 999px;
+            --shadow-card: 0 18px 45px rgba(15, 23, 42, 0.08);
+            --shadow-card-hover: 0 24px 60px rgba(15, 23, 42, 0.12);
+
+            padding: 42px 0;
+            background: var(--page-bg);
+            min-height: calc(100vh - 100px);
+        }
+
+        /* ---------- Optional Breadcrumb ---------- */
         .breadcrumb-bar {
-            background: linear-gradient(135deg, #0f2b3d 0%, #1a4a6f 100%);
-            padding: 2rem 0;
             position: relative;
             overflow: hidden;
+            padding: 32px 0;
+            background: linear-gradient(135deg, #0f2b3d 0%, #1a4a6f 100%);
         }
-        
-        .breadcrumb-bar::before {
-            content: '';
+
+        .breadcrumb-bar::before,
+        .breadcrumb-bar::after {
+            content: "";
             position: absolute;
-            top: -50%;
-            right: -20%;
+            border-radius: 50%;
+            pointer-events: none;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .breadcrumb-bar::before {
+            top: -120px;
+            right: -80px;
             width: 300px;
             height: 300px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 50%;
-            pointer-events: none;
         }
-        
+
         .breadcrumb-bar::after {
-            content: '';
-            position: absolute;
-            bottom: -30%;
-            left: -10%;
-            width: 250px;
-            height: 250px;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 50%;
-            pointer-events: none;
+            bottom: -100px;
+            left: -70px;
+            width: 240px;
+            height: 240px;
+            background: rgba(255, 255, 255, 0.035);
         }
-        
+
         .page-breadcrumb .breadcrumb {
-            background: transparent;
+            margin-bottom: 8px;
             padding: 0;
-            margin-bottom: 0.5rem;
+            background: transparent;
         }
-        
+
         .page-breadcrumb .breadcrumb-item a {
-            color: rgba(255, 255, 255, 0.8);
+            color: rgba(255, 255, 255, 0.78);
             text-decoration: none;
             transition: color 0.2s ease;
         }
-        
-        .page-breadcrumb .breadcrumb-item a:hover {
-            color: white;
-        }
-        
+
+        .page-breadcrumb .breadcrumb-item a:hover,
         .page-breadcrumb .breadcrumb-item.active {
-            color: white;
+            color: #ffffff;
         }
-        
+
         .breadcrumb-title {
-            color: white;
-            font-size: 1.75rem;
-            font-weight: 700;
             margin: 0;
-            letter-spacing: -0.3px;
+            color: #ffffff;
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.4px;
         }
-        
-        /* Main Content Area */
-        .content {
-            padding: 2.5rem 0;
-            background: #f8fafc;
-            min-height: calc(100vh - 200px);
+
+        /* ---------- Layout ---------- */
+        .customer-profile-page .container-fluid {
+            max-width: 1480px;
         }
-        
-        /* Card Styling */
-        .card {
-            border: none;
-            border-radius: 24px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
-            transition: all 0.3s ease;
+
+        .customer-profile-page .profile-settings-card {
             overflow: hidden;
+            border: 0;
+            border-radius: var(--radius-lg);
+            background: var(--surface);
+            box-shadow: var(--shadow-card);
+            animation: profileFadeIn 0.35s ease-out;
+            transition: box-shadow 0.25s ease, transform 0.25s ease;
         }
-        
-        .card:hover {
-            box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.1);
+
+        .customer-profile-page .profile-settings-card:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-card-hover);
         }
-        
-        .card-body {
-            padding: 2rem;
+
+        .customer-profile-page .card-body {
+            padding: 38px 36px;
         }
-        
-        /* Form Styling */
-        .form-row {
-            display: flex;
-            flex-wrap: wrap;
-            margin-right: -10px;
-            margin-left: -10px;
+
+        .customer-profile-page .form-row {
+            row-gap: 4px;
         }
-        
-        .form-group {
-            margin-bottom: 1.5rem;
-            position: relative;
+
+        /* ---------- Avatar Upload ---------- */
+        .customer-profile-page .avatar-block {
+            margin-bottom: 12px;
         }
-        
-        .form-group label {
-            font-weight: 600;
-            color: #1e293b;
-            margin-bottom: 0.5rem;
-            font-size: 0.875rem;
-            letter-spacing: -0.2px;
-            display: block;
-        }
-        
-        .form-group label .text-danger {
-            color: #ef4444;
-            margin-left: 2px;
-        }
-        
-        .form-control, select.form-control {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            font-size: 0.9375rem;
-            font-weight: 400;
-            line-height: 1.5;
-            color: #1e293b;
-            background-color: #ffffff;
-            background-clip: padding-box;
-            border: 1.5px solid #e2e8f0;
-            border-radius: 14px;
-            transition: all 0.2s ease;
-            font-family: inherit;
-        }
-        
-        .form-control:focus, select.form-control:focus {
-            border-color: #2563eb;
-            outline: 0;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
-        
-        .form-control[readonly] {
-            background-color: #f8fafc;
-            cursor: not-allowed;
-        }
-        
-        /* Error Styling */
-        .error {
-            color: #dc2626;
-            font-size: 0.75rem;
-            margin-top: 0.375rem;
-            display: block;
-        }
-        
-        /* Avatar Upload Section */
-        .change-avatar {
+
+        .customer-profile-page .change-avatar {
             display: flex;
             align-items: center;
-            gap: 1.5rem;
+            gap: 34px;
             flex-wrap: wrap;
-            margin-bottom: 1rem;
         }
-        
-        .profile-img {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
+
+        .customer-profile-page .profile-img {
+            width: 124px;
+            height: 124px;
+            flex: 0 0 124px;
             overflow: hidden;
+            border-radius: 50%;
             background: #f1f5f9;
-            border: 3px solid #e2e8f0;
-            transition: all 0.3s ease;
+            border: 4px solid #e7eef7;
+            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);
         }
-        
-        .profile-img img {
+
+        .customer-profile-page .profile-img img {
             width: 100%;
             height: 100%;
+            display: block;
             object-fit: cover;
         }
-        
-        .upload-img {
-            flex: 1;
+
+        .customer-profile-page .upload-img {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 12px;
+            min-width: 220px;
         }
-        
-        .change-photo-btn {
-            display: inline-block;
-            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
-            color: white;
-            padding: 0.625rem 1.25rem;
-            border-radius: 40px;
-            font-size: 0.875rem;
-            font-weight: 500;
+
+        .customer-profile-page .change-photo-btn {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 190px;
+            min-height: 58px;
+            padding: 0;
+            border: 0;
+            border-radius: var(--radius-pill);
+            color: #ffffff;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            box-shadow: 0 10px 22px rgba(37, 84, 216, 0.24);
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .customer-profile-page .change-photo-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 28px rgba(37, 84, 216, 0.32);
+        }
+
+        .customer-profile-page .change-photo-btn label {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .customer-profile-page .change-photo-btn span {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            min-height: 58px;
+            padding: 0 24px;
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: 700;
+            line-height: 1.2;
             text-align: center;
-            border: none;
         }
-        
-        .change-photo-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3);
+
+        .customer-profile-page .change-photo-btn i {
+            font-size: 16px;
         }
-        
-        .change-photo-btn span {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+
+        .customer-profile-page .upload-img input[name="profile_picture"] {
+            position: absolute !important;
+            width: 1px !important;
+            height: 1px !important;
+            padding: 0 !important;
+            margin: -1px !important;
+            overflow: hidden !important;
+            clip: rect(0, 0, 0, 0) !important;
+            white-space: nowrap !important;
+            border: 0 !important;
         }
-        
-        .change-photo-btn span i {
-            font-size: 0.875rem;
+
+        .customer-profile-page .form-text {
+            margin: 0;
+            color: var(--muted-text);
+            font-size: 13px;
+            line-height: 1.4;
         }
-        
-        .form-text {
-            font-size: 0.7rem;
-            color: #64748b;
-            margin-top: 0.5rem;
+
+        /* ---------- Form Fields ---------- */
+        .customer-profile-page .form-group {
+            position: relative;
+            margin-bottom: 24px;
+        }
+
+        .customer-profile-page .form-group label {
             display: block;
+            margin-bottom: 10px;
+            color: var(--text);
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: -0.2px;
         }
-        
-        /* Submit Button */
-        .submit-section {
-            margin-top: 1.5rem;
-            text-align: right;
+
+        .customer-profile-page .text-danger {
+            color: var(--danger) !important;
         }
-        
-        .submit-btn {
-            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
-            color: white;
-            border: none;
-            padding: 0.75rem 2rem;
-            font-size: 0.9375rem;
-            font-weight: 600;
-            border-radius: 40px;
+
+        .customer-profile-page .form-control,
+        .customer-profile-page .form-group input:not([type="file"]),
+        .customer-profile-page .form-group select,
+        .customer-profile-page .form-group textarea {
+            width: 100%;
+            min-height: 58px;
+            padding: 14px 20px;
+            color: var(--text);
+            background-color: var(--input-bg);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-md);
+            outline: 0;
+            box-shadow: none;
+            font-family: inherit;
+            font-size: 16px;
+            font-weight: 500;
+            line-height: 1.45;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+        }
+
+        .customer-profile-page .form-group textarea {
+            min-height: 58px;
+            resize: vertical;
+        }
+
+        .customer-profile-page .form-control:hover,
+        .customer-profile-page .form-group input:not([type="file"]):hover,
+        .customer-profile-page .form-group select:hover,
+        .customer-profile-page .form-group textarea:hover {
+            border-color: var(--border-strong);
+        }
+
+        .customer-profile-page .form-control:focus,
+        .customer-profile-page .form-group input:not([type="file"]):focus,
+        .customer-profile-page .form-group select:focus,
+        .customer-profile-page .form-group textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-soft);
+        }
+
+        .customer-profile-page .form-control::placeholder,
+        .customer-profile-page .form-group input::placeholder,
+        .customer-profile-page .form-group textarea::placeholder {
+            color: #94a3b8;
+        }
+
+        .customer-profile-page .form-control:disabled,
+        .customer-profile-page .form-control[readonly],
+        .customer-profile-page .form-group input:disabled,
+        .customer-profile-page .form-group input[readonly],
+        .customer-profile-page .form-group textarea:disabled,
+        .customer-profile-page .form-group textarea[readonly] {
+            color: #475569;
+            background-color: var(--readonly-bg);
+            cursor: not-allowed;
+            opacity: 1;
+        }
+
+        .customer-profile-page select.form-control,
+        .customer-profile-page .form-group select {
+            padding-right: 48px;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%2364748b' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.8' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 18px center;
+            background-size: 18px;
+        }
+
+        .customer-profile-page input[type="date"]::-webkit-calendar-picker-indicator {
             cursor: pointer;
-            transition: all 0.2s ease;
+            opacity: 0.8;
+        }
+
+        .customer-profile-page input[type="number"]::-webkit-inner-spin-button,
+        .customer-profile-page input[type="number"]::-webkit-outer-spin-button {
+            margin: 0;
+            -webkit-appearance: none;
+        }
+
+        /* ---------- Validation ---------- */
+        .customer-profile-page .error {
+            display: block;
+            margin-top: 7px;
+            color: #dc2626;
+            font-size: 13px;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .customer-profile-page .form-control.is-invalid {
+            border-color: var(--danger);
+        }
+
+        .customer-profile-page .form-control.is-valid {
+            border-color: var(--success);
+        }
+
+        /* ---------- Submit Button ---------- */
+        .customer-profile-page .submit-section {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 10px;
+        }
+
+        .customer-profile-page .submit-btn {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            justify-content: center;
+            min-height: 52px;
+            padding: 0 34px;
+            border: 0;
+            border-radius: var(--radius-pill);
+            color: #ffffff;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            box-shadow: 0 10px 22px rgba(37, 84, 216, 0.24);
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.1px;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
-        
-        .submit-btn:hover {
+
+        .customer-profile-page .submit-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3);
+            box-shadow: 0 14px 28px rgba(37, 84, 216, 0.32);
         }
-        
-        .submit-btn:active {
+
+        .customer-profile-page .submit-btn:active {
             transform: translateY(0);
         }
-        
-        /* Select Dropdown Styling */
-        select.form-control {
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%2364748b' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
-            background-position: right 1rem center;
-            background-repeat: no-repeat;
-            background-size: 1.25rem;
-        }
-        
-        /* Responsive Adjustments */
-        @media (max-width: 991.98px) {
-            .card-body {
-                padding: 1.5rem;
-            }
-            
-            .breadcrumb-title {
-                font-size: 1.5rem;
-            }
-        }
-        
-        @media (max-width: 768px) {
-            .change-avatar {
-                flex-direction: column;
-                align-items: center;
-                text-align: center;
-            }
-            
-            .upload-img {
-                width: 100%;
-            }
-            
-            .change-photo-btn {
-                width: 100%;
-                text-align: center;
-            }
-            
-            .submit-section {
-                text-align: center;
-            }
-            
-            .submit-btn {
-                width: 100%;
-                justify-content: center;
-            }
-            
-            .form-row > [class*="col-"] {
-                padding-right: 10px;
-                padding-left: 10px;
-            }
-        }
-        
-        /* Animation */
-        @keyframes fadeInUp {
+
+        /* ---------- Animation ---------- */
+        @keyframes profileFadeIn {
             from {
                 opacity: 0;
-                transform: translateY(20px);
+                transform: translateY(18px);
             }
             to {
                 opacity: 1;
                 transform: translateY(0);
             }
         }
-        
-        .card {
-            animation: fadeInUp 0.4s ease-out;
+
+        /* ---------- Responsive ---------- */
+        @media (max-width: 1199.98px) {
+            .customer-profile-page .card-body {
+                padding: 32px 28px;
+            }
         }
-        
-        /* Input number spinner removal */
-        input[type="number"]::-webkit-inner-spin-button,
-        input[type="number"]::-webkit-outer-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
+
+        @media (max-width: 991.98px) {
+            .customer-profile-page {
+                padding: 30px 0;
+            }
+
+            .customer-profile-page .profile-settings-card {
+                border-radius: 22px;
+            }
+
+            .breadcrumb-title {
+                font-size: 24px;
+            }
         }
-        
-        /* Placeholder styling */
-        .form-control::placeholder {
-            color: #94a3b8;
-            opacity: 1;
+
+        @media (max-width: 767.98px) {
+            .customer-profile-page .card-body {
+                padding: 26px 20px;
+            }
+
+            .customer-profile-page .change-avatar {
+                flex-direction: column;
+                align-items: center;
+                gap: 18px;
+                text-align: center;
+            }
+
+            .customer-profile-page .upload-img {
+                width: 100%;
+                align-items: center;
+            }
+
+            .customer-profile-page .change-photo-btn {
+                width: 100%;
+                max-width: 280px;
+            }
+
+            .customer-profile-page .form-group {
+                margin-bottom: 20px;
+            }
+
+            .customer-profile-page .submit-section {
+                justify-content: center;
+            }
+
+            .customer-profile-page .submit-btn {
+                width: 100%;
+            }
         }
-        
-        /* Disabled input styling */
-        .form-control:disabled,
-        .form-control[readonly] {
-            background-color: #f1f5f9;
-            opacity: 0.8;
-        }
-        
-        /* Success/Error border colors */
-        .form-control.is-invalid {
-            border-color: #dc2626;
-        }
-        
-        .form-control.is-valid {
-            border-color: #10b981;
+
+        @media (max-width: 575.98px) {
+            .customer-profile-page {
+                padding: 20px 0;
+            }
+
+            .customer-profile-page .profile-img {
+                width: 108px;
+                height: 108px;
+                flex-basis: 108px;
+            }
+
+            .customer-profile-page .form-control,
+            .customer-profile-page .form-group input:not([type="file"]),
+            .customer-profile-page .form-group select,
+            .customer-profile-page .form-group textarea {
+                min-height: 54px;
+                padding: 13px 16px;
+                font-size: 15px;
+            }
         }
     </style>
 
@@ -361,21 +485,21 @@
     /Breadcrumb -->
 
     <!-- Page Content -->
-    <div class="content">
+    <div class="content customer-profile-page">
         <div class="container-fluid">
             <div class="row">
 
                 {% include 'includes/c_sidebar.html' %}
 
                 <div class="col-md-7 col-lg-8 col-xl-9">
-                    <div class="card">
+                    <div class="card profile-settings-card">
                         <div class="card-body">
 
                             <!-- Profile Settings Form -->
-                            <form action="{% url 'cprofile' %}" method="POST" enctype="multipart/form-data">
+                            <form action="{% url 'cprofile' %}" method="POST" enctype="multipart/form-data" id="customerProfileForm">
                                 {% csrf_token %}
                                 <div class="row form-row">
-                                    <div class="col-12 col-md-12">
+                                    <div class="col-12 avatar-block">
                                         <div class="form-group">
                                             <div class="change-avatar">
                                                 <div class="profile-img">
@@ -383,62 +507,76 @@
                                                 </div>
                                                 <div class="upload-img">
                                                     <div class="change-photo-btn">
-                                                        <label for="id_profile_picture" style="cursor: pointer; margin-bottom: 0; display: inline-block; width: 100%;">
+                                                        <label for="id_profile_picture">
                                                             <span><i class="fa fa-upload"></i> Upload Photo</span>
                                                         </label>
-                                                        <!-- Hidden original input -->
-                                                        {{profile_form.profile_picture}}
+                                                        {{ profile_form.profile_picture }}
                                                     </div>
                                                     <small class="form-text text-muted">Allowed JPG, GIF or PNG. Max size of 2MB</small>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
+
                                     <div class="col-12 col-md-6">
                                         <div class="form-group">
                                             <label>First Name</label>
-                                            <input type="text" class="form-control" name="first_name" id="id_first_name" {% if user_form.first_name.value %} value="{{ user_form.first_name.value }}" {% else%}value="" {% endif %}>
+                                            <input type="text" class="form-control" name="first_name" id="id_first_name" {% if user_form.first_name.value %} value="{{ user_form.first_name.value }}" {% else %} value="" {% endif %}>
                                             {% if user_form.first_name.errors %}
                                                 <div class="error">{{ user_form.first_name.errors.as_text }}</div>
                                             {% endif %}
                                         </div>
                                     </div>
+
                                     <div class="col-12 col-md-6">
                                         <div class="form-group">
                                             <label>Last Name</label>
-                                            <input type="text" class="form-control" name="last_name" id="id_last_name" {% if user_form.last_name.value %} value="{{ user_form.last_name.value }}" {% else%}value="" {% endif %}>
+                                            <input type="text" class="form-control" name="last_name" id="id_last_name" {% if user_form.last_name.value %} value="{{ user_form.last_name.value }}" {% else %} value="" {% endif %}>
                                             {% if user_form.last_name.errors %}
                                                 <div class="error">{{ user_form.last_name.errors.as_text }}</div>
                                             {% endif %}
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
+
+                                    <div class="col-12 col-md-6">
                                         <div class="form-group">
                                             <label>Username <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control" name="username" id="id_username" {% if user_form.username.value %} value="{{ user_form.username.value }}" {% else%}value="" {% endif %} readonly>
+                                            <input type="text" class="form-control" name="username" id="id_username" {% if user_form.username.value %} value="{{ user_form.username.value }}" {% else %} value="" {% endif %} readonly>
                                             {% if user_form.username.errors %}
                                                 <div class="error">{{ user_form.username.errors.as_text }}</div>
                                             {% endif %}
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
+
+                                    <div class="col-12 col-md-6">
                                         <div class="form-group">
                                             <label>Email <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control" name="email" id="id_email" {% if user_form.email.value %} value="{{ user_form.email.value }}" {% else%}value="" {% endif %} readonly>
+                                            <input type="text" class="form-control" name="email" id="id_email" {% if user_form.email.value %} value="{{ user_form.email.value }}" {% else %} value="" {% endif %} readonly>
                                             {% if user_form.email.errors %}
                                                 <div class="error">{{ user_form.email.errors.as_text }}</div>
                                             {% endif %}
                                         </div>
                                     </div>
+
                                     <div class="col-12 col-md-6">
                                         <div class="form-group">
                                             <label>Date of Birth</label>
-                                            <input type="date" name="date_of_birth" value="{{ profile_form.instance.date_of_birth|date:'Y-m-d' }}" class="form-control" id="id_date_of_birth">
+                                            <input
+                                                type="date"
+                                                name="date_of_birth"
+                                                value="{{ profile_form.instance.date_of_birth|date:'Y-m-d' }}"
+                                                class="form-control"
+                                                id="id_date_of_birth"
+                                            >
+                                            <div class="error" id="dobFutureError" style="display: none;">
+                                                Date of Birth cannot be in the future.
+                                            </div>
                                             {% if profile_form.date_of_birth.errors %}
                                                 <div class="error">{{ profile_form.date_of_birth.errors.as_text }}</div>
                                             {% endif %}
                                         </div>
                                     </div>
+
                                     <div class="col-12 col-md-6">
                                         <div class="form-group">
                                             <label>Blood Group</label>
@@ -457,15 +595,17 @@
                                             {% endif %}
                                         </div>
                                     </div>
+
                                     <div class="col-12">
                                         <div class="form-group">
                                             <label>Phone</label>
-                                            <input type="tel" pattern="[0-9]{10}" class="form-control" name="phone_number" id="id_phone_number" {% if user_form.phone_number.value %} value="{{ user_form.phone_number.value }}" {% else%}value="" {% endif %}>
+                                            <input type="tel" pattern="[0-9]{10}" class="form-control" name="phone_number" id="id_phone_number" {% if user_form.phone_number.value %} value="{{ user_form.phone_number.value }}" {% else %} value="" {% endif %}>
                                             {% if user_form.phone_number.errors %}
                                                 <div class="error">{{ user_form.phone_number.errors.as_text }}</div>
                                             {% endif %}
                                         </div>
                                     </div>
+
                                     <div class="col-12">
                                         <div class="form-group">
                                             <label>Address</label>
@@ -475,43 +615,48 @@
                                             {% endif %}
                                         </div>
                                     </div>
+
                                     <div class="col-12 col-md-6">
                                         <div class="form-group">
                                             <label>City</label>
-                                            <input type="text" class="form-control" name="city" id="id_city" {% if profile_form.city.value %} value="{{ profile_form.city.value }}" {% else%}value="" {% endif %}>
+                                            <input type="text" class="form-control" name="city" id="id_city" {% if profile_form.city.value %} value="{{ profile_form.city.value }}" {% else %} value="" {% endif %}>
                                             {% if profile_form.city.errors %}
                                                 <div class="error">{{ profile_form.city.errors.as_text }}</div>
                                             {% endif %}
                                         </div>
                                     </div>
+
                                     <div class="col-12 col-md-6">
                                         <div class="form-group">
                                             <label>State</label>
-                                            <input type="text" class="form-control" name="state" id="id_state" {% if profile_form.state.value %} value="{{ profile_form.state.value }}" {% else%}value="" {% endif %}>
+                                            <input type="text" class="form-control" name="state" id="id_state" {% if profile_form.state.value %} value="{{ profile_form.state.value }}" {% else %} value="" {% endif %}>
                                             {% if profile_form.state.errors %}
                                                 <div class="error">{{ profile_form.state.errors.as_text }}</div>
                                             {% endif %}
                                         </div>
                                     </div>
+
                                     <div class="col-12 col-md-6">
                                         <div class="form-group">
                                             <label>Zip Code</label>
-                                            <input type="text" class="form-control" name="pin_code" id="id_pin_code" {% if profile_form.pin_code.value %} value="{{ profile_form.pin_code.value }}" {% else%}value="" {% endif %}>
+                                            <input type="text" class="form-control" name="pin_code" id="id_pin_code" {% if profile_form.pin_code.value %} value="{{ profile_form.pin_code.value }}" {% else %} value="" {% endif %}>
                                             {% if profile_form.pin_code.errors %}
                                                 <div class="error">{{ profile_form.pin_code.errors.as_text }}</div>
                                             {% endif %}
                                         </div>
                                     </div>
+
                                     <div class="col-12 col-md-6">
                                         <div class="form-group">
                                             <label>Country</label>
-                                            <input type="text" class="form-control" name="country" id="id_country" {% if profile_form.country.value %} value="{{ profile_form.country.value }}" {% else%}value="" {% endif %}>
+                                            <input type="text" class="form-control" name="country" id="id_country" {% if profile_form.country.value %} value="{{ profile_form.country.value }}" {% else %} value="" {% endif %}>
                                             {% if profile_form.country.errors %}
                                                 <div class="error">{{ profile_form.country.errors.as_text }}</div>
                                             {% endif %}
                                         </div>
                                     </div>
                                 </div>
+
                                 <div class="submit-section">
                                     <button type="submit" class="btn btn-primary submit-btn">Save Changes</button>
                                 </div>
@@ -526,58 +671,78 @@
     </div>
     <!-- /Page Content -->
 
-    <style>
-        /* This specific selector ensures ONLY the profile picture input is affected */
-        .upload-img input[name="profile_picture"] {
-            position: absolute !important;
-            width: 1px !important;
-            height: 1px !important;
-            padding: 0 !important;
-            margin: -1px !important;
-            overflow: hidden !important;
-            clip: rect(0, 0, 0, 0) !important;
-            border: 0 !important;
-        }
-    </style>
-
     <script>
-        document.getElementById('id_address').removeAttribute('disabled');
-        document.getElementById('id_address').classList.remove('pac-target-input', 'gm-err-autocomplete');
-        document.getElementById('id_address').style.backgroundImage = 'none';
-        
-        document.addEventListener('DOMContentLoaded', function() {
-            // Get the actual Django form field
+        document.addEventListener('DOMContentLoaded', function () {
+            const profileForm = document.getElementById('customerProfileForm');
+            const addressInput = document.getElementById('id_address');
             const djangoFileInput = document.getElementById('id_profile_picture');
-            const uploadButton = document.querySelector('.change-photo-btn span');
+            const uploadButtonText = document.querySelector('.change-photo-btn span');
             const profileImage = document.getElementById('profilePicture');
-            
-            // Store original button text
-            const originalButtonText = uploadButton.innerHTML;
-            
-            // When upload button is clicked, trigger Django file input
-            if (uploadButton) {
-                uploadButton.addEventListener('click', function() {
-                    djangoFileInput.click();
+            const dobInput = document.getElementById('id_date_of_birth');
+            const dobFutureError = document.getElementById('dobFutureError');
+
+            if (addressInput) {
+                addressInput.removeAttribute('disabled');
+                addressInput.classList.remove('pac-target-input', 'gm-err-autocomplete');
+                addressInput.style.backgroundImage = 'none';
+            }
+
+            if (dobInput) {
+                const today = new Date().toISOString().split('T')[0];
+
+                dobInput.setAttribute('max', today);
+
+                function validateDob() {
+                    if (dobInput.value && dobInput.value > today) {
+                        dobInput.value = '';
+                        dobInput.classList.add('is-invalid');
+
+                        if (dobFutureError) {
+                            dobFutureError.style.display = 'block';
+                        }
+
+                        return false;
+                    }
+
+                    dobInput.classList.remove('is-invalid');
+
+                    if (dobFutureError) {
+                        dobFutureError.style.display = 'none';
+                    }
+
+                    return true;
+                }
+
+                dobInput.addEventListener('change', validateDob);
+                dobInput.addEventListener('input', validateDob);
+
+                if (profileForm) {
+                    profileForm.addEventListener('submit', function (event) {
+                        if (!validateDob()) {
+                            event.preventDefault();
+                            dobInput.focus();
+                        }
+                    });
+                }
+            }
+
+            if (djangoFileInput && uploadButtonText && profileImage) {
+                const originalButtonText = uploadButtonText.innerHTML;
+
+                djangoFileInput.addEventListener('change', function () {
+                    if (this.files && this.files[0]) {
+                        uploadButtonText.innerHTML = '<i class="fa fa-upload"></i> ' + this.files[0].name;
+
+                        const reader = new FileReader();
+                        reader.onload = function (e) {
+                            profileImage.src = e.target.result;
+                        };
+                        reader.readAsDataURL(this.files[0]);
+                    } else {
+                        uploadButtonText.innerHTML = originalButtonText;
+                    }
                 });
             }
-            
-            // When file is selected
-            djangoFileInput.addEventListener('change', function() {
-                if (this.files && this.files[0]) {
-                    // Show filename but keep the icon
-                    uploadButton.innerHTML = '<i class="fa fa-upload"></i> ' + this.files[0].name;
-                    
-                    // Preview image
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        profileImage.src = e.target.result;
-                    }
-                    reader.readAsDataURL(this.files[0]);
-                } else {
-                    // Reset if no file selected
-                    uploadButton.innerHTML = originalButtonText;
-                }
-            });
         });
     </script>
 

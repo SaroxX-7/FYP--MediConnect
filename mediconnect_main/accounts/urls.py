@@ -23,4 +23,7 @@ urlpatterns = [
     # path('customer/', include('customers.urls')),
     # path('doctor/', include('doctor.urls')),
     path('settings/security/update-password/', views.change_password_view, name='update_password'),
+    path('verify-email/<uidb64>/', views.verify_email_code, name='verify_email_code'),
+    path('resend-verification-code/<uidb64>/', views.resend_verification_code, name='resend_verification_code'),
+    path('verify-forgot-password-code/<uidb64>/', views.verify_forgot_password_code, name='verify_forgot_password_code'),
 ]

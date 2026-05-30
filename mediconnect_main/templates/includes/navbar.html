@@ -536,6 +536,37 @@
         .logged-item.show .dropdown-toggle::after {
             transform: rotate(180deg);
         }
+        /* Pharmacist simple name display */
+.pharmacist-name-item {
+    display: flex;
+    align-items: center;
+}
+
+.pharmacist-name-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0.55rem 1rem;
+    border-radius: 999px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    color: #2563eb;
+    font-size: 0.92rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.pharmacist-name-pill i {
+    color: #00c2a8;
+    font-size: 0.95rem;
+}
+
+@media (max-width: 768px) {
+    .pharmacist-name-pill {
+        padding: 0.45rem 0.75rem;
+        font-size: 0.8rem;
+    }
+}
         
         /* Ensure no overlap with content */
         .content-wrapper {
@@ -614,11 +645,26 @@
                     </div>
                 </li>
 
-                {% if user.is_authenticated %}
+                {% if user.is_authenticated  %}
                 <li class="nav-item">
                     <a class="nav-link header-login" href="{% url 'logout' %}">Logout</a>
                 </li>
 
+                {% if request.user.role == 3 %}
+<li class="nav-item pharmacist-name-item">
+    <span class="pharmacist-name-pill">
+        <i class="fas fa-user-md"></i>
+
+        {% if request.user.first_name or request.user.last_name %}
+            {{ request.user.first_name }} {{ request.user.last_name }}
+        {% else %}
+            {{ request.user.username }}
+        {% endif %}
+    </span>
+</li>
+{% endif %}
+
+                {% if user.role != 3 %}
                 <li class="nav-right dropdown has-arrow logged-item" id="userDropdown">
                     <a href="javascript:void(0);" class="dropdown-toggle nav-link" data-toggle="dropdown" id="dropdownToggle">
                         <span class="user-img">
@@ -663,6 +709,8 @@
     <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
 </div>
                 </li>
+                {% endif %}
+                
                 {% else %}
                 <li class="nav-item">
                     <a class="nav-link header-login" href="{% url 'login' %}">Login / Signup</a>
