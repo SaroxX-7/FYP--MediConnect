@@ -1,7 +1,6 @@
 {% load static %}
 
 <style>
-
 .footer {
     background: linear-gradient(135deg, #0f2b3d 0%, #1a4a6f 100%);
     position: relative;
@@ -61,13 +60,37 @@
     max-width: 520px;
 }
 
+/* Footer Logo */
 .footer-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    text-decoration: none;
+}
+
+.footer-logo-img {
+    width: 52px;
+    height: 52px;
+    object-fit: contain;
+    display: block;
+}
+
+.footer-logo-text {
     font-size: 2rem;
     font-weight: 800;
     color: #ffffff;
-    margin-bottom: 20px;
     letter-spacing: -0.5px;
     line-height: 1.2;
+    transition: color 0.25s ease;
+}
+
+.footer-logo:hover {
+    text-decoration: none;
+}
+
+.footer-logo:hover .footer-logo-text {
+    color: #60a5fa;
 }
 
 .footer-about-content p {
@@ -283,9 +306,17 @@
     opacity: 0;
 }
 
-.footer-widget:nth-child(1) { animation-delay: 0.1s; }
-.footer-widget:nth-child(2) { animation-delay: 0.2s; }
-.footer-widget:nth-child(3) { animation-delay: 0.3s; }
+.footer-widget:nth-child(1) { 
+    animation-delay: 0.1s; 
+}
+
+.footer-widget:nth-child(2) { 
+    animation-delay: 0.2s; 
+}
+
+.footer-widget:nth-child(3) { 
+    animation-delay: 0.3s; 
+}
 
 .footer-widget:hover {
     transform: translateY(-3px);
@@ -308,8 +339,13 @@
         max-width: 100%;
     }
 
-    .footer-logo {
+    .footer-logo-text {
         font-size: 1.8rem;
+    }
+
+    .footer-logo-img {
+        width: 48px;
+        height: 48px;
     }
 
     .footer-title {
@@ -328,8 +364,13 @@
         padding: 0 18px;
     }
 
-    .footer-logo {
+    .footer-logo-text {
         font-size: 1.6rem;
+    }
+
+    .footer-logo-img {
+        width: 44px;
+        height: 44px;
     }
 
     .footer-about-content p {
@@ -354,6 +395,19 @@
         padding: 0 16px;
     }
 
+    .footer-logo {
+        gap: 10px;
+    }
+
+    .footer-logo-text {
+        font-size: 1.45rem;
+    }
+
+    .footer-logo-img {
+        width: 40px;
+        height: 40px;
+    }
+
     .social-icon ul {
         justify-content: flex-start;
     }
@@ -369,13 +423,17 @@
     }
 }
 </style>
+
 <footer class="footer">
     <div class="footer-top">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-lg-7 col-md-12">
                     <div class="footer-widget footer-about-content">
-                        <div class="footer-logo">MediConnect</div>
+                        <a href="/" class="footer-logo">
+                            <img src="{% static 'img/mediconnect-logo.png' %}" alt="MediConnect Logo" class="main-logo-img">
+</a>
+
                         <p>
                             Simply select the type of consultation you need, choose a convenient time,
                             and book your appointment with just a few clicks.
